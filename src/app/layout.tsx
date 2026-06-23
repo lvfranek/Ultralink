@@ -1,5 +1,14 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import {
+  Inter,
+  Playfair_Display,
+  Poppins,
+  Montserrat,
+  Space_Grotesk,
+  DM_Sans,
+  Cormorant,
+  Bebas_Neue,
+} from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -13,6 +22,45 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
   display: "swap",
   weight: ["400", "500", "600", "700", "800", "900"],
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  variable: "--font-poppins",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+
+const cormorant = Cormorant({
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
+const bebasNeue = Bebas_Neue({
+  subsets: ["latin"],
+  variable: "--font-bebas",
+  display: "swap",
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -42,7 +90,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${playfair.variable} h-full`}
+      className={[
+        inter.variable,
+        playfair.variable,
+        poppins.variable,
+        montserrat.variable,
+        spaceGrotesk.variable,
+        dmSans.variable,
+        cormorant.variable,
+        bebasNeue.variable,
+        "h-full",
+      ].join(" ")}
       suppressHydrationWarning
     >
       <body className="min-h-dvh antialiased">{children}</body>

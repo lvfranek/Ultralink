@@ -75,6 +75,7 @@ export default async function BioPage({ params }: Props) {
         page={typedPage}
         links={activeLinks}
         socials={socials}
+        theme={typedPage.theme as Record<string, unknown>}
       />
 
       {/* Footer */}

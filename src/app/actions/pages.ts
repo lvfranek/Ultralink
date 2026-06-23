@@ -84,6 +84,16 @@ export async function updatePage(
   const active_badge = formData.get("active_badge") === "true";
   const age_gate_enabled = formData.get("age_gate_enabled") === "true";
 
+  const themeStr = formData.get("theme") as string | null;
+  let theme: Record<string, unknown> | undefined;
+  if (themeStr) {
+    try {
+      theme = JSON.parse(themeStr);
+    } catch {
+      return { error: "Invalid theme data." };
+    }
+  }
+
   const slugError = validateSlug(slug);
   if (slugError) return { error: slugError };
   if (!title) return { error: "Title is required." };
@@ -122,6 +132,7 @@ export async function updatePage(
       updated_at: new Date().toISOString(),
       ...(avatar_url !== undefined ? { avatar_url } : {}),
       ...(avatar_style !== undefined ? { avatar_style } : {}),
+      ...(theme !== undefined ? { theme } : {}),
     })
     .eq("id", id)
     .eq("owner_id", user.id);

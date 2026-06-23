@@ -6,13 +6,15 @@ import { updatePage } from "@/app/actions/pages";
 import { sanitizeSlug, validateSlug } from "@/lib/slug";
 import { checkSlugAvailable } from "@/app/actions/pages";
 import { ProfileTab } from "./profile-tab";
+import { DesignTab } from "./design-tab";
 import { LinksTab } from "./links-tab";
 import { SocialsTab } from "./socials-tab";
 import { AdvancedTab } from "./advanced-tab";
 import { LivePreview } from "./live-preview";
 import type { Page, PageLink, PageSocial, Plan } from "@/lib/supabase/types";
+import { type Theme, resolveTheme } from "@/lib/config/theme";
 
-type Tab = "profile" | "links" | "socials" | "advanced";
+type Tab = "profile" | "design" | "links" | "socials" | "advanced";
 
 interface PageBuilderProps {
   page: Page;
@@ -47,6 +49,8 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
     age_gate_enabled: page.age_gate_enabled,
   });
 
+  const [theme, setTheme] = useState<Theme>(() => resolveTheme(page.theme as Record<string, unknown>));
+
   const [isDirty, setIsDirty] = useState(false);
   const [slugError, setSlugError] = useState<string | null>(null);
   const [slugOk, setSlugOk] = useState(true);
@@ -54,6 +58,8 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
   const [copied, setCopied] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_isPending, startTransition] = useTransition();
 
   const boundUpdatePage = updatePage.bind(null, page.id);
   const [state, formAction, pending] = useActionState(boundUpdatePage, null);
@@ -98,6 +104,11 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
     setIsDirty(true);
   }, []);
 
+  const handleThemeChange = useCallback((newTheme: Theme) => {
+    setTheme(newTheme);
+    setIsDirty(true);
+  }, []);
+
   const canSave = !slugError && slugOk && (local.title?.trim().length ?? 0) > 0;
 
   const publicUrl = `${siteUrl}/${local.slug || page.slug}`;
@@ -113,9 +124,10 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
   }
 
   const TABS: { id: Tab; label: string }[] = [
-    { id: "profile", label: "Profile" },
-    { id: "links", label: "Links" },
-    { id: "socials", label: "Socials" },
+    { id: "profile",  label: "Profile" },
+    { id: "design",   label: "Design" },
+    { id: "links",    label: "Links" },
+    { id: "socials",  label: "Socials" },
     { id: "advanced", label: "Advanced" },
   ];
 
@@ -197,6 +209,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
               <input type="hidden" name="avatar_style" value={local.avatar_style ?? "circle"} />
               <input type="hidden" name="active_badge" value={String(local.active_badge ?? false)} />
               <input type="hidden" name="age_gate_enabled" value={String(local.age_gate_enabled)} />
+              <input type="hidden" name="theme" value={JSON.stringify(theme)} />
               <button
                 type="submit"
                 disabled={!canSave || pending}
@@ -222,15 +235,15 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
         {/* Left pane: tabs */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Tab bar */}
-          <div className="flex-shrink-0 border-b border-border px-4 sm:px-6">
-            <div className="flex gap-1 -mb-px">
+          <div className="flex-shrink-0 border-b border-border px-4 sm:px-6 overflow-x-auto">
+            <div className="flex gap-1 -mb-px min-w-max">
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
                   className={[
-                    "px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer",
+                    "px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer whitespace-nowrap",
                     activeTab === tab.id
                       ? "border-gold text-gold"
                       : "border-transparent text-text-muted hover:text-text hover:border-border-strong",
@@ -258,7 +271,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
           {/* Mobile preview drawer */}
           {showPreview && (
             <div className="lg:hidden border-b border-border p-6 flex justify-center bg-surface">
-              <LivePreview page={previewPage} links={activeLinks} socials={socials} />
+              <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} />
             </div>
           )}
 
@@ -311,6 +324,13 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
                 onChange={(patch) => handleLocalChange(patch as Partial<LocalPageState>)}
               />
             )}
+            {activeTab === "design" && (
+              <DesignTab
+                theme={theme}
+                userId={userId}
+                onChange={handleThemeChange}
+              />
+            )}
             {activeTab === "links" && (
               <LinksTab
                 pageId={page.id}
@@ -337,7 +357,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
 
         {/* Right pane: live preview (desktop only) */}
         <div className="hidden lg:flex flex-col items-center justify-start gap-6 w-80 flex-shrink-0 border-l border-border bg-surface p-8 overflow-y-auto">
-          <LivePreview page={previewPage} links={activeLinks} socials={socials} />
+          <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} />
         </div>
       </div>
     </div>

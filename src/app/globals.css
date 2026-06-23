@@ -91,3 +91,28 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-subtle);
 }
+
+/* Theme animations — applied to link buttons, respects reduced-motion */
+@keyframes theme-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-4px); }
+}
+@keyframes theme-shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-3px); }
+  75%      { transform: translateX(3px); }
+}
+@keyframes theme-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.82; transform: scale(0.982); }
+}
+
+.theme-anim-bounce:hover { animation: theme-bounce 0.45s ease; }
+.theme-anim-shake:hover  { animation: theme-shake  0.40s ease; }
+.theme-anim-pulse:hover  { animation: theme-pulse  0.50s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-anim-bounce:hover,
+  .theme-anim-shake:hover,
+  .theme-anim-pulse:hover { animation: none; }
+}
