@@ -65,7 +65,7 @@ export const FREE_PLAN: FreePlan = {
     { text: "Remove Ultralink badge", included: false },
     { text: "Geo-blocking", included: false },
     { text: "Team members", included: false },
-    { text: "Traffic Recovery", included: false },
+    { text: "Win-Back", included: false },
   ],
 };
 
@@ -86,7 +86,7 @@ export const CREATOR_PLAN: CreatorPlan = {
     { text: "Remove Ultralink badge", included: true },
     { text: "Geo-blocking", included: true },
     { text: "Team members", included: false },
-    { text: "Traffic Recovery", included: false },
+    { text: "Win-Back", included: false },
   ],
 };
 
@@ -111,7 +111,7 @@ export const AGENCY_PLAN: AgencyPlan = {
     { text: "Remove Ultralink badge", included: true },
     { text: "Geo-blocking", included: true },
     { text: "Unlimited team members", included: true },
-    { text: "Traffic Recovery", included: true },
+    { text: "Win-Back", included: true },
   ],
 };
 

@@ -21,7 +21,7 @@ const STEPS = [
   },
   {
     number: "03",
-    label: "Traffic Recovery",
+    label: "Win-Back",
     description: "A clean, opt-in prompt offers them a second destination — a different offer, product, or channel — before they go.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
@@ -46,7 +46,7 @@ export function TrafficRecovery() {
   return (
     <section
       className="py-24 sm:py-32 px-4 sm:px-6"
-      aria-labelledby="traffic-recovery-heading"
+      aria-labelledby="win-back-heading"
     >
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
@@ -56,7 +56,7 @@ export function TrafficRecovery() {
               Agency exclusive
             </div>
             <h2
-              id="traffic-recovery-heading"
+              id="win-back-heading"
               className="font-display text-4xl sm:text-5xl font-bold text-text"
               style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
             >
@@ -64,7 +64,7 @@ export function TrafficRecovery() {
             </h2>
           </div>
           <p className="text-text-muted max-w-sm text-base leading-relaxed lg:text-right">
-            Most visitors who leave are gone forever. Traffic Recovery gives you a
+            Most visitors who leave are gone forever. Win-Back gives you a
             second chance to capture them — legitimately, without dark patterns.
           </p>
         </div>

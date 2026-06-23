@@ -1,4 +1,5 @@
 export type Plan = "free" | "creator" | "agency";
+export type AvatarStyle = "circle" | "hero";
 
 export interface Profile {
   id: string;
@@ -14,6 +15,8 @@ export interface Page {
   title: string;
   bio: string | null;
   avatar_url: string | null;
+  avatar_style: AvatarStyle;
+  active_badge: boolean;
   template: string;
   theme: Record<string, unknown>;
   age_gate_enabled: boolean;
@@ -30,9 +33,26 @@ export interface PageLink {
   position: number;
   layout: string;
   is_active: boolean;
+  icon: string | null;
+  thumbnail_url: string | null;
+  is_adult: boolean;
+  created_at: string;
+}
+
+export interface PageSocial {
+  id: string;
+  page_id: string;
+  platform: string;
+  url: string;
+  position: number;
   created_at: string;
 }
 
 export interface PageWithLinks extends Page {
   page_links: PageLink[];
+}
+
+export interface PageWithData extends Page {
+  page_links: PageLink[];
+  page_socials: PageSocial[];
 }

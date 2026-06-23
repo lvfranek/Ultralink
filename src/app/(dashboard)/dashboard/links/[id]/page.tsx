@@ -2,11 +2,13 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { siteConfig } from "@/lib/config/site";
-import { EditPageForm } from "@/components/dashboard/edit-page-form";
-import type { Page } from "@/lib/supabase/types";
+import { PageBuilder } from "@/components/dashboard/page-builder/page-builder";
+import type { Page, PageLink, PageSocial, Plan } from "@/lib/supabase/types";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Edit link — Dashboard",
+  title: "Edit page — Dashboard",
   robots: { index: false, follow: false },
 };
 
@@ -24,24 +26,38 @@ export default async function EditLinkPage({
 
   if (!user) redirect("/login");
 
-  const { data: page } = await supabase
-    .from("pages")
-    .select("*")
-    .eq("id", id)
-    .eq("owner_id", user.id)
-    .single();
+  const [pageResult, linksResult, socialsResult, profileResult] = await Promise.all([
+    supabase.from("pages").select("*").eq("id", id).eq("owner_id", user.id).single(),
+    supabase
+      .from("page_links")
+      .select("*")
+      .eq("page_id", id)
+      .order("position", { ascending: true }),
+    supabase
+      .from("page_socials")
+      .select("*")
+      .eq("page_id", id)
+      .order("position", { ascending: true }),
+    supabase.from("profiles").select("plan").eq("id", user.id).single(),
+  ]);
 
-  if (!page) notFound();
+  if (!pageResult.data) notFound();
+
+  const page = pageResult.data as Page;
+  const links = (linksResult.data ?? []) as PageLink[];
+  const socials = (socialsResult.data ?? []) as PageSocial[];
+  const plan = (profileResult.data?.plan ?? "free") as Plan;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-text">Edit link</h1>
-        <p className="text-sm text-text-muted mt-1">
-          Update your page settings. The link editor (templates, link buttons) is coming soon.
-        </p>
-      </div>
-      <EditPageForm page={page as Page} siteUrl={siteConfig.url} />
+    <div className="flex flex-col h-screen lg:h-dvh">
+      <PageBuilder
+        page={page}
+        initialLinks={links}
+        initialSocials={socials}
+        plan={plan}
+        userId={user.id}
+        siteUrl={siteConfig.url}
+      />
     </div>
   );
 }

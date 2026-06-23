@@ -79,10 +79,18 @@ export async function updatePage(
   const title = ((formData.get("title") as string) ?? "").trim();
   const bio = ((formData.get("bio") as string) ?? "").trim();
   const is_active = formData.get("is_active") === "true";
+  const avatar_url = (formData.get("avatar_url") as string | null) ?? undefined;
+  const avatar_style = (formData.get("avatar_style") as string | null) ?? undefined;
+  const active_badge = formData.get("active_badge") === "true";
+  const age_gate_enabled = formData.get("age_gate_enabled") === "true";
 
   const slugError = validateSlug(slug);
   if (slugError) return { error: slugError };
   if (!title) return { error: "Title is required." };
+
+  if (avatar_style && avatar_style !== "circle" && avatar_style !== "hero") {
+    return { error: "Invalid avatar style." };
+  }
 
   const { data: existing } = await supabase
     .from("pages")
@@ -104,7 +112,17 @@ export async function updatePage(
 
   const { error } = await supabase
     .from("pages")
-    .update({ slug, title, bio, is_active, updated_at: new Date().toISOString() })
+    .update({
+      slug,
+      title,
+      bio,
+      is_active,
+      age_gate_enabled,
+      active_badge,
+      updated_at: new Date().toISOString(),
+      ...(avatar_url !== undefined ? { avatar_url } : {}),
+      ...(avatar_style !== undefined ? { avatar_style } : {}),
+    })
     .eq("id", id)
     .eq("owner_id", user.id);
 

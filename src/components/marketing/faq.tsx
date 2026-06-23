@@ -24,9 +24,9 @@ const FAQS = [
       "No — and this is something we take seriously. Many link-in-bio tools use 'link cloaking,' which means they show Instagram or TikTok's crawlers a different URL than what your real visitors see. This is a direct violation of those platforms' terms of service, and it gets accounts permanently banned when detected. Ultralink explicitly does not cloak. Our redirects are fully honest: crawlers and users always see the same destination. Your account is safe.",
   },
   {
-    question: "What is Traffic Recovery?",
+    question: "What is Win-Back?",
     answer:
-      "Traffic Recovery is an Agency-exclusive feature that gives you a second chance to convert visitors who start to leave your link page. When a visitor attempts to navigate away, they're shown a clean, non-intrusive prompt offering them an alternative destination — a different offer, a different product, or another channel. It recovers traffic that would otherwise be completely lost, without dark patterns or manipulation.",
+      "Win-Back is an Agency-exclusive feature that gives you a second chance to convert visitors who start to leave your link page. When a visitor attempts to navigate away, they're shown a clean, non-intrusive prompt offering them an alternative destination — a different offer, a different product, or another channel. It recovers traffic that would otherwise be completely lost, without dark patterns or manipulation.",
   },
   {
     question: "Can my team manage our link pages?",
