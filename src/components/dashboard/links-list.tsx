@@ -14,7 +14,7 @@ function StatusDot({ active }: { active: boolean }) {
   return (
     <span
       className={`inline-block w-2 h-2 rounded-full shrink-0 ${
-        active ? "bg-emerald-400" : "bg-text-subtle"
+        active ? "bg-emerald-500" : "bg-border-strong"
       }`}
       aria-label={active ? "Active" : "Inactive"}
     />
@@ -50,12 +50,8 @@ function KebabMenu({ page }: { page: Page }) {
 
       {open && (
         <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setOpen(false)}
-            aria-hidden="true"
-          />
-          <div className="absolute right-0 top-full mt-1 z-20 w-36 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} aria-hidden="true" />
+          <div className="absolute right-0 top-full mt-1 z-20 w-36 bg-white border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_4px_20px_rgba(0,0,0,0.10)]">
             <Link
               href={`/dashboard/links/${page.id}`}
               className="flex items-center gap-2 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface transition-colors"
@@ -71,7 +67,7 @@ function KebabMenu({ page }: { page: Page }) {
               <button
                 type="button"
                 onClick={() => setShowConfirm(true)}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-surface transition-colors cursor-pointer"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-surface transition-colors cursor-pointer"
               >
                 <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                   <path d="M2 4h12M5 4V2h6v2M13 4l-1 10H4L3 4" strokeLinecap="round" strokeLinejoin="round" />
@@ -86,7 +82,7 @@ function KebabMenu({ page }: { page: Page }) {
                     type="button"
                     onClick={() => { setOpen(false); setShowConfirm(false); handleDelete(); }}
                     disabled={deleting}
-                    className="flex-1 py-1 text-xs text-red-400 hover:text-red-300 border border-red-800/40 rounded hover:bg-red-950/30 transition-colors cursor-pointer"
+                    className="flex-1 py-1 text-xs text-red-500 hover:text-red-600 border border-red-200 rounded hover:bg-red-50 transition-colors cursor-pointer"
                   >
                     {deleting ? "…" : "Yes"}
                   </button>
@@ -125,13 +121,13 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
     setActive(next);
     startToggle(async () => {
       const result = await togglePageActive(page.id, next);
-      if ("error" in result) setActive(active); // revert on error
+      if ("error" in result) setActive(active);
     });
   };
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0 hover:bg-surface-2/50 transition-colors group first:rounded-t-[var(--radius-lg)] last:rounded-b-[var(--radius-lg)]">
-      {/* Drag handle (non-functional this phase) */}
+    <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0 hover:bg-surface/60 transition-colors group first:rounded-t-[var(--radius-lg)] last:rounded-b-[var(--radius-lg)]">
+      {/* Drag handle */}
       <div className="cursor-grab text-text-subtle opacity-0 group-hover:opacity-40 transition-opacity shrink-0" aria-hidden="true">
         <svg viewBox="0 0 16 16" className="w-4 h-4" fill="currentColor">
           <circle cx="5.5" cy="4.5" r="1" />
@@ -154,11 +150,11 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
           <button
             type="button"
             onClick={handleCopy}
-            className="shrink-0 p-0.5 rounded text-text-subtle hover:text-gold transition-colors cursor-pointer"
+            className="shrink-0 p-0.5 rounded text-text-subtle hover:text-text transition-colors cursor-pointer"
             aria-label="Copy link"
           >
             {copied ? (
-              <svg viewBox="0 0 14 14" className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <svg viewBox="0 0 14 14" className="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path d="M2 7l3.5 3.5L12 3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             ) : (
@@ -181,7 +177,7 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
           onClick={handleToggle}
           disabled={toggling}
           className={[
-            "relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg cursor-pointer disabled:cursor-wait",
+            "relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text focus-visible:ring-offset-2 focus-visible:ring-offset-bg cursor-pointer disabled:cursor-wait",
             active ? "bg-gold" : "bg-surface-2 border border-border-strong",
           ].join(" ")}
         >
@@ -211,7 +207,7 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
       if (sort === "newest") {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
-      return 0; // manual order — drag not implemented this phase
+      return 0;
     });
 
   const activeCount = pages.filter((p) => p.is_active).length;
@@ -230,7 +226,7 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as "manual" | "newest")}
-            className="bg-surface-2 border border-border-strong text-text-muted text-xs rounded-[var(--radius-sm)] px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-gold/50 cursor-pointer"
+            className="bg-surface-2 border border-border-strong text-text-muted text-xs rounded-[var(--radius-sm)] px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-text/20 cursor-pointer"
           >
             <option value="newest">Newest</option>
             <option value="manual">Manual order</option>
@@ -256,7 +252,7 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
           placeholder="Search by slug or title…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-surface border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/40 transition-colors"
+          className="w-full bg-white border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-text/20 focus:border-text/30 transition-colors"
         />
       </div>
 
@@ -266,7 +262,7 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
           {search ? "No links match your search." : ""}
         </p>
       ) : (
-        <div className="bg-surface border border-border rounded-[var(--radius-lg)]">
+        <div className="bg-white border border-border rounded-[var(--radius-lg)] shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
           {filtered.map((page) => (
             <PageRow key={page.id} page={page} siteUrl={siteUrl} />
           ))}

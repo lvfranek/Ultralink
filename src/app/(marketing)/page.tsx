@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <>
+    <div style={{background:'#F6F6F7', minHeight:'100dvh'}}>
       <Header />
       <main>
         <Hero />
@@ -34,6 +34,6 @@ export default function HomePage() {
         <FAQ />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

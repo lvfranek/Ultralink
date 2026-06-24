@@ -30,7 +30,7 @@ function NavItem({
   const cls = [
     "flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius)] text-sm font-medium transition-all duration-150",
     active
-      ? "bg-gold-dim text-gold border border-gold/20"
+      ? "bg-gold text-bg"
       : disabled
       ? "text-text-subtle cursor-not-allowed opacity-60"
       : "text-text-muted hover:text-text hover:bg-surface-2 cursor-pointer",
@@ -73,12 +73,11 @@ function AccountMenu({ user, displayName }: { user: User; displayName?: string |
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-3 p-2.5 rounded-[var(--radius)] hover:bg-surface-2 transition-colors cursor-pointer group"
+        className="w-full flex items-center gap-3 p-2.5 rounded-[var(--radius)] hover:bg-surface-2 transition-colors cursor-pointer"
         aria-expanded={open}
       >
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-bg shrink-0"
-          style={{ background: "linear-gradient(135deg, #E6C878, #C9A86A)" }}
+          className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-bg shrink-0 bg-text"
         >
           {name.charAt(0).toUpperCase()}
         </div>
@@ -105,7 +104,7 @@ function AccountMenu({ user, displayName }: { user: User; displayName?: string |
             onClick={() => setOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+          <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-white border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_8px_30px_rgba(0,0,0,0.1)]">
             <button
               type="button"
               onClick={() => { setOpen(false); router.push("/login"); }}
@@ -121,7 +120,7 @@ function AccountMenu({ user, displayName }: { user: User; displayName?: string |
             <button
               type="button"
               onClick={() => { setOpen(false); handleSignOut(); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-surface transition-colors cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-surface transition-colors cursor-pointer"
             >
               <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                 <path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3" strokeLinecap="round" />
@@ -140,13 +139,11 @@ export function Sidebar({ user, displayName }: SidebarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  // Close on route change
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
   const navItems = [
@@ -251,7 +248,7 @@ export function Sidebar({ user, displayName }: SidebarProps) {
       </aside>
 
       {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 h-14 bg-surface border-b border-border flex items-center justify-between px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 h-14 bg-white border-b border-border flex items-center justify-between px-4">
         <Logo href="/dashboard" iconSize={22} />
         <button
           type="button"
@@ -261,15 +258,9 @@ export function Sidebar({ user, displayName }: SidebarProps) {
           aria-expanded={mobileOpen}
         >
           <span className="flex flex-col gap-[5px] w-5" aria-hidden="true">
-            <span
-              className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "rotate-45 translate-y-[7px]" : ""}`}
-            />
-            <span
-              className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "opacity-0 scale-x-0" : ""}`}
-            />
-            <span
-              className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "-rotate-45 -translate-y-[7px]" : ""}`}
-            />
+            <span className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
+            <span className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "opacity-0 scale-x-0" : ""}`} />
+            <span className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
           </span>
         </button>
       </div>
@@ -278,11 +269,11 @@ export function Sidebar({ user, displayName }: SidebarProps) {
       {mobileOpen && (
         <>
           <div
-            className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+            className="lg:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
             aria-hidden="true"
           />
-          <div className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-surface border-r border-border overflow-y-auto">
+          <div className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-white border-r border-border overflow-y-auto">
             <SidebarContent onClose={() => setMobileOpen(false)} />
           </div>
         </>

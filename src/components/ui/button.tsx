@@ -12,9 +12,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  gold: "bg-gold text-bg font-semibold hover:bg-gold-bright active:scale-[0.98] shadow-[0_1px_20px_rgba(201,168,106,0.25)]",
+  gold: "bg-gold text-bg font-semibold hover:bg-gold-bright active:scale-[0.98] shadow-[0_1px_8px_rgba(0,0,0,0.12)]",
   ghost: "text-text-muted hover:text-text hover:bg-surface-2 active:scale-[0.98]",
-  outline: "border border-border-strong text-text hover:border-gold/40 hover:bg-surface-2 active:scale-[0.98]",
+  outline: "border border-border-strong text-text hover:bg-surface-2 active:scale-[0.98]",
   subtle: "bg-surface-2 text-text hover:bg-border-strong active:scale-[0.98]",
 };
 
@@ -34,7 +34,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={[
-          "inline-flex items-center justify-center gap-2 font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer",
+          "inline-flex items-center justify-center gap-2 font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer",
           variantClasses[variant],
           sizeClasses[size],
           className,

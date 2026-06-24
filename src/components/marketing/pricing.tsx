@@ -41,23 +41,30 @@ export function Pricing() {
   return (
     <section
       id="pricing"
-      className="py-24 sm:py-32 px-4 sm:px-6"
+      className="px-6"
       aria-labelledby="pricing-heading"
     >
-      <div className="max-w-7xl mx-auto">
+      <div
+        className="px-8 sm:px-12 py-12 sm:py-14"
+        style={{
+          maxWidth: 1100,
+          margin: '40px auto',
+          background: '#FFFFFF',
+          border: '1px solid #E4E4E7',
+          borderRadius: 24,
+          boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 10px 30px -18px rgba(0,0,0,.12)',
+        }}
+      >
         {/* Section header */}
         <div className="text-center mb-12">
-          <p className="text-xs tracking-widest uppercase text-gold font-medium mb-4">Pricing</p>
           <h2
             id="pricing-heading"
-            className="font-display text-4xl sm:text-5xl font-bold text-text mb-4"
-            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+            className="text-4xl sm:text-5xl font-black text-text mb-4 tracking-tight"
           >
             Simple, honest pricing.
           </h2>
           <p className="text-text-muted text-lg max-w-md mx-auto">
-            Start free. Upgrade when you need more.
-            No hidden fees, no lock-in.
+            Start free. Upgrade when you need more. No hidden fees, no lock-in.
           </p>
         </div>
 
@@ -94,7 +101,7 @@ export function Pricing() {
         {/* Plans grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Free */}
-          <div className="relative flex flex-col p-7 rounded-[var(--radius-lg)] bg-surface border border-border">
+          <div className="relative flex flex-col p-7 rounded-[var(--radius-lg)] bg-white border border-[#E4E4E7] shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
             <p className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-2">
               {FREE_PLAN.name}
             </p>
@@ -110,7 +117,7 @@ export function Pricing() {
                   key={f.text}
                   className={`flex items-center gap-2.5 text-sm ${f.included ? "text-text-muted" : "text-text-subtle line-through"}`}
                 >
-                  <span className={f.included ? "text-emerald-400" : "text-text-subtle"}>
+                  <span className={f.included ? "text-emerald-500" : "text-text-subtle"}>
                     {f.included ? <CheckIcon /> : <XIcon />}
                   </span>
                   {f.text}
@@ -120,20 +127,20 @@ export function Pricing() {
 
             <Link
               href="/login"
-              className="inline-flex items-center justify-center w-full py-3 text-sm font-semibold rounded-[var(--radius)] border border-border-strong text-text hover:border-gold/40 hover:bg-surface-2 transition-all duration-150"
+              className="inline-flex items-center justify-center w-full py-3 text-sm font-semibold rounded-[var(--radius)] border border-border-strong text-text hover:bg-surface-2 transition-all duration-150"
             >
               Get started free
             </Link>
           </div>
 
           {/* Creator — most popular */}
-          <div className="relative flex flex-col p-7 rounded-[var(--radius-lg)] bg-surface border border-gold/30 shadow-[0_0_40px_rgba(201,168,106,0.1)]">
+          <div className="relative flex flex-col p-7 rounded-[var(--radius-lg)] bg-white border-2 border-text shadow-[0_4px_24px_rgba(0,0,0,0.10)]">
             {/* Popular badge */}
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gold text-bg text-xs font-bold uppercase tracking-wider whitespace-nowrap">
               {CREATOR_PLAN.badge}
             </div>
 
-            <p className="text-xs font-semibold uppercase tracking-widest text-gold mb-2">
+            <p className="text-xs font-semibold uppercase tracking-widest text-text mb-2">
               {CREATOR_PLAN.name}
             </p>
             <div className="flex items-end gap-1.5 mb-1">
@@ -154,7 +161,7 @@ export function Pricing() {
                   key={f.text}
                   className={`flex items-center gap-2.5 text-sm ${f.included ? "text-text-muted" : "text-text-subtle line-through"}`}
                 >
-                  <span className={f.included ? "text-emerald-400" : "text-text-subtle"}>
+                  <span className={f.included ? "text-emerald-500" : "text-text-subtle"}>
                     {f.included ? <CheckIcon /> : <XIcon />}
                   </span>
                   {f.text}
@@ -164,19 +171,19 @@ export function Pricing() {
 
             <Link
               href="/login?plan=creator"
-              className="inline-flex items-center justify-center w-full py-3 text-sm font-semibold rounded-[var(--radius)] bg-gold text-bg hover:bg-gold-bright transition-all duration-150 shadow-[0_1px_20px_rgba(201,168,106,0.3)] active:scale-[0.98]"
+              className="inline-flex items-center justify-center w-full py-3 text-sm font-semibold rounded-[var(--radius)] bg-gold text-bg hover:bg-gold-bright transition-all duration-150 shadow-[0_1px_8px_rgba(0,0,0,0.12)] active:scale-[0.98]"
             >
               Start {CREATOR_PLAN.trialDays}-day free trial
             </Link>
           </div>
 
           {/* Agency */}
-          <div className="relative flex flex-col p-7 rounded-[var(--radius-lg)] bg-surface border border-border">
+          <div className="relative flex flex-col p-7 rounded-[var(--radius-lg)] bg-white border border-[#E4E4E7] shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
             <div className="flex items-start justify-between mb-2">
               <p className="text-xs font-semibold uppercase tracking-widest text-text-muted">
                 {AGENCY_PLAN.name}
               </p>
-              <span className="px-2.5 py-1 rounded-full border border-gold/20 bg-gold-dim text-xs font-medium text-gold">
+              <span className="px-2.5 py-1 rounded-full border border-border-strong bg-surface-2 text-xs font-medium text-text-muted">
                 {AGENCY_PLAN.badge}
               </span>
             </div>
@@ -202,7 +209,7 @@ export function Pricing() {
                 id="agency-links"
                 value={agencyTierIndex}
                 onChange={(e) => setAgencyTierIndex(Number(e.target.value))}
-                className="w-full bg-surface-2 border border-border-strong text-text text-sm rounded-[var(--radius-sm)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/40 transition-all duration-150 cursor-pointer"
+                className="w-full bg-surface-2 border border-border-strong text-text text-sm rounded-[var(--radius-sm)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-text/20 focus:border-text/30 transition-all duration-150 cursor-pointer"
               >
                 {AGENCY_PLAN.tiers.map((tier, i) => (
                   <option key={tier.links} value={i}>
@@ -218,7 +225,7 @@ export function Pricing() {
                   key={f.text}
                   className={`flex items-center gap-2.5 text-sm ${f.included ? "text-text-muted" : "text-text-subtle"}`}
                 >
-                  <span className={f.included ? "text-emerald-400" : "text-text-subtle"}>
+                  <span className={f.included ? "text-emerald-500" : "text-text-subtle"}>
                     {f.included ? <CheckIcon /> : <XIcon />}
                   </span>
                   {f.text}
@@ -228,7 +235,7 @@ export function Pricing() {
 
             <Link
               href="/login?plan=agency"
-              className="inline-flex items-center justify-center w-full py-3 text-sm font-semibold rounded-[var(--radius)] border border-border-strong text-text hover:border-gold/40 hover:bg-surface-2 transition-all duration-150"
+              className="inline-flex items-center justify-center w-full py-3 text-sm font-semibold rounded-[var(--radius)] border border-border-strong text-text hover:bg-surface-2 transition-all duration-150"
             >
               Get started
             </Link>

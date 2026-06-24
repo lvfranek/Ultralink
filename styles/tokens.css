@@ -1,18 +1,27 @@
 /* Ultralink design tokens — single source of truth */
 
 :root {
-  --bg: #0A0A0B;
-  --surface: #141417;
-  --surface-2: #1C1C20;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
-  --gold: #C9A86A;
-  --gold-bright: #E6C878;
-  --gold-dim: rgba(201, 168, 106, 0.15);
-  --text: #F5F3EF;
-  --text-muted: #9A9AA2;
-  --text-subtle: #6B6B75;
-  --radius: 0.625rem;
-  --radius-sm: 0.375rem;
-  --radius-lg: 1rem;
+  /* Backgrounds */
+  --bg: #FFFFFF;
+  --surface: #FAFAFA;
+  --surface-2: #F4F4F4;
+
+  /* Borders */
+  --border: rgba(0, 0, 0, 0.07);
+  --border-strong: rgba(0, 0, 0, 0.13);
+
+  /* Primary action color (black) — replaces gold everywhere in chrome */
+  --gold: #0A0A0A;
+  --gold-bright: #1C1C1C;
+  --gold-dim: rgba(0, 0, 0, 0.05);
+
+  /* Text */
+  --text: #0A0A0A;
+  --text-muted: #6B6B6B;
+  --text-subtle: #9B9B9B;
+
+  /* Radius */
+  --radius-sm: 0.375rem;   /* 6px  */
+  --radius: 0.625rem;      /* 10px — buttons, inputs */
+  --radius-lg: 0.875rem;   /* 14px — cards, containers */
 }

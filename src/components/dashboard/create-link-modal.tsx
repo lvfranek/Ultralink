@@ -26,43 +26,34 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Navigate to edit page after successful creation
   useEffect(() => {
     if (state && "pageId" in state) {
       router.push(`/dashboard/links/${state.pageId}`);
     }
   }, [state, router]);
 
-  // Focus slug input on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // Lock body scroll
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = ""; };
   }, []);
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  // Debounced slug availability check
   useEffect(() => {
     setSlugOk(false);
     setSlugError(null);
-
     if (!slug) return;
 
     const clientError = validateSlug(slug);
-    if (clientError) {
-      setSlugError(clientError);
-      return;
-    }
+    if (clientError) { setSlugError(clientError); return; }
 
     setChecking(true);
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -70,18 +61,11 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
     debounceRef.current = setTimeout(async () => {
       const result = await checkSlugAvailable(slug);
       setChecking(false);
-      if (result.available) {
-        setSlugOk(true);
-        setSlugError(null);
-      } else {
-        setSlugError(result.error ?? "Not available.");
-        setSlugOk(false);
-      }
+      if (result.available) { setSlugOk(true); setSlugError(null); }
+      else { setSlugError(result.error ?? "Not available."); setSlugOk(false); }
     }, 400);
 
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [slug]);
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,7 +90,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
   return (
     <>
       <div
-        className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -117,7 +101,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
         <div
-          className="w-full max-w-md bg-surface border border-border-strong rounded-[var(--radius-lg)] shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden"
+          className="w-full max-w-md bg-white border border-border rounded-[var(--radius-lg)] shadow-[0_8px_40px_rgba(0,0,0,0.12)] overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -163,10 +147,10 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                   className={[
                     "w-full bg-surface-2 border text-text placeholder-text-subtle rounded-[var(--radius)] pl-[7.5rem] pr-10 py-3 text-sm transition-colors duration-150 focus:outline-none focus:ring-2 disabled:opacity-50",
                     slugError
-                      ? "border-red-500/60 focus:ring-red-500/30 focus:border-red-500/60"
+                      ? "border-red-400 focus:ring-red-400/30 focus:border-red-400"
                       : slugOk
-                      ? "border-emerald-500/40 focus:ring-emerald-500/20 focus:border-emerald-500/40"
-                      : "border-border-strong focus:ring-gold/40 focus:border-gold/40",
+                      ? "border-emerald-400 focus:ring-emerald-400/20 focus:border-emerald-400"
+                      : "border-border-strong focus:ring-text/20 focus:border-text/30",
                   ].join(" ")}
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm" aria-hidden="true">
@@ -174,19 +158,19 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                     <span className="inline-block w-3.5 h-3.5 border border-current border-t-transparent rounded-full animate-spin text-text-subtle" />
                   )}
                   {!checking && slugOk && (
-                    <svg viewBox="0 0 14 14" className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg viewBox="0 0 14 14" className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M2 7l3.5 3.5L12 3" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
                   {!checking && slugError && (
-                    <svg viewBox="0 0 14 14" className="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg viewBox="0 0 14 14" className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M3 3l8 8M11 3L3 11" strokeLinecap="round" />
                     </svg>
                   )}
                 </span>
               </div>
-              {slugError && <p className="mt-1.5 text-xs text-red-400">{slugError}</p>}
-              {slugOk && !slugError && <p className="mt-1.5 text-xs text-emerald-400">Available!</p>}
+              {slugError && <p className="mt-1.5 text-xs text-red-500">{slugError}</p>}
+              {slugOk && !slugError && <p className="mt-1.5 text-xs text-emerald-600">Available!</p>}
             </div>
 
             {/* Title */}
@@ -205,7 +189,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
               />
             </div>
 
-            {/* Inline hint when user tries to submit with incomplete form */}
+            {/* Inline hint */}
             {showValidation && missingMessage() && (
               <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-surface-2 border border-border-strong text-sm text-text-muted">
                 {missingMessage()}
@@ -214,7 +198,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
 
             {/* Server error */}
             {state && "error" in state && (
-              <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-red-950/30 border border-red-800/30 text-sm text-red-400">
+              <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-red-50 border border-red-200 text-sm text-red-600">
                 {state.error}
               </div>
             )}
@@ -243,7 +227,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                 <button
                   type="button"
                   onClick={handleSubmitAttempt}
-                  className="flex-1 py-3 text-sm font-semibold text-bg bg-gold/60 rounded-[var(--radius)] cursor-pointer hover:bg-gold/70 transition-colors"
+                  className="flex-1 py-3 text-sm font-semibold text-bg bg-gold/50 rounded-[var(--radius)] cursor-pointer hover:bg-gold/60 transition-colors"
                 >
                   Create link
                 </button>

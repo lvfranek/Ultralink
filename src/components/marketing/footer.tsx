@@ -32,9 +32,9 @@ export function Footer() {
           <div className="col-span-2 sm:col-span-1">
             <Logo className="mb-4" />
             <p className="text-sm text-text-muted leading-relaxed max-w-[220px]">
-              {siteConfig.tagline}
+              One link for everything you do.
               <br />
-              Premium link-in-bio for creators who play long-term.
+              Fast, beautiful, and built to keep your accounts safe.
             </p>
           </div>
 

@@ -145,7 +145,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
   return (
     <div className="flex flex-col h-full">
       {/* Compact header */}
-      <div className="flex-shrink-0 border-b border-border bg-surface px-4 sm:px-6 py-3">
+      <div className="flex-shrink-0 border-b border-border bg-white px-4 sm:px-6 py-3">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           {/* URL + copy */}
           <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -153,7 +153,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
               href={publicUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-text-muted hover:text-gold transition-colors truncate max-w-xs"
+              className="text-sm text-text-muted hover:text-text transition-colors truncate max-w-xs"
             >
               {siteUrl}/{local.slug || page.slug}
             </a>
@@ -213,7 +213,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
               <button
                 type="submit"
                 disabled={!canSave || pending}
-                className="px-4 py-1.5 text-xs font-semibold bg-gold text-bg rounded-[var(--radius-sm)] hover:bg-gold-bright transition-colors disabled:opacity-40 cursor-pointer"
+                className="px-4 py-1.5 text-xs font-semibold bg-gold text-bg rounded-[var(--radius-sm)] hover:bg-gold-bright transition-colors disabled:opacity-40 cursor-pointer shadow-[0_1px_4px_rgba(0,0,0,0.10)]"
               >
                 {pending ? "Saving…" : saveSuccess ? "Saved!" : "Save"}
               </button>
@@ -245,7 +245,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
                   className={[
                     "px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer whitespace-nowrap",
                     activeTab === tab.id
-                      ? "border-gold text-gold"
+                      ? "border-text text-text"
                       : "border-transparent text-text-muted hover:text-text hover:border-border-strong",
                   ].join(" ")}
                 >
@@ -270,7 +270,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
 
           {/* Mobile preview drawer */}
           {showPreview && (
-            <div className="lg:hidden border-b border-border p-6 flex justify-center bg-surface">
+            <div className="lg:hidden border-b border-border p-6 flex justify-center bg-surface-2">
               <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} />
             </div>
           )}
@@ -295,10 +295,10 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
                     className={[
                       "w-full bg-surface-2 border text-text rounded-[var(--radius)] pl-[8.5rem] pr-10 py-3 text-sm transition-colors focus:outline-none focus:ring-2",
                       slugError
-                        ? "border-red-500/60 focus:ring-red-500/30"
+                        ? "border-red-400 focus:ring-red-400/30"
                         : slugOk
-                        ? "border-emerald-500/40 focus:ring-emerald-500/20"
-                        : "border-border-strong focus:ring-gold/40",
+                        ? "border-emerald-400 focus:ring-emerald-400/20"
+                        : "border-border-strong focus:ring-text/20",
                     ].join(" ")}
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -356,7 +356,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
         </div>
 
         {/* Right pane: live preview (desktop only) */}
-        <div className="hidden lg:flex flex-col items-center justify-start gap-6 w-80 flex-shrink-0 border-l border-border bg-surface p-8 overflow-y-auto">
+        <div className="hidden lg:flex flex-col items-center justify-start gap-6 w-80 flex-shrink-0 border-l border-border bg-surface-2 p-8 overflow-y-auto">
           <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} />
         </div>
       </div>

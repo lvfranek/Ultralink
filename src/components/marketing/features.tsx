@@ -65,26 +65,35 @@ export function Features() {
   return (
     <section
       id="features"
-      className="py-24 sm:py-32 px-4 sm:px-6"
+      className="px-6"
       aria-labelledby="features-heading"
     >
-      <div className="max-w-7xl mx-auto">
+      <div
+        className="px-8 sm:px-12 py-12 sm:py-14"
+        style={{
+          maxWidth: 1100,
+          margin: '40px auto',
+          background: '#FFFFFF',
+          border: '1px solid #E4E4E7',
+          borderRadius: 24,
+          boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 10px 30px -18px rgba(0,0,0,.12)',
+        }}
+      >
         {/* Section header */}
         <div className="text-center mb-16 sm:mb-20">
-          <p className="text-xs tracking-widest uppercase text-gold font-medium mb-4">
-            What you get
+          <p className="text-xs tracking-widest uppercase text-text-subtle font-medium mb-4">
+            Features
           </p>
           <h2
             id="features-heading"
-            className="font-display text-4xl sm:text-5xl font-bold text-text mb-4"
-            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+            className="text-4xl sm:text-5xl font-black text-text mb-4 tracking-tight"
           >
             Everything a creator needs.
             <br />
             <span className="text-text-muted font-normal">Nothing they don&apos;t.</span>
           </h2>
           <p className="text-text-muted max-w-lg mx-auto text-lg">
-            Designed for serious creators and the agencies managing them at scale.
+            Built for serious creators and agencies managing them at scale.
           </p>
         </div>
 
@@ -93,12 +102,9 @@ export function Features() {
           {FEATURES.map((feature) => (
             <div
               key={feature.title}
-              className="group relative p-6 rounded-[var(--radius-lg)] bg-surface border border-border hover:border-border-strong transition-all duration-200 hover:bg-surface-2"
+              className="p-6 rounded-[var(--radius-lg)] bg-white border border-[#E4E4E7] shadow-[0_2px_16px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.08)] transition-shadow duration-200"
             >
-              {/* Gold accent dot on hover */}
-              <div className="absolute top-4 right-4 w-1.5 h-1.5 rounded-full bg-gold opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-
-              <div className="text-gold mb-5">{feature.icon}</div>
+              <div className="text-text-muted mb-5">{feature.icon}</div>
               <h3 className="text-base font-semibold text-text mb-2">
                 {feature.title}
               </h3>

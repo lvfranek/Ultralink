@@ -120,10 +120,10 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
               className={[
                 "w-full bg-surface-2 border text-text rounded-[var(--radius)] pl-[7.5rem] pr-10 py-3 text-sm transition-colors duration-150 focus:outline-none focus:ring-2",
                 slugError
-                  ? "border-red-500/60 focus:ring-red-500/30"
+                  ? "border-red-400 focus:ring-red-400/30"
                   : slugOk
-                  ? "border-emerald-500/40 focus:ring-emerald-500/20"
-                  : "border-border-strong focus:ring-gold/40",
+                  ? "border-emerald-400 focus:ring-emerald-400/20"
+                  : "border-border-strong focus:ring-text/20",
               ].join(" ")}
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2" aria-hidden="true">
@@ -144,7 +144,7 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
               href={`${siteUrl}/${page.slug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gold hover:text-gold-bright transition-colors"
+              className="text-text-muted hover:text-text transition-colors"
             >
               {siteUrl}/{page.slug}
             </a>
@@ -178,7 +178,7 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
             onChange={(e) => setBio(e.target.value)}
             placeholder="A short description about you or this page"
             rows={3}
-            className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] px-4 py-3 text-sm resize-none transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/40"
+            className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] px-4 py-3 text-sm resize-none transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-text/20 focus:border-text/30"
           />
         </div>
 
@@ -196,8 +196,8 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
             aria-checked={isActive}
             onClick={() => setIsActive((v) => !v)}
             className={[
-              "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg cursor-pointer",
-              isActive ? "bg-gold" : "bg-surface-2 border border-border-strong",
+              "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text focus-visible:ring-offset-2 focus-visible:ring-offset-bg cursor-pointer",
+              isActive ? "bg-gold" : "bg-border-strong",
             ].join(" ")}
           >
             <span
@@ -210,14 +210,14 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
 
         {/* Server error */}
         {state && "error" in state && (
-          <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-red-950/30 border border-red-800/30 text-sm text-red-400">
+          <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-red-50 border border-red-200 text-sm text-red-600">
             {state.error}
           </div>
         )}
 
         {/* Success */}
         {saveSuccess && (
-          <div role="status" className="p-3 rounded-[var(--radius-sm)] bg-emerald-950/30 border border-emerald-800/30 text-sm text-emerald-400">
+          <div role="status" className="p-3 rounded-[var(--radius-sm)] bg-emerald-50 border border-emerald-200 text-sm text-emerald-700">
             Changes saved!
           </div>
         )}
@@ -242,13 +242,13 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
           <button
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
-            className="px-4 py-2 text-sm text-red-400 border border-red-800/40 rounded-[var(--radius)] hover:bg-red-950/30 hover:text-red-300 transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm text-red-500 border border-red-200 rounded-[var(--radius)] hover:bg-red-50 transition-colors cursor-pointer"
           >
             Delete this page
           </button>
         ) : (
-          <div className="p-4 bg-red-950/20 border border-red-800/30 rounded-[var(--radius)] space-y-3">
-            <p className="text-sm text-red-300 font-medium">
+          <div className="p-4 bg-red-50 border border-red-200 rounded-[var(--radius)] space-y-3">
+            <p className="text-sm text-red-600 font-medium">
               Are you sure? This cannot be undone.
             </p>
             <p className="text-xs text-text-muted">
@@ -259,7 +259,7 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
                 type="button"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="px-4 py-2 text-sm text-red-400 border border-red-800/40 rounded-[var(--radius)] hover:bg-red-950/40 transition-colors cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 text-sm text-red-500 border border-red-200 rounded-[var(--radius)] hover:bg-red-100 transition-colors cursor-pointer disabled:opacity-50"
               >
                 {deleting ? "Deleting…" : "Yes, delete"}
               </button>
@@ -273,7 +273,7 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
               </button>
             </div>
             {deleteError && (
-              <p className="text-xs text-red-400 mt-2">{deleteError}</p>
+              <p className="text-xs text-red-500 mt-2">{deleteError}</p>
             )}
           </div>
         )}

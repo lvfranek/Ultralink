@@ -51,16 +51,10 @@ export function DashboardShell({ pages, siteUrl, initialSlug }: DashboardShellPr
       {/* Empty state */}
       {pages.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div
-            className="w-16 h-16 rounded-[var(--radius-lg)] flex items-center justify-center mb-5"
-            style={{
-              background: "rgba(201,168,106,0.08)",
-              border: "1px solid rgba(201,168,106,0.15)",
-            }}
-          >
+          <div className="w-16 h-16 rounded-[var(--radius-lg)] flex items-center justify-center mb-5 bg-surface-2 border border-border">
             <svg
               viewBox="0 0 24 24"
-              className="w-7 h-7 text-gold"
+              className="w-7 h-7 text-text-muted"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"

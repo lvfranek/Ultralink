@@ -15,8 +15,8 @@
   --color-text-muted: var(--text-muted);
   --color-text-subtle: var(--text-subtle);
 
-  /* Typography */
-  --font-display: var(--font-playfair);
+  /* Typography — Inter only in the chrome */
+  --font-display: var(--font-inter);
   --font-sans: var(--font-inter);
 
   /* Radius */
@@ -47,34 +47,16 @@ body {
   min-height: 100dvh;
 }
 
-/* Gold gradient text utility */
-.text-gold-gradient {
-  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 50%, var(--gold) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Subtle noise texture overlay */
-.surface-noise::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  border-radius: inherit;
-}
-
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
 /* Selection */
 ::selection {
-  background-color: rgba(201, 168, 106, 0.25);
-  color: var(--gold-bright);
+  background-color: rgba(10, 10, 10, 0.12);
+  color: var(--text);
 }
 
 /* Scrollbar */
@@ -92,7 +74,25 @@ body {
   background: var(--text-subtle);
 }
 
-/* Theme animations — applied to link buttons, respects reduced-motion */
+/* Gradient frame — visible gradient border + soft outer glow for claim container */
+.claim-gradient-frame {
+  position: relative;
+  border-radius: 16px;
+  padding: 1.5px;
+  background: linear-gradient(110deg, #FBC2A4 0%, #F7A8C4 33%, #C9A7F2 66%, #A7C7F7 100%);
+}
+
+.claim-gradient-glow {
+  position: absolute;
+  inset: -12px;
+  border-radius: 26px;
+  background: linear-gradient(110deg, #FBC2A4 0%, #F7A8C4 33%, #C9A7F2 66%, #A7C7F7 100%);
+  filter: blur(22px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* Theme animations — applied to link buttons on end-user pages, respects reduced-motion */
 @keyframes theme-bounce {
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(-4px); }

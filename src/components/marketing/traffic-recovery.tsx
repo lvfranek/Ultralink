@@ -8,6 +8,7 @@ const STEPS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" />
       </svg>
     ),
+    highlight: false,
   },
   {
     number: "02",
@@ -18,11 +19,12 @@ const STEPS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
       </svg>
     ),
+    highlight: false,
   },
   {
     number: "03",
     label: "Win-Back",
-    description: "A clean, opt-in prompt offers them a second destination — a different offer, product, or channel — before they go.",
+    description: "A clean prompt offers them a second destination — a different offer, product, or channel — before they go.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -39,33 +41,43 @@ const STEPS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
+    highlight: false,
   },
 ];
 
 export function TrafficRecovery() {
   return (
     <section
-      className="py-24 sm:py-32 px-4 sm:px-6"
+      className="px-6"
       aria-labelledby="win-back-heading"
     >
-      <div className="max-w-7xl mx-auto">
+      <div
+        className="px-8 sm:px-12 py-12 sm:py-14"
+        style={{
+          maxWidth: 1100,
+          margin: '40px auto',
+          background: '#FFFFFF',
+          border: '1px solid #E4E4E7',
+          borderRadius: 24,
+          boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 10px 30px -18px rgba(0,0,0,.12)',
+        }}
+      >
         {/* Section header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-16">
           <div>
-            <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full border border-gold/20 bg-gold-dim text-xs font-medium tracking-widest uppercase text-gold">
-              Agency exclusive
+            <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full border border-border-strong bg-surface-2 text-xs font-medium text-text-muted">
+              For agencies
             </div>
             <h2
               id="win-back-heading"
-              className="font-display text-4xl sm:text-5xl font-bold text-text"
-              style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+              className="text-4xl sm:text-5xl font-black text-text tracking-tight"
             >
               Turn exits into conversions.
             </h2>
           </div>
           <p className="text-text-muted max-w-sm text-base leading-relaxed lg:text-right">
             Most visitors who leave are gone forever. Win-Back gives you a
-            second chance to capture them — legitimately, without dark patterns.
+            second chance — legitimately, without dark patterns.
           </p>
         </div>
 
@@ -84,41 +96,27 @@ export function TrafficRecovery() {
                 className={[
                   "relative p-6 rounded-[var(--radius-lg)] border transition-all duration-200",
                   step.highlight
-                    ? "bg-gold-dim border-gold/30 shadow-[0_0_40px_rgba(201,168,106,0.1)]"
-                    : "bg-surface border-border",
+                    ? "bg-white border-[#C9A7F2] shadow-[0_2px_16px_rgba(201,167,242,0.18)]"
+                    : "bg-white border-[#E4E4E7] shadow-[0_2px_16px_rgba(0,0,0,0.05)]",
                 ].join(" ")}
               >
                 {/* Step number chip */}
-                <div
-                  className={[
-                    "inline-flex items-center justify-center w-10 h-10 rounded-full text-xs font-bold tracking-wider mb-5",
-                    step.highlight
-                      ? "bg-gold text-bg"
-                      : "bg-surface-2 text-text-muted border border-border-strong",
-                  ].join(" ")}
-                >
+                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full text-xs font-bold tracking-wider mb-5 bg-surface-2 text-text-muted border border-border-strong">
                   {step.number}
                 </div>
 
                 {/* Arrow connector (mobile) */}
                 {index < STEPS.length - 1 && (
-                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-text-subtle lg:hidden" aria-hidden="true">
+                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 lg:hidden text-text-subtle" aria-hidden="true">
                     ↓
                   </div>
                 )}
 
-                <div className={step.highlight ? "text-gold" : "text-text-subtle"}>
-                  {step.icon}
-                </div>
-                <h3
-                  className={[
-                    "text-base font-semibold mt-3 mb-2",
-                    step.highlight ? "text-gold" : "text-text",
-                  ].join(" ")}
-                >
+                <div className="text-text-muted">{step.icon}</div>
+                <h3 className="text-base font-semibold mt-3 mb-2 text-text">
                   {step.label}
                 </h3>
-                <p className="text-sm text-text-muted leading-relaxed">
+                <p className="text-sm leading-relaxed text-text-muted">
                   {step.description}
                 </p>
               </div>
