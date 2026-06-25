@@ -23,15 +23,21 @@ export function Footer() {
 
   return (
     <footer
-      className="relative border-t border-border bg-surface"
+      style={{ background: '#0A0A0A', borderTop: '1px solid rgba(255,255,255,.08)' }}
       aria-label="Footer"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
-        <div className="grid grid-cols-2 sm:grid-cols-[2fr_1fr_1fr_1fr] gap-10 sm:gap-12">
+      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '56px 24px 40px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: 40,
+          }}
+        >
           {/* Brand column */}
-          <div className="col-span-2 sm:col-span-1">
-            <Logo className="mb-4" />
-            <p className="text-sm text-text-muted leading-relaxed max-w-[220px]">
+          <div style={{ gridColumn: 'span 1' }}>
+            <Logo onDark className="mb-4" />
+            <p style={{ fontSize: 14, color: '#9A9A9A', lineHeight: 1.6, maxWidth: 220, marginTop: 16 }}>
               One link for everything you do.
               <br />
               Fast, beautiful, and built to keep your accounts safe.
@@ -41,15 +47,15 @@ export function Footer() {
           {/* Link columns */}
           {Object.entries(FOOTER_LINKS).map(([category, links]) => (
             <div key={category}>
-              <p className="text-xs font-semibold uppercase tracking-widest text-text-subtle mb-4">
+              <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(154,154,154,0.6)', marginBottom: 16 }}>
                 {category}
               </p>
-              <ul className="space-y-3">
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-text-muted hover:text-text transition-colors duration-150"
+                      style={{ fontSize: 14, color: '#9A9A9A', textDecoration: 'none' }}
                       {...(link.href.startsWith("http") || link.href.startsWith("mailto")
                         ? { target: "_blank", rel: "noopener noreferrer" }
                         : {})}
@@ -64,11 +70,22 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-14 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-text-subtle">
+        <div
+          style={{
+            marginTop: 48,
+            paddingTop: 24,
+            borderTop: '1px solid rgba(255,255,255,.08)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+          }}
+        >
+          <p style={{ fontSize: 12, color: 'rgba(154,154,154,0.6)', margin: 0 }}>
             &copy; {year} Ultralink. All rights reserved.
           </p>
-          <p className="text-xs text-text-subtle">
+          <p style={{ fontSize: 12, color: 'rgba(154,154,154,0.6)', margin: 0 }}>
             Built for creators who keep their accounts.
           </p>
         </div>

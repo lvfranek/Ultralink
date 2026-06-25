@@ -1,106 +1,176 @@
 export function NoCloaking() {
   return (
     <section
-      className="px-6"
       aria-labelledby="no-cloaking-heading"
+      style={{ maxWidth: 1140, margin: '0 auto', padding: '72px 24px' }}
     >
+      {/* Floating header — no box, eyebrow removed */}
+      <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        <h2
+          id="no-cloaking-heading"
+          style={{
+            fontWeight: 500,
+            letterSpacing: '-0.02em',
+            fontSize: 'clamp(28px, 4vw, 40px)',
+            color: '#ffffff',
+            margin: '0 0 10px',
+          }}
+        >
+          We don&apos;t cloak your links.
+        </h2>
+        <p style={{ color: '#9A9A9A', fontSize: 17, margin: '0 auto', maxWidth: 560 }}>
+          Your account stays alive because we do redirects the honest way.
+        </p>
+      </div>
+
+      {/* Two-column content */}
       <div
-        className="px-8 sm:px-12 py-12 sm:py-14"
         style={{
-          maxWidth: 1100,
-          margin: '40px auto',
-          background: '#FFFFFF',
-          border: '1px solid #E4E4E7',
-          borderRadius: 24,
-          boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 10px 30px -18px rgba(0,0,0,.12)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: 32,
+          alignItems: 'start',
         }}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left: floating card */}
-          <div className="order-2 lg:order-1">
-            <div className="bg-white border border-[#E4E4E7] rounded-[var(--radius-lg)] p-8 shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
-              {/* Honesty badge */}
-              <div className="flex items-center gap-3 mb-6 p-4 rounded-[var(--radius)] bg-emerald-50 border border-emerald-100">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Platform-safe</p>
-                  <p className="text-xs text-text-muted mt-0.5">Honest redirects. No crawler deception.</p>
-                </div>
-              </div>
-
-              {/* Comparison */}
-              <div className="space-y-3">
-                <div className="flex items-start gap-3 p-3 rounded-[var(--radius-sm)] bg-red-50 border border-red-100">
-                  <span className="text-red-500 mt-0.5 text-sm flex-shrink-0">✗</span>
-                  <div>
-                    <p className="text-xs font-medium text-red-600">Link cloaking</p>
-                    <p className="text-xs text-text-subtle mt-0.5">Shows Instagram/TikTok one URL, sends users to another. Violates ToS → permanent ban.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 rounded-[var(--radius-sm)] bg-emerald-50 border border-emerald-100">
-                  <span className="text-emerald-600 mt-0.5 text-sm flex-shrink-0">✓</span>
-                  <div>
-                    <p className="text-xs font-medium text-emerald-700">Ultralink honest redirects</p>
-                    <p className="text-xs text-text-subtle mt-0.5">Crawlers and users always see the same destination. Your account stays alive.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 rounded-[var(--radius-sm)] bg-emerald-50 border border-emerald-100">
-                  <span className="text-emerald-600 mt-0.5 text-sm flex-shrink-0">✓</span>
-                  <div>
-                    <p className="text-xs font-medium text-emerald-700">Compliant 18+ age gate</p>
-                    <p className="text-xs text-text-subtle mt-0.5">Age-restrict content the right way — no ToS violations, no account risk.</p>
-                  </div>
-                </div>
-              </div>
+        {/* Left: comparison card */}
+        <div
+          style={{
+            background: '#1A1A1A',
+            border: '1px solid rgba(255,255,255,.10)',
+            borderRadius: 16,
+            padding: 28,
+          }}
+        >
+          {/* Platform-safe badge */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              marginBottom: 20,
+              padding: '12px 16px',
+              borderRadius: 10,
+              background: 'rgba(16,185,129,0.10)',
+              border: '1px solid rgba(16,185,129,0.20)',
+            }}
+          >
+            <div
+              style={{
+                flexShrink: 0,
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                background: 'rgba(16,185,129,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#10b981',
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 16, height: 16 }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+            </div>
+            <div>
+              <p style={{ fontSize: 11, fontWeight: 700, color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Platform-safe</p>
+              <p style={{ fontSize: 12, color: '#9A9A9A', margin: '2px 0 0' }}>Honest redirects. No crawler deception.</p>
             </div>
           </div>
 
-          {/* Right: copy */}
-          <div className="order-1 lg:order-2">
-            <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 text-xs font-medium tracking-widest uppercase text-emerald-700">
-              Our commitment
-            </div>
-            <h2
-              id="no-cloaking-heading"
-              className="text-4xl sm:text-5xl font-black text-text mb-6 leading-tight tracking-tight"
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 12,
+                padding: '12px 14px',
+                borderRadius: 8,
+                background: 'rgba(239,68,68,0.08)',
+                border: '1px solid rgba(239,68,68,0.18)',
+              }}
             >
-              We don&apos;t cloak
-              <br />
-              your links.
-              <br />
-              <span className="text-text-muted font-normal">Ever.</span>
-            </h2>
-            <div className="space-y-4 text-text-muted leading-relaxed">
-              <p>
-                Link cloaking — serving Instagram and TikTok&apos;s crawlers one URL while sending your real visitors to a different destination — is a direct violation of every major social platform&apos;s terms of service.
-              </p>
-              <p>
-                When it&apos;s detected (and it is detected), the result is a permanent ban of your account. Not just the link. Your entire account.
-              </p>
-              <p className="text-text font-medium">
-                Ultralink is built differently. Our redirects are completely honest: crawlers and users always see the same destination. No deception, no risk.
-              </p>
-              <p>
-                Need to gate adult content? We give you a proper 18+ verification screen. Need to control who sees your page? Use geo-blocking. Everything we build keeps your accounts safe — by doing it the right way.
-              </p>
-            </div>
-
-            <div className="mt-8 flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 flex-shrink-0">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                </svg>
+              <span style={{ color: '#ef4444', fontSize: 14, flexShrink: 0, marginTop: 1 }}>✗</span>
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#ef4444', margin: '0 0 2px' }}>Link cloaking</p>
+                <p style={{ fontSize: 12, color: '#9A9A9A', margin: 0, lineHeight: 1.5 }}>Shows Instagram/TikTok one URL, sends users to another. Violates ToS → permanent ban.</p>
               </div>
-              <p className="text-sm text-text-muted">
-                This is a permanent product principle. We will{" "}
-                <span className="text-text font-medium">never</span> add cloaking,
-                regardless of demand.
-              </p>
             </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 12,
+                padding: '12px 14px',
+                borderRadius: 8,
+                background: 'rgba(16,185,129,0.08)',
+                border: '1px solid rgba(16,185,129,0.18)',
+              }}
+            >
+              <span style={{ color: '#10b981', fontSize: 14, flexShrink: 0, marginTop: 1 }}>✓</span>
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#10b981', margin: '0 0 2px' }}>Ultralink honest redirects</p>
+                <p style={{ fontSize: 12, color: '#9A9A9A', margin: 0, lineHeight: 1.5 }}>Crawlers and users always see the same destination. Your account stays alive.</p>
+              </div>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 12,
+                padding: '12px 14px',
+                borderRadius: 8,
+                background: 'rgba(16,185,129,0.08)',
+                border: '1px solid rgba(16,185,129,0.18)',
+              }}
+            >
+              <span style={{ color: '#10b981', fontSize: 14, flexShrink: 0, marginTop: 1 }}>✓</span>
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#10b981', margin: '0 0 2px' }}>Compliant 18+ age gate</p>
+                <p style={{ fontSize: 12, color: '#9A9A9A', margin: 0, lineHeight: 1.5 }}>Age-restrict content the right way — no ToS violations, no account risk.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: copy */}
+        <div style={{ color: '#9A9A9A', lineHeight: 1.7, fontSize: 16 }}>
+          <p style={{ margin: '0 0 16px' }}>
+            Link cloaking — serving Instagram and TikTok&apos;s crawlers one URL while sending your real visitors to a different destination — is a direct violation of every major social platform&apos;s terms of service.
+          </p>
+          <p style={{ margin: '0 0 16px' }}>
+            When it&apos;s detected (and it is detected), the result is a permanent ban of your account. Not just the link. Your entire account.
+          </p>
+          <p style={{ margin: '0 0 16px', color: '#ffffff', fontWeight: 500 }}>
+            Ultralink is built differently. Our redirects are completely honest: crawlers and users always see the same destination. No deception, no risk.
+          </p>
+          <p style={{ margin: '0 0 24px' }}>
+            Need to gate adult content? We give you a proper 18+ verification screen. Need to control who sees your page? Use geo-blocking. Everything we build keeps your accounts safe — by doing it the right way.
+          </p>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div
+              style={{
+                flexShrink: 0,
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                background: 'rgba(16,185,129,0.12)',
+                border: '1px solid rgba(16,185,129,0.20)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#10b981',
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 20, height: 20 }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+            </div>
+            <p style={{ fontSize: 14, color: '#9A9A9A', margin: 0 }}>
+              This is a permanent product principle. We will{" "}
+              <span style={{ color: '#ffffff', fontWeight: 500 }}>never</span> add cloaking,
+              regardless of demand.
+            </p>
           </div>
         </div>
       </div>

@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-dvh bg-bg">
+    <div className="min-h-dvh bg-bg dark-theme">
       {/* Minimal header */}
       <header className="border-b border-border px-4 sm:px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Logo />
+          <Logo onDark />
           <Link href="/" className="text-sm text-text-muted hover:text-text transition-colors">
             ← Back to home
           </Link>
@@ -43,7 +43,7 @@ export default function PrivacyPage() {
           Last updated: {new Date().toLocaleDateString("en-DE", { year: "numeric", month: "long", day: "numeric" })}
         </p>
 
-        <div className="prose prose-invert max-w-none space-y-10 text-text-muted leading-relaxed">
+        <div className="max-w-none space-y-10 text-text-muted leading-relaxed">
 
           {/* 1 */}
           <section>
@@ -247,7 +247,7 @@ export default function PrivacyPage() {
       {/* Simple footer */}
       <footer className="border-t border-border px-4 sm:px-6 py-6 mt-12">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-subtle">
-          <Logo iconSize={20} />
+          <Logo iconSize={20} onDark />
           <div className="flex gap-6">
             <Link href="/terms" className="hover:text-text transition-colors">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-text transition-colors text-text-muted">Privacy Policy</Link>

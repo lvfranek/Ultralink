@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 
@@ -11,129 +11,216 @@ const NAV_LINKS = [
 ];
 
 export function Header() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 24);
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileOpen]);
 
   return (
     <>
       <header
-        className={[
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          scrolled
-            ? "bg-white/90 backdrop-blur-xl border-b border-border shadow-[0_1px_12px_rgba(0,0,0,0.06)]"
-            : "bg-transparent",
-        ].join(" ")}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+        }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-18">
-            {/* Logo */}
-            <Logo />
-
-            {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="px-4 py-2 text-sm text-text hover:text-text-muted transition-colors duration-150 rounded-[var(--radius-sm)] hover:bg-surface-2"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-
-            {/* Desktop CTAs */}
-            <div className="hidden md:flex items-center gap-3">
-              <Link
-                href="/login"
-                className="text-sm font-medium text-text-muted hover:text-text transition-colors duration-150 px-4 py-2 rounded-[var(--radius)] border border-border-strong hover:bg-surface-2"
-              >
-                Login
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold bg-gold text-bg rounded-[var(--radius)] hover:bg-gold-bright transition-colors duration-150 active:scale-[0.98] shadow-[0_1px_8px_rgba(0,0,0,0.12)]"
-              >
-                Sign up for free
-              </Link>
-            </div>
-
-            {/* Mobile hamburger */}
-            <button
-              className="md:hidden p-2 text-text-muted hover:text-text transition-colors rounded-[var(--radius-sm)]"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              aria-expanded={mobileOpen}
-            >
-              <div className="w-5 h-4 flex flex-col justify-between">
-                <span
-                  className={`block h-0.5 bg-current transition-all duration-200 origin-center ${mobileOpen ? "rotate-45 translate-y-[7.5px]" : ""}`}
-                />
-                <span
-                  className={`block h-0.5 bg-current transition-all duration-200 ${mobileOpen ? "opacity-0 scale-x-0" : ""}`}
-                />
-                <span
-                  className={`block h-0.5 bg-current transition-all duration-200 origin-center ${mobileOpen ? "-rotate-45 -translate-y-[7.5px]" : ""}`}
-                />
-              </div>
-            </button>
+        <div
+          style={{
+            maxWidth: 1140,
+            margin: "0 auto",
+            padding: "22px 24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 14,
+          }}
+        >
+          {/* Logo — left, wrapped in matching glass pill */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'rgba(255,255,255,.05)',
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
+              border: '1px solid rgba(255,255,255,.10)',
+              borderRadius: 999,
+              padding: '8px 14px',
+            }}
+          >
+            <Logo onDark />
           </div>
+
+          {/* Glass pill — right (desktop) */}
+          <div
+            style={{
+              alignItems: "center",
+              gap: 2,
+              background: "rgba(255,255,255,.05)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255,255,255,.10)",
+              borderRadius: 999,
+              padding: 5,
+            }}
+            className="hidden md:flex"
+          >
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                style={{
+                  color: "#cfcfcf",
+                  textDecoration: "none",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  padding: "8px 14px",
+                  borderRadius: 999,
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#cfcfcf")}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href="/login"
+              style={{
+                color: "#cfcfcf",
+                textDecoration: "none",
+                fontSize: 14,
+                fontWeight: 500,
+                padding: "8px 14px",
+                borderRadius: 999,
+                transition: "color 0.15s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#cfcfcf")}
+            >
+              Login
+            </Link>
+            <Link
+              href="/login"
+              style={{
+                background: "#fff",
+                color: "#0A0A0A",
+                fontWeight: 600,
+                borderRadius: 999,
+                padding: "8px 15px",
+                fontSize: 14,
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Sign up for free
+            </Link>
+          </div>
+
+          {/* Mobile hamburger */}
+          <button
+            className="md:hidden"
+            style={{
+              background: "rgba(255,255,255,.05)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255,255,255,.10)",
+              borderRadius: 999,
+              padding: "10px 14px",
+              cursor: "pointer",
+              color: "#fff",
+            }}
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? (
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
+                <path d="M0 1h18M0 7h18M0 13h18" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+              </svg>
+            )}
+          </button>
         </div>
       </header>
 
-      {/* Mobile menu overlay */}
+      {/* Mobile menu */}
       <div
-        className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 49,
+          background: "rgba(10,10,10,0.97)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          transition: "opacity 0.2s, pointer-events 0.2s",
+          opacity: mobileOpen ? 1 : 0,
+          pointerEvents: mobileOpen ? "auto" : "none",
+        }}
+        className="md:hidden"
         aria-hidden={!mobileOpen}
       >
-        <div
-          className="absolute inset-0 bg-white/90 backdrop-blur-xl"
-          onClick={() => setMobileOpen(false)}
-        />
         <nav
-          className="absolute top-16 left-0 right-0 bg-white border-b border-border p-6 flex flex-col gap-2"
-          aria-label="Mobile navigation"
+          style={{
+            position: "absolute",
+            top: 72,
+            left: 0,
+            right: 0,
+            padding: "24px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
         >
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="px-4 py-3 text-base text-text hover:text-text-muted transition-colors rounded-[var(--radius-sm)] hover:bg-surface-2"
+              style={{
+                color: "#cfcfcf",
+                textDecoration: "none",
+                fontSize: 18,
+                fontWeight: 500,
+                padding: "14px 16px",
+                borderRadius: 12,
+              }}
             >
               {link.label}
             </Link>
           ))}
-          <div className="mt-4 flex flex-col gap-3 pt-4 border-t border-border">
+          <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 10, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.10)" }}>
             <Link
               href="/login"
               onClick={() => setMobileOpen(false)}
-              className="px-4 py-3 text-base font-medium text-text-muted hover:text-text transition-colors text-center border border-border-strong rounded-[var(--radius)] hover:bg-surface-2"
+              style={{
+                color: "#cfcfcf",
+                textDecoration: "none",
+                fontSize: 16,
+                fontWeight: 500,
+                padding: "14px 16px",
+                textAlign: "center",
+                borderRadius: 12,
+              }}
             >
               Login
             </Link>
             <Link
               href="/login"
               onClick={() => setMobileOpen(false)}
-              className="inline-flex items-center justify-center w-full px-7 py-3.5 text-base font-semibold bg-gold text-bg rounded-[var(--radius)] hover:bg-gold-bright active:scale-[0.98] shadow-[0_1px_8px_rgba(0,0,0,0.12)]"
+              style={{
+                background: "#fff",
+                color: "#0A0A0A",
+                textDecoration: "none",
+                fontSize: 16,
+                fontWeight: 600,
+                padding: "14px 16px",
+                textAlign: "center",
+                borderRadius: 999,
+              }}
             >
               Sign up for free
             </Link>

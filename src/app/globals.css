@@ -15,9 +15,9 @@
   --color-text-muted: var(--text-muted);
   --color-text-subtle: var(--text-subtle);
 
-  /* Typography — Inter only in the chrome */
-  --font-display: var(--font-inter);
-  --font-sans: var(--font-inter);
+  /* Typography — Geist in the chrome */
+  --font-display: var(--font-geist);
+  --font-sans: var(--font-geist);
 
   /* Radius */
   --radius-sm: var(--radius-sm);
@@ -43,7 +43,7 @@ html {
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-geist), system-ui, sans-serif;
   min-height: 100dvh;
 }
 
@@ -53,10 +53,10 @@ body {
   outline-offset: 2px;
 }
 
-/* Selection */
+/* Selection — pastel purple visible on both dark and light backgrounds */
 ::selection {
-  background-color: rgba(10, 10, 10, 0.12);
-  color: var(--text);
+  background-color: rgba(201, 167, 242, 0.45);
+  color: inherit;
 }
 
 /* Scrollbar */
@@ -72,6 +72,21 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-subtle);
+}
+
+/* Dark theme token override — applied to legal pages (privacy, terms) */
+.dark-theme {
+  --bg: #0A0A0A;
+  --surface: #0A0A0A;
+  --surface-2: #1A1A1A;
+  --border: rgba(255,255,255,.08);
+  --border-strong: rgba(255,255,255,.15);
+  --gold: #cfcfcf;
+  --gold-bright: #ffffff;
+  --gold-dim: rgba(255,255,255,0.05);
+  --text: #FFFFFF;
+  --text-muted: #9A9A9A;
+  --text-subtle: rgba(154,154,154,0.55);
 }
 
 /* Gradient frame — visible gradient border + soft outer glow for claim container */

@@ -4,15 +4,13 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "signin" | "signup";
 
 function GoogleIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
+    <svg viewBox="0 0 24 24" style={{ width: 20, height: 20 }} aria-hidden="true">
       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
       <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -24,6 +22,24 @@ function GoogleIcon() {
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  background: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(255,255,255,.15)',
+  color: '#ffffff',
+  borderRadius: 8,
+  padding: '12px 14px',
+  fontSize: 14,
+  fontFamily: 'inherit',
+  outline: 'none',
+  boxSizing: 'border-box',
+};
+
+const inputErrorStyle: React.CSSProperties = {
+  ...inputStyle,
+  border: '1px solid rgba(239,68,68,0.6)',
+};
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -41,7 +57,6 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Inline field errors (shown after blur or submit attempt)
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
 
@@ -54,9 +69,7 @@ export function LoginForm() {
     : null;
 
   const passwordError = passwordTouched && password.length < 8
-    ? mode === "signup"
-      ? "Password must be at least 8 characters."
-      : "Password must be at least 8 characters."
+    ? "Password must be at least 8 characters."
     : null;
 
   const isFormValid = isValidEmail(email) && password.length >= 8;
@@ -75,7 +88,6 @@ export function LoginForm() {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Touch all fields to show validation errors
     setEmailTouched(true);
     setPasswordTouched(true);
     if (!isFormValid) return;
@@ -138,27 +150,48 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-12 bg-bg relative overflow-hidden">
-      {/* Subtle pastel glow */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] glow-pastel rounded-full"
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10 w-full max-w-sm">
+    <div
+      style={{
+        minHeight: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 16px',
+        background: '#0A0A0A',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: 380 }}>
         {/* Logo */}
-        <div className="flex justify-center mb-8">
-          <Logo href="/" iconSize={32} />
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
+          <Logo href="/" iconSize={32} onDark />
         </div>
 
         {/* Card */}
-        <div className="bg-white border border-border rounded-[var(--radius-lg)] p-7 shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
+        <div
+          style={{
+            background: '#1A1A1A',
+            border: '1px solid rgba(255,255,255,.10)',
+            borderRadius: 16,
+            padding: 28,
+          }}
+        >
           {/* Username claim context */}
           {prefilledUsername && (
-            <div className="mb-5 p-3 rounded-[var(--radius-sm)] bg-surface-2 border border-border-strong">
-              <p className="text-xs text-text-muted font-medium">
+            <div
+              style={{
+                marginBottom: 20,
+                padding: '10px 14px',
+                borderRadius: 8,
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,.10)',
+              }}
+            >
+              <p style={{ fontSize: 12, color: '#9A9A9A', margin: 0, fontWeight: 500 }}>
                 Claiming{" "}
-                <span className="font-bold text-text">ultralink.bio/{prefilledUsername}</span>
+                <span style={{ fontWeight: 700, color: '#ffffff' }}>ultralink.bio/{prefilledUsername}</span>
               </p>
             </div>
           )}
@@ -167,7 +200,14 @@ export function LoginForm() {
           <div
             role="tablist"
             aria-label="Authentication mode"
-            className="flex bg-surface-2 rounded-[var(--radius-sm)] p-1 mb-7"
+            style={{
+              display: 'flex',
+              background: 'rgba(255,255,255,0.05)',
+              borderRadius: 8,
+              padding: 4,
+              marginBottom: 24,
+              gap: 4,
+            }}
           >
             {(["signup", "signin"] as Mode[]).map((m) => (
               <button
@@ -175,12 +215,19 @@ export function LoginForm() {
                 role="tab"
                 aria-selected={mode === m}
                 onClick={() => handleModeSwitch(m)}
-                className={[
-                  "flex-1 py-2 text-sm font-medium rounded-[calc(var(--radius-sm)-2px)] transition-all duration-150 cursor-pointer",
-                  mode === m
-                    ? "bg-white text-text shadow-sm border border-border"
-                    : "text-text-muted hover:text-text",
-                ].join(" ")}
+                style={{
+                  flex: 1,
+                  padding: '8px 12px',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  borderRadius: 6,
+                  border: mode === m ? '1px solid rgba(255,255,255,.15)' : 'none',
+                  background: mode === m ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  color: mode === m ? '#ffffff' : '#9A9A9A',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.15s',
+                }}
               >
                 {m === "signup" ? "Create account" : "Sign in"}
               </button>
@@ -188,10 +235,10 @@ export function LoginForm() {
           </div>
 
           {/* Heading */}
-          <h1 className="text-xl font-semibold text-text mb-1">
+          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#ffffff', margin: '0 0 4px' }}>
             {mode === "signup" ? "Create your account" : "Welcome back"}
           </h1>
-          <p className="text-sm text-text-muted mb-6">
+          <p style={{ fontSize: 14, color: '#9A9A9A', margin: '0 0 24px' }}>
             {mode === "signup"
               ? "Start for free. No credit card required."
               : "Sign in to continue to your dashboard."}
@@ -202,11 +249,37 @@ export function LoginForm() {
             type="button"
             onClick={handleGoogleAuth}
             disabled={googleLoading || loading}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-[var(--radius)] border border-border-strong text-sm font-medium text-text hover:bg-surface-2 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed mb-5 cursor-pointer"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              padding: '12px 16px',
+              borderRadius: 8,
+              border: '1px solid rgba(255,255,255,.15)',
+              fontSize: 14,
+              fontWeight: 500,
+              color: '#ffffff',
+              background: 'rgba(255,255,255,0.05)',
+              cursor: googleLoading || loading ? 'not-allowed' : 'pointer',
+              opacity: googleLoading || loading ? 0.5 : 1,
+              marginBottom: 20,
+              fontFamily: 'inherit',
+              transition: 'all 0.15s',
+            }}
           >
             {googleLoading ? (
               <span
-                className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"
+                style={{
+                  display: 'inline-block',
+                  width: 16,
+                  height: 16,
+                  border: '2px solid currentColor',
+                  borderTopColor: 'transparent',
+                  borderRadius: '50%',
+                  animation: 'spin 0.75s linear infinite',
+                }}
                 aria-hidden="true"
               />
             ) : (
@@ -216,27 +289,24 @@ export function LoginForm() {
           </button>
 
           {/* Divider */}
-          <div className="relative my-5">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-border" />
+          <div style={{ position: 'relative', margin: '20px 0' }}>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }} aria-hidden="true">
+              <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,.10)' }} />
             </div>
-            <div className="relative flex justify-center">
-              <span className="px-3 bg-white text-xs text-text-subtle">
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+              <span style={{ padding: '0 12px', background: '#1A1A1A', fontSize: 12, color: '#9A9A9A' }}>
                 or continue with email
               </span>
             </div>
           </div>
 
           {/* Email/password form */}
-          <form onSubmit={handleEmailAuth} className="space-y-4" noValidate>
+          <form onSubmit={handleEmailAuth} style={{ display: 'flex', flexDirection: 'column', gap: 16 }} noValidate>
             <div>
-              <label
-                htmlFor="email"
-                className="block text-xs font-medium text-text-muted mb-1.5"
-              >
+              <label htmlFor="email" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#9A9A9A', marginBottom: 6 }}>
                 Email address
               </label>
-              <Input
+              <input
                 id="email"
                 type="email"
                 value={email}
@@ -246,21 +316,21 @@ export function LoginForm() {
                 autoComplete="email"
                 required
                 disabled={loading}
-                error={emailError ?? undefined}
+                style={emailError ? inputErrorStyle : inputStyle}
               />
+              {emailError && (
+                <p style={{ marginTop: 6, fontSize: 12, color: '#ef4444' }}>{emailError}</p>
+              )}
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-xs font-medium text-text-muted mb-1.5"
-              >
+              <label htmlFor="password" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#9A9A9A', marginBottom: 6 }}>
                 Password
                 {mode === "signup" && (
-                  <span className="font-normal text-text-subtle ml-1">(min. 8 characters)</span>
+                  <span style={{ fontWeight: 400, color: 'rgba(154,154,154,0.7)', marginLeft: 4 }}>(min. 8 characters)</span>
                 )}
               </label>
-              <Input
+              <input
                 id="password"
                 type="password"
                 value={password}
@@ -270,62 +340,103 @@ export function LoginForm() {
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 required
                 disabled={loading}
-                error={passwordError ?? undefined}
+                style={passwordError ? inputErrorStyle : inputStyle}
               />
+              {passwordError && (
+                <p style={{ marginTop: 6, fontSize: 12, color: '#ef4444' }}>{passwordError}</p>
+              )}
             </div>
 
-            {/* Supabase auth error */}
             {error && (
               <div
                 role="alert"
-                className="p-3 rounded-[var(--radius-sm)] bg-red-50 border border-red-200 text-sm text-red-600"
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  background: 'rgba(239,68,68,0.10)',
+                  border: '1px solid rgba(239,68,68,0.30)',
+                  fontSize: 14,
+                  color: '#f87171',
+                }}
               >
                 {error}
               </div>
             )}
 
-            {/* Success */}
             {successMessage && (
               <div
                 role="status"
-                className="p-3 rounded-[var(--radius-sm)] bg-emerald-50 border border-emerald-200 text-sm text-emerald-700"
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  background: 'rgba(16,185,129,0.10)',
+                  border: '1px solid rgba(16,185,129,0.30)',
+                  fontSize: 14,
+                  color: '#34d399',
+                }}
               >
                 {successMessage}
               </div>
             )}
 
-            <Button
+            <button
               type="submit"
-              variant="gold"
-              size="lg"
-              loading={loading}
-              disabled={googleLoading}
-              className="w-full"
+              disabled={loading || googleLoading}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                padding: '14px 0',
+                fontSize: 15,
+                fontWeight: 600,
+                borderRadius: 10,
+                border: 'none',
+                background: '#ffffff',
+                color: '#0A0A0A',
+                cursor: loading || googleLoading ? 'not-allowed' : 'pointer',
+                opacity: loading || googleLoading ? 0.6 : 1,
+                fontFamily: 'inherit',
+                transition: 'opacity 0.15s',
+              }}
             >
+              {loading && (
+                <span
+                  style={{
+                    display: 'inline-block',
+                    width: 16,
+                    height: 16,
+                    border: '2px solid currentColor',
+                    borderTopColor: 'transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 0.75s linear infinite',
+                  }}
+                  aria-hidden="true"
+                />
+              )}
               {mode === "signup" ? "Create account" : "Sign in"}
-            </Button>
+            </button>
           </form>
         </div>
 
         {/* Bottom links */}
-        <p className="mt-6 text-center text-xs text-text-subtle">
+        <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: '#9A9A9A' }}>
           By continuing, you agree to our{" "}
-          <Link
-            href="/terms"
-            className="text-text-muted hover:text-text underline-offset-2 hover:underline transition-colors"
-          >
+          <Link href="/terms" style={{ color: '#cfcfcf', textDecoration: 'underline', textUnderlineOffset: 2 }}>
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link
-            href="/privacy"
-            className="text-text-muted hover:text-text underline-offset-2 hover:underline transition-colors"
-          >
+          <Link href="/privacy" style={{ color: '#cfcfcf', textDecoration: 'underline', textUnderlineOffset: 2 }}>
             Privacy Policy
           </Link>
           .
         </p>
       </div>
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 }

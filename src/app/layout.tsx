@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import {
+  Geist,
   Inter,
   Playfair_Display,
   Poppins,
@@ -10,6 +11,12 @@ import {
   Bebas_Neue,
 } from "next/font/google";
 import "./globals.css";
+
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist",
+  display: "swap",
+});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -71,6 +78,9 @@ export const metadata: Metadata = {
   description:
     "The premium link-in-bio platform for creators and agencies. Fast pages, real analytics, no cloaking, no bans.",
   metadataBase: new URL("https://ultralink.bio"),
+  icons: {
+    icon: "/favicon/favicon.png",
+  },
   openGraph: {
     siteName: "Ultralink",
     locale: "en_US",
@@ -91,6 +101,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={[
+        geist.variable,
         inter.variable,
         playfair.variable,
         poppins.variable,

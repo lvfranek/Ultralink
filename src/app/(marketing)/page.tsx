@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div style={{background:'#F6F6F7', minHeight:'100dvh'}}>
+    <div style={{background:'#0A0A0A', minHeight:'100dvh'}}>
       <Header />
       <main>
         <Hero />

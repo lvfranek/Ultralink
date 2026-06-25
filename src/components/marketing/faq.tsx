@@ -45,21 +45,6 @@ const FAQS = [
   },
 ];
 
-function ChevronIcon({ open }: { open: boolean }) {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-      aria-hidden="true"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 8l5 5 5-5" />
-    </svg>
-  );
-}
-
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -68,75 +53,109 @@ export function FAQ() {
   return (
     <section
       id="faq"
-      className="px-6 pb-16 sm:pb-20"
       aria-labelledby="faq-heading"
+      style={{ maxWidth: 1140, margin: '0 auto', padding: '72px 24px 80px' }}
     >
-      <div
-        className="px-8 sm:px-12 py-12 sm:py-14"
+      {/* Floating header — no wrapper box, eyebrow removed */}
+      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+        <h2
+          id="faq-heading"
+          style={{
+            fontWeight: 500,
+            letterSpacing: '-0.02em',
+            fontSize: 'clamp(28px, 4vw, 40px)',
+            color: '#ffffff',
+            margin: 0,
+          }}
+        >
+          Questions answered.
+        </h2>
+      </div>
+
+      {/* Accordion */}
+      <dl
         style={{
-          maxWidth: 1100,
-          margin: '40px auto',
-          background: '#FFFFFF',
-          border: '1px solid #E4E4E7',
-          borderRadius: 24,
-          boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 10px 30px -18px rgba(0,0,0,.12)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+          maxWidth: 760,
+          margin: '0 auto',
         }}
       >
-        {/* Section header */}
-        <div className="text-center mb-14">
-          <p className="text-xs tracking-widest uppercase text-text-subtle font-medium mb-4">FAQ</p>
-          <h2
-            id="faq-heading"
-            className="text-4xl sm:text-5xl font-black text-text tracking-tight"
-          >
-            Questions answered.
-          </h2>
-        </div>
-
-        {/* Accordion */}
-        <dl className="space-y-2 max-w-3xl mx-auto">
-          {FAQS.map((faq, i) => {
-            const isOpen = openIndex === i;
-            return (
-              <div
-                key={faq.question}
-                className={`rounded-[var(--radius)] border transition-all duration-150 ${
-                  isOpen
-                    ? "border-border-strong bg-white shadow-[0_2px_12px_rgba(0,0,0,0.05)]"
-                    : "border-[#E4E4E7] bg-white hover:border-border-strong"
-                }`}
-              >
-                <dt>
-                  <button
-                    onClick={() => toggle(i)}
-                    className="w-full flex items-center justify-between px-5 py-4 text-left gap-4 cursor-pointer"
-                    aria-expanded={isOpen}
-                    aria-controls={`faq-answer-${i}`}
-                    id={`faq-question-${i}`}
-                  >
-                    <span className="text-sm font-medium text-text pr-2">
-                      {faq.question}
-                    </span>
-                    <span className="text-text-muted">
-                      <ChevronIcon open={isOpen} />
-                    </span>
-                  </button>
-                </dt>
-                <dd
-                  id={`faq-answer-${i}`}
-                  role="region"
-                  aria-labelledby={`faq-question-${i}`}
-                  className={`overflow-hidden transition-all duration-200 ${isOpen ? "max-h-96" : "max-h-0"}`}
+        {FAQS.map((faq, i) => {
+          const isOpen = openIndex === i;
+          return (
+            <div
+              key={faq.question}
+              style={{
+                borderRadius: 12,
+                border: isOpen
+                  ? '1px solid rgba(255,255,255,.20)'
+                  : '1px solid rgba(255,255,255,.10)',
+                background: '#1A1A1A',
+                transition: 'border-color 0.15s',
+              }}
+            >
+              <dt>
+                <button
+                  onClick={() => toggle(i)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '16px 20px',
+                    textAlign: 'left',
+                    gap: 16,
+                    cursor: 'pointer',
+                    background: 'none',
+                    border: 'none',
+                    fontFamily: 'inherit',
+                  }}
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${i}`}
+                  id={`faq-question-${i}`}
                 >
-                  <p className="px-5 pb-5 text-sm text-text-muted leading-relaxed">
-                    {faq.answer}
-                  </p>
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
-      </div>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: '#ffffff', flex: 1 }}>
+                    {faq.question}
+                  </span>
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    style={{
+                      width: 16,
+                      height: 16,
+                      flexShrink: 0,
+                      color: '#9A9A9A',
+                      transition: 'transform 0.2s',
+                      transform: isOpen ? 'rotate(180deg)' : 'none',
+                    }}
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 8l5 5 5-5" />
+                  </svg>
+                </button>
+              </dt>
+              <dd
+                id={`faq-answer-${i}`}
+                role="region"
+                aria-labelledby={`faq-question-${i}`}
+                style={{
+                  overflow: 'hidden',
+                  maxHeight: isOpen ? 400 : 0,
+                  transition: 'max-height 0.2s ease',
+                }}
+              >
+                <p style={{ padding: '0 20px 18px', fontSize: 14, color: '#9A9A9A', lineHeight: 1.65, margin: 0 }}>
+                  {faq.answer}
+                </p>
+              </dd>
+            </div>
+          );
+        })}
+      </dl>
     </section>
   );
 }

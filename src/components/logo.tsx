@@ -6,6 +6,7 @@ interface LogoProps {
   iconSize?: number;
   showWordmark?: boolean;
   href?: string;
+  onDark?: boolean;
 }
 
 export function Logo({
@@ -13,6 +14,7 @@ export function Logo({
   iconSize = 28,
   showWordmark = true,
   href = "/",
+  onDark = false,
 }: LogoProps) {
   const content = (
     <span
@@ -25,12 +27,12 @@ export function Logo({
         width={iconSize}
         height={iconSize}
         aria-hidden="true"
-        style={{ width: iconSize, height: iconSize }}
+        style={{ width: iconSize, height: iconSize, filter: onDark ? "invert(1)" : undefined }}
       />
       {showWordmark && (
         <span
-          className="text-[1.05rem] font-semibold tracking-[-0.02em] text-text"
-          style={{ fontFamily: "var(--font-inter), sans-serif" }}
+          className="text-[1.05rem] font-semibold tracking-[-0.02em]"
+          style={{ color: onDark ? "#ffffff" : "var(--text)" }}
         >
           ultralink
         </span>
@@ -40,7 +42,7 @@ export function Logo({
 
   if (href) {
     return (
-      <Link href={href} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-text rounded-sm">
+      <Link href={href} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-text rounded-sm inline-flex items-center">
         {content}
       </Link>
     );

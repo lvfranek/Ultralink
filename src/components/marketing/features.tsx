@@ -1,7 +1,7 @@
 const FEATURES = [
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 24, height: 24 }}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
       </svg>
     ),
@@ -11,7 +11,7 @@ const FEATURES = [
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 24, height: 24 }}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" />
       </svg>
     ),
@@ -21,7 +21,7 @@ const FEATURES = [
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 24, height: 24 }}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
       </svg>
     ),
@@ -31,7 +31,7 @@ const FEATURES = [
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 24, height: 24 }}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
       </svg>
     ),
@@ -41,7 +41,7 @@ const FEATURES = [
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 24, height: 24 }}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3m-3 3h3m-6 3h.008v.008H9v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
       </svg>
     ),
@@ -51,7 +51,7 @@ const FEATURES = [
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 24, height: 24 }}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
       </svg>
     ),
@@ -65,55 +65,55 @@ export function Features() {
   return (
     <section
       id="features"
-      className="px-6"
       aria-labelledby="features-heading"
+      style={{ maxWidth: 1140, margin: '0 auto', padding: '72px 24px' }}
     >
+      {/* Floating header — no box, no eyebrow */}
+      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+        <h2
+          id="features-heading"
+          style={{
+            fontWeight: 500,
+            letterSpacing: '-0.02em',
+            fontSize: 'clamp(28px, 4vw, 40px)',
+            color: '#ffffff',
+            margin: '0 0 10px',
+          }}
+        >
+          Everything a creator needs.
+        </h2>
+        <p style={{ color: '#9A9A9A', fontSize: 17, margin: '0 auto', maxWidth: 560 }}>
+          Designed for serious creators and the agencies managing them at scale.
+        </p>
+      </div>
+
+      {/* Feature cards — #1A1A1A */}
       <div
-        className="px-8 sm:px-12 py-12 sm:py-14"
         style={{
-          maxWidth: 1100,
-          margin: '40px auto',
-          background: '#FFFFFF',
-          border: '1px solid #E4E4E7',
-          borderRadius: 24,
-          boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 10px 30px -18px rgba(0,0,0,.12)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: 16,
         }}
       >
-        {/* Section header */}
-        <div className="text-center mb-16 sm:mb-20">
-          <p className="text-xs tracking-widest uppercase text-text-subtle font-medium mb-4">
-            Features
-          </p>
-          <h2
-            id="features-heading"
-            className="text-4xl sm:text-5xl font-black text-text mb-4 tracking-tight"
+        {FEATURES.map((feature) => (
+          <div
+            key={feature.title}
+            style={{
+              background: '#1A1A1A',
+              border: '1px solid rgba(255,255,255,.10)',
+              borderRadius: 16,
+              padding: 24,
+            }}
           >
-            Everything a creator needs.
-            <br />
-            <span className="text-text-muted font-normal">Nothing they don&apos;t.</span>
-          </h2>
-          <p className="text-text-muted max-w-lg mx-auto text-lg">
-            Built for serious creators and agencies managing them at scale.
-          </p>
-        </div>
-
-        {/* Features grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {FEATURES.map((feature) => (
-            <div
-              key={feature.title}
-              className="p-6 rounded-[var(--radius-lg)] bg-white border border-[#E4E4E7] shadow-[0_2px_16px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.08)] transition-shadow duration-200"
-            >
-              <div className="text-text-muted mb-5">{feature.icon}</div>
-              <h3 className="text-base font-semibold text-text mb-2">
-                {feature.title}
-              </h3>
-              <p className="text-sm text-text-muted leading-relaxed">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
+            <div style={{ color: '#9A9A9A', marginBottom: 16 }}>{feature.icon}</div>
+            <h3 style={{ fontSize: 17, fontWeight: 600, color: '#ffffff', margin: '0 0 8px' }}>
+              {feature.title}
+            </h3>
+            <p style={{ color: '#9A9A9A', fontSize: 14, lineHeight: 1.55, margin: 0 }}>
+              {feature.description}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );
