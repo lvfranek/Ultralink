@@ -11,12 +11,12 @@ const FAQS = [
   {
     question: "Do I need a credit card for the free plan?",
     answer:
-      "No. The Free plan is genuinely free — no credit card required, no trial period, no automatic upgrade. Use it as long as you like. When you're ready for analytics, custom domains, or other premium features, upgrade to Creator or Agency at any time.",
+      "No. The Free plan is genuinely free — no credit card required, no trial period, no automatic upgrade. Use it as long as you like. When you're ready for analytics, custom domains, or other premium features, upgrade to Pro at any time.",
   },
   {
     question: "Can I use my own domain?",
     answer:
-      "Yes. Creator and Agency plans both include custom domain support. Instead of ultralink.bio/yourname, you can use something like links.yourbrand.com. We provide simple DNS setup instructions and the domain propagates within minutes.",
+      "Yes. The Pro plan includes custom domain support. Instead of ultralink.bio/yourname, you can use something like links.yourbrand.com. We provide simple DNS setup instructions and the domain propagates within minutes.",
   },
   {
     question: "Will using Ultralink get my Instagram or TikTok banned?",
@@ -26,17 +26,12 @@ const FAQS = [
   {
     question: "What is Win-Back?",
     answer:
-      "Win-Back is an Agency-exclusive feature that gives you a second chance with visitors who start to leave your link page. When a visitor tries to navigate away, they see a clean prompt offering an alternative destination — a different offer, product, or channel. It recovers traffic that would otherwise be lost.",
+      "Win-Back is a Pro feature that gives you a second chance with visitors who start to leave your link page. When a visitor tries to navigate away, they see a clean prompt offering an alternative destination — a different offer, product, or channel. It recovers traffic that would otherwise be lost.",
   },
   {
     question: "Can my team manage our link pages?",
     answer:
-      "Team access is available on the Agency plan. You can invite team members — virtual assistants, social media managers, or colleagues — and they can manage link pages without access to your billing or account settings.",
-  },
-  {
-    question: "How does the Creator 7-day free trial work?",
-    answer:
-      "When you sign up for the Creator plan, you get 7 days of full access at no charge. No credit card is required until the trial ends. If you don't continue, your account reverts to the Free plan — you won't be charged. If you do continue, billing starts on day 8.",
+      "Team access is available on the Pro plan. You can invite team members — virtual assistants, social media managers, or colleagues — and they can manage link pages without access to your billing or account settings.",
   },
   {
     question: "How do I cancel?",
@@ -56,7 +51,6 @@ export function FAQ() {
       aria-labelledby="faq-heading"
       style={{ maxWidth: 1140, margin: '0 auto', padding: '72px 24px 80px' }}
     >
-      {/* Floating header — no wrapper box, eyebrow removed */}
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
         <h2
           id="faq-heading"
@@ -72,12 +66,11 @@ export function FAQ() {
         </h2>
       </div>
 
-      {/* Accordion */}
       <dl
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 8,
+          gap: 10,
           maxWidth: 760,
           margin: '0 auto',
         }}
@@ -88,12 +81,11 @@ export function FAQ() {
             <div
               key={faq.question}
               style={{
-                borderRadius: 12,
-                border: isOpen
-                  ? '1px solid rgba(255,255,255,.20)'
-                  : '1px solid rgba(255,255,255,.10)',
+                borderRadius: 14,
+                border: '1px solid rgba(255,255,255,.10)',
                 background: '#1A1A1A',
                 transition: 'border-color 0.15s',
+                ...(isOpen ? { borderColor: 'rgba(255,255,255,.20)' } : {}),
               }}
             >
               <dt>
@@ -104,7 +96,7 @@ export function FAQ() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '16px 20px',
+                    padding: '18px 22px',
                     textAlign: 'left',
                     gap: 16,
                     cursor: 'pointer',
@@ -129,7 +121,7 @@ export function FAQ() {
                       height: 16,
                       flexShrink: 0,
                       color: '#9A9A9A',
-                      transition: 'transform 0.2s',
+                      transition: 'transform 0.22s ease',
                       transform: isOpen ? 'rotate(180deg)' : 'none',
                     }}
                     aria-hidden="true"
@@ -145,10 +137,10 @@ export function FAQ() {
                 style={{
                   overflow: 'hidden',
                   maxHeight: isOpen ? 400 : 0,
-                  transition: 'max-height 0.2s ease',
+                  transition: 'max-height 0.25s ease',
                 }}
               >
-                <p style={{ padding: '0 20px 18px', fontSize: 14, color: '#9A9A9A', lineHeight: 1.65, margin: 0 }}>
+                <p style={{ padding: '0 22px 20px', fontSize: 14, color: '#9A9A9A', lineHeight: 1.7, margin: 0 }}>
                   {faq.answer}
                 </p>
               </dd>

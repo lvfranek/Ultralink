@@ -4,16 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   FREE_PLAN,
-  CREATOR_PLAN,
-  AGENCY_PLAN,
+  PRO_PLAN,
   type BillingInterval,
-  type AgencyTier,
+  type ProTier,
 } from "@/lib/config/pricing";
 
-function CheckIcon() {
+const GRADIENT = 'linear-gradient(110deg,#FBC2A4 0%,#F7A8C4 33%,#C9A7F2 66%,#A7C7F7 100%)';
+
+function CheckIcon({ muted }: { muted?: boolean }) {
   return (
     <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16, flexShrink: 0 }} aria-hidden="true">
-      <circle cx="8" cy="8" r="7" stroke="currentColor" strokeOpacity="0.3" />
+      <circle cx="8" cy="8" r="7" stroke="currentColor" strokeOpacity={muted ? 0.2 : 0.3} />
       <path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -29,14 +30,11 @@ function XIcon() {
 
 export function Pricing() {
   const [interval, setInterval] = useState<BillingInterval>("monthly");
-  const [agencyTierIndex, setAgencyTierIndex] = useState(0);
+  const [proTierIndex, setProTierIndex] = useState(0);
 
-  const selectedAgencyTier: AgencyTier = AGENCY_PLAN.tiers[agencyTierIndex];
-
-  const agencyPrice =
-    interval === "monthly"
-      ? selectedAgencyTier.monthlyPrice
-      : selectedAgencyTier.annualMonthlyPrice;
+  const selectedTier: ProTier = PRO_PLAN.tiers[proTierIndex];
+  const proPrice =
+    interval === "monthly" ? selectedTier.monthlyPrice : selectedTier.annualMonthlyPrice;
 
   return (
     <section
@@ -44,7 +42,7 @@ export function Pricing() {
       aria-labelledby="pricing-heading"
       style={{ maxWidth: 1140, margin: '0 auto', padding: '72px 24px' }}
     >
-      {/* Floating header — no wrapper box */}
+      {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
         <h2
           id="pricing-heading"
@@ -107,36 +105,37 @@ export function Pricing() {
         </div>
       </div>
 
-      {/* Plans grid */}
+      {/* Two-card grid */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: 16,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: 20,
+          maxWidth: 860,
+          margin: '0 auto',
         }}
       >
-        {/* Free */}
+        {/* Free card */}
         <div
           style={{
-            position: 'relative',
             display: 'flex',
             flexDirection: 'column',
-            padding: 28,
-            borderRadius: 18,
+            padding: 32,
+            borderRadius: 20,
             background: '#1A1A1A',
             border: '1px solid rgba(255,255,255,.10)',
           }}
         >
-          <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9A9A9A', margin: '0 0 8px' }}>
+          <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9A9A9A', margin: '0 0 10px' }}>
             {FREE_PLAN.name}
           </p>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, marginBottom: 4 }}>
-            <span style={{ fontSize: 48, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>$0</span>
-            <span style={{ color: '#9A9A9A', fontSize: 14, marginBottom: 6 }}>/mo</span>
+            <span style={{ fontSize: 52, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>$0</span>
+            <span style={{ color: '#9A9A9A', fontSize: 14, marginBottom: 8 }}>/mo</span>
           </div>
-          <p style={{ fontSize: 12, color: '#9A9A9A', margin: '0 0 28px' }}>Free forever</p>
+          <p style={{ fontSize: 12, color: '#9A9A9A', margin: '0 0 32px' }}>Free forever</p>
 
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
             {FREE_PLAN.features.map((f) => (
               <li
                 key={f.text}
@@ -145,11 +144,10 @@ export function Pricing() {
                   alignItems: 'center',
                   gap: 10,
                   fontSize: 14,
-                  color: f.included ? '#9A9A9A' : 'rgba(154,154,154,0.4)',
-                  textDecoration: f.included ? 'none' : 'line-through',
+                  color: f.included ? '#C8C8C8' : 'rgba(154,154,154,0.35)',
                 }}
               >
-                <span style={{ color: f.included ? '#10b981' : 'rgba(154,154,154,0.4)' }}>
+                <span style={{ color: f.included ? '#10b981' : 'rgba(154,154,154,0.3)' }}>
                   {f.included ? <CheckIcon /> : <XIcon />}
                 </span>
                 {f.text}
@@ -164,11 +162,11 @@ export function Pricing() {
               alignItems: 'center',
               justifyContent: 'center',
               width: '100%',
-              padding: '12px 0',
+              padding: '13px 0',
               fontSize: 14,
               fontWeight: 600,
-              borderRadius: 10,
-              border: '1px solid rgba(255,255,255,.15)',
+              borderRadius: 11,
+              border: '1px solid rgba(255,255,255,.18)',
               color: '#ffffff',
               textDecoration: 'none',
               background: 'transparent',
@@ -179,214 +177,157 @@ export function Pricing() {
           </Link>
         </div>
 
-        {/* Creator — most popular */}
-        <div
-          style={{
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: 28,
-            borderRadius: 18,
-            background: '#1A1A1A',
-            border: '2px solid #ffffff',
-          }}
-        >
-          {/* Popular badge */}
+        {/* Pro card — gradient glow border */}
+        <div style={{ position: 'relative', isolation: 'isolate' }}>
+          {/* Glow layer — sits behind the card, never clipped */}
           <div
+            aria-hidden="true"
             style={{
               position: 'absolute',
-              top: -14,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              padding: '4px 16px',
-              borderRadius: 999,
-              background: '#ffffff',
-              color: '#0A0A0A',
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              whiteSpace: 'nowrap',
+              inset: -16,
+              borderRadius: 36,
+              background: GRADIENT,
+              filter: 'blur(28px)',
+              opacity: 0.55,
+              zIndex: 0,
+              pointerEvents: 'none',
             }}
-          >
-            {CREATOR_PLAN.badge}
-          </div>
-
-          <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#ffffff', margin: '0 0 8px' }}>
-            {CREATOR_PLAN.name}
-          </p>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, marginBottom: 4 }}>
-            <span style={{ fontSize: 48, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>
-              ${interval === "monthly" ? CREATOR_PLAN.monthlyPrice : CREATOR_PLAN.annualMonthlyPrice}
-            </span>
-            <span style={{ color: '#9A9A9A', fontSize: 14, marginBottom: 6 }}>/mo</span>
-          </div>
-          <p style={{ fontSize: 12, color: '#9A9A9A', margin: '0 0 28px' }}>
-            {interval === "annual"
-              ? `Billed $${CREATOR_PLAN.annualPrice}/yr`
-              : `Billed monthly · ${CREATOR_PLAN.trialDays}-day free trial`}
-          </p>
-
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-            {CREATOR_PLAN.features.map((f) => (
-              <li
-                key={f.text}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  fontSize: 14,
-                  color: f.included ? '#9A9A9A' : 'rgba(154,154,154,0.4)',
-                  textDecoration: f.included ? 'none' : 'line-through',
-                }}
-              >
-                <span style={{ color: f.included ? '#10b981' : 'rgba(154,154,154,0.4)' }}>
-                  {f.included ? <CheckIcon /> : <XIcon />}
-                </span>
-                {f.text}
-              </li>
-            ))}
-          </ul>
-
-          <Link
-            href="/login?plan=creator"
+          />
+          {/* Gradient border frame */}
+          <div
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              padding: '12px 0',
-              fontSize: 14,
-              fontWeight: 600,
-              borderRadius: 10,
-              border: 'none',
-              color: '#0A0A0A',
-              textDecoration: 'none',
-              background: '#ffffff',
-              boxSizing: 'border-box',
-              cursor: 'pointer',
+              position: 'relative',
+              zIndex: 1,
+              borderRadius: 21,
+              padding: 1.5,
+              background: GRADIENT,
             }}
           >
-            Start {CREATOR_PLAN.trialDays}-day free trial
-          </Link>
-        </div>
-
-        {/* Agency */}
-        <div
-          style={{
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: 28,
-            borderRadius: 18,
-            background: '#1A1A1A',
-            border: '1px solid rgba(255,255,255,.10)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9A9A9A', margin: 0 }}>
-              {AGENCY_PLAN.name}
-            </p>
-            <span
+            {/* Card inner */}
+            <div
               style={{
-                padding: '3px 10px',
-                borderRadius: 999,
-                border: '1px solid rgba(255,255,255,.15)',
-                fontSize: 11,
-                fontWeight: 500,
-                color: '#9A9A9A',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: 32,
+                borderRadius: 20,
+                background: '#1A1A1A',
               }}
             >
-              {AGENCY_PLAN.badge}
-            </span>
-          </div>
+              {/* Recommended pill */}
+              <div style={{ marginBottom: 12 }}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    padding: '4px 14px',
+                    borderRadius: 999,
+                    background: 'rgba(255,255,255,0.10)',
+                    border: '1px solid rgba(255,255,255,.18)',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  Recommended
+                </span>
+              </div>
 
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, marginBottom: 4 }}>
-            <span style={{ fontSize: 48, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>
-              ${agencyPrice}
-            </span>
-            <span style={{ color: '#9A9A9A', fontSize: 14, marginBottom: 6 }}>/mo</span>
-          </div>
-          <p style={{ fontSize: 12, color: '#9A9A9A', margin: '0 0 16px' }}>
-            {interval === "annual"
-              ? `Billed $${selectedAgencyTier.annualPrice}/yr`
-              : "Billed monthly"}
-          </p>
+              <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#ffffff', margin: '0 0 10px' }}>
+                {PRO_PLAN.name}
+              </p>
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, marginBottom: 4 }}>
+                <span style={{ fontSize: 52, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                  ${proPrice}
+                </span>
+                <span style={{ color: '#9A9A9A', fontSize: 14, marginBottom: 8 }}>/mo</span>
+              </div>
+              <p style={{ fontSize: 12, color: '#9A9A9A', margin: '0 0 20px' }}>
+                {interval === "annual"
+                  ? `Billed $${selectedTier.annualPrice}/yr`
+                  : "Billed monthly"}
+              </p>
 
-          {/* Link volume selector */}
-          <div style={{ marginBottom: 28 }}>
-            <label htmlFor="agency-links" style={{ display: 'block', fontSize: 12, color: '#9A9A9A', marginBottom: 6, fontWeight: 500 }}>
-              Number of link pages
-            </label>
-            <select
-              id="agency-links"
-              value={agencyTierIndex}
-              onChange={(e) => setAgencyTierIndex(Number(e.target.value))}
-              style={{
-                width: '100%',
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,.15)',
-                color: '#ffffff',
-                fontSize: 14,
-                borderRadius: 8,
-                padding: '10px 12px',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-              }}
-            >
-              {AGENCY_PLAN.tiers.map((tier, i) => (
-                <option key={tier.links} value={i} style={{ background: '#1A1A1A' }}>
-                  {tier.links} links
-                </option>
-              ))}
-            </select>
-          </div>
+              {/* Volume selector */}
+              <div style={{ marginBottom: 28 }}>
+                <label
+                  htmlFor="pro-links"
+                  style={{ display: 'block', fontSize: 12, color: '#9A9A9A', marginBottom: 6, fontWeight: 500 }}
+                >
+                  Number of link pages
+                </label>
+                <select
+                  id="pro-links"
+                  value={proTierIndex}
+                  onChange={(e) => setProTierIndex(Number(e.target.value))}
+                  style={{
+                    width: '100%',
+                    background: 'rgba(255,255,255,0.07)',
+                    border: '1px solid rgba(255,255,255,.18)',
+                    color: '#ffffff',
+                    fontSize: 14,
+                    borderRadius: 9,
+                    padding: '10px 12px',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  {PRO_PLAN.tiers.map((tier, i) => (
+                    <option key={tier.links} value={i} style={{ background: '#1A1A1A' }}>
+                      {tier.links} {tier.links === 1 ? "link page" : "link pages"}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-            {AGENCY_PLAN.features.map((f) => (
-              <li
-                key={f.text}
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+                {PRO_PLAN.features.map((f) => (
+                  <li
+                    key={f.text}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      fontSize: 14,
+                      color: '#C8C8C8',
+                    }}
+                  >
+                    <span style={{ color: '#10b981' }}>
+                      <CheckIcon />
+                    </span>
+                    {f.text}
+                  </li>
+                ))}
+              </ul>
+
+              <Link
+                href="/login?plan=pro"
                 style={{
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 10,
+                  justifyContent: 'center',
+                  width: '100%',
+                  padding: '13px 0',
                   fontSize: 14,
-                  color: f.included ? '#9A9A9A' : 'rgba(154,154,154,0.4)',
+                  fontWeight: 600,
+                  borderRadius: 11,
+                  border: 'none',
+                  color: '#0A0A0A',
+                  textDecoration: 'none',
+                  background: '#ffffff',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer',
                 }}
               >
-                <span style={{ color: f.included ? '#10b981' : 'rgba(154,154,154,0.4)' }}>
-                  {f.included ? <CheckIcon /> : <XIcon />}
-                </span>
-                {f.text}
-              </li>
-            ))}
-          </ul>
-
-          <Link
-            href="/login?plan=agency"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              padding: '12px 0',
-              fontSize: 14,
-              fontWeight: 600,
-              borderRadius: 10,
-              border: '1px solid rgba(255,255,255,.15)',
-              color: '#ffffff',
-              textDecoration: 'none',
-              background: 'transparent',
-              boxSizing: 'border-box',
-            }}
-          >
-            Get started
-          </Link>
+                Get Pro
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
-      <p style={{ textAlign: 'center', fontSize: 12, color: '#9A9A9A', marginTop: 24 }}>
-        All prices in USD. Annual billing is charged as a single payment at the start of the year. Cancel any time.
+      <p style={{ textAlign: 'center', fontSize: 12, color: '#9A9A9A', marginTop: 28 }}>
+        All prices in USD. Cancel any time.
       </p>
     </section>
   );

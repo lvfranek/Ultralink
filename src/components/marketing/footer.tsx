@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { Logo } from "@/components/logo";
 import { siteConfig } from "@/lib/config/site";
 
@@ -17,6 +20,27 @@ const FOOTER_LINKS = {
     { label: "Agency news", href: siteConfig.socialLinks.telegram },
   ],
 };
+
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const [hovered, setHovered] = useState(false);
+  const external = href.startsWith("http") || href.startsWith("mailto");
+  return (
+    <Link
+      href={href}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        fontSize: 14,
+        color: hovered ? '#ffffff' : '#9A9A9A',
+        textDecoration: 'none',
+        transition: 'color 0.15s',
+      }}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+    >
+      {children}
+    </Link>
+  );
+}
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -47,21 +71,13 @@ export function Footer() {
           {/* Link columns */}
           {Object.entries(FOOTER_LINKS).map(([category, links]) => (
             <div key={category}>
-              <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(154,154,154,0.6)', marginBottom: 16 }}>
+              <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(154,154,154,0.5)', marginBottom: 16 }}>
                 {category}
               </p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      style={{ fontSize: 14, color: '#9A9A9A', textDecoration: 'none' }}
-                      {...(link.href.startsWith("http") || link.href.startsWith("mailto")
-                        ? { target: "_blank", rel: "noopener noreferrer" }
-                        : {})}
-                    >
-                      {link.label}
-                    </Link>
+                    <FooterLink href={link.href}>{link.label}</FooterLink>
                   </li>
                 ))}
               </ul>
@@ -74,7 +90,7 @@ export function Footer() {
           style={{
             marginTop: 48,
             paddingTop: 24,
-            borderTop: '1px solid rgba(255,255,255,.08)',
+            borderTop: '1px solid rgba(255,255,255,.06)',
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
@@ -82,11 +98,11 @@ export function Footer() {
             gap: 16,
           }}
         >
-          <p style={{ fontSize: 12, color: 'rgba(154,154,154,0.6)', margin: 0 }}>
+          <p style={{ fontSize: 12, color: 'rgba(154,154,154,0.55)', margin: 0 }}>
             &copy; {year} Ultralink. All rights reserved.
           </p>
-          <p style={{ fontSize: 12, color: 'rgba(154,154,154,0.6)', margin: 0 }}>
-            Built for creators who keep their accounts.
+          <p style={{ fontSize: 12, color: 'rgba(154,154,154,0.55)', margin: 0 }}>
+            Built for influencer agencies.
           </p>
         </div>
       </div>

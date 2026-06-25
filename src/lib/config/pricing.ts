@@ -5,6 +5,13 @@ export interface PlanFeature {
   included: boolean;
 }
 
+export interface ProTier {
+  links: number;
+  monthlyPrice: number;
+  annualMonthlyPrice: number;
+  annualPrice: number;
+}
+
 export interface FreePlan {
   id: "free";
   name: "Free";
@@ -13,39 +20,17 @@ export interface FreePlan {
   annualPrice: 0;
   links: 1;
   users: 1;
-  trialDays: 0;
   features: PlanFeature[];
   badge: null;
 }
 
-export interface CreatorPlan {
-  id: "creator";
-  name: "Creator";
-  monthlyPrice: 8;
-  annualMonthlyPrice: 6;
-  annualPrice: 72;
-  links: 1;
-  users: 1;
-  trialDays: 7;
-  features: PlanFeature[];
-  badge: "Most popular";
-}
-
-export interface AgencyTier {
-  links: number;
-  monthlyPrice: number;
-  annualMonthlyPrice: number;
-  annualPrice: number;
-}
-
-export interface AgencyPlan {
-  id: "agency";
-  name: "Agency";
-  tiers: AgencyTier[];
+export interface ProPlan {
+  id: "pro";
+  name: "Pro";
+  tiers: ProTier[];
   users: "unlimited";
-  trialDays: 0;
   features: PlanFeature[];
-  badge: "For teams";
+  badge: "Recommended";
 }
 
 export const FREE_PLAN: FreePlan = {
@@ -56,73 +41,67 @@ export const FREE_PLAN: FreePlan = {
   annualPrice: 0,
   links: 1,
   users: 1,
-  trialDays: 0,
   badge: null,
   features: [
     { text: "1 link page", included: true },
-    { text: "Basic analytics", included: false },
-    { text: "Custom domain", included: false },
-    { text: "Remove Ultralink badge", included: false },
-    { text: "Geo-blocking", included: false },
-    { text: "Team members", included: false },
+    { text: "Beautiful designs", included: true },
+    { text: "Deep linking", included: true },
+    { text: "Fast loading", included: true },
+    { text: "18+ age gate", included: true },
+    { text: "Active badge", included: false },
+    { text: "Country blocking", included: false },
+    { text: "Custom domains", included: false },
+    { text: "Team access", included: false },
+    { text: "Analytics", included: false },
     { text: "Win-Back", included: false },
   ],
 };
 
-export const CREATOR_PLAN: CreatorPlan = {
-  id: "creator",
-  name: "Creator",
-  monthlyPrice: 8,
-  annualMonthlyPrice: 6,
-  annualPrice: 72,
-  links: 1,
-  users: 1,
-  trialDays: 7,
-  badge: "Most popular",
-  features: [
-    { text: "1 link page", included: true },
-    { text: "Full analytics", included: true },
-    { text: "1 custom domain", included: true },
-    { text: "Remove Ultralink badge", included: true },
-    { text: "Geo-blocking", included: true },
-    { text: "Team members", included: false },
-    { text: "Win-Back", included: false },
-  ],
-};
-
-export const AGENCY_PLAN: AgencyPlan = {
-  id: "agency",
-  name: "Agency",
+export const PRO_PLAN: ProPlan = {
+  id: "pro",
+  name: "Pro",
   users: "unlimited",
-  trialDays: 0,
-  badge: "For teams",
+  badge: "Recommended",
   tiers: [
-    { links: 10, monthlyPrice: 29, annualMonthlyPrice: 22, annualPrice: 264 },
-    { links: 25, monthlyPrice: 49, annualMonthlyPrice: 37, annualPrice: 444 },
-    { links: 50, monthlyPrice: 89, annualMonthlyPrice: 67, annualPrice: 804 },
+    { links: 1,   monthlyPrice: 8,   annualMonthlyPrice: 6,   annualPrice: 72 },
+    { links: 3,   monthlyPrice: 14,  annualMonthlyPrice: 11,  annualPrice: 132 },
+    { links: 10,  monthlyPrice: 29,  annualMonthlyPrice: 22,  annualPrice: 264 },
+    { links: 25,  monthlyPrice: 49,  annualMonthlyPrice: 37,  annualPrice: 444 },
+    { links: 50,  monthlyPrice: 89,  annualMonthlyPrice: 67,  annualPrice: 804 },
     { links: 100, monthlyPrice: 149, annualMonthlyPrice: 112, annualPrice: 1344 },
     { links: 200, monthlyPrice: 249, annualMonthlyPrice: 187, annualPrice: 2244 },
     { links: 400, monthlyPrice: 399, annualMonthlyPrice: 299, annualPrice: 3588 },
   ],
   features: [
-    { text: "Up to 400 link pages", included: true },
+    { text: "Everything in Free", included: true },
+    { text: "Active badge", included: true },
+    { text: "Country blocking", included: true },
+    { text: "Custom domains", included: true },
+    { text: "Team access", included: true },
     { text: "Full analytics", included: true },
-    { text: "1 custom domain per link", included: true },
-    { text: "Remove Ultralink badge", included: true },
-    { text: "Geo-blocking", included: true },
-    { text: "Unlimited team members", included: true },
     { text: "Win-Back", included: true },
+    { text: "No Ultralink badge", included: true },
   ],
 };
 
-export const PLANS = [FREE_PLAN, CREATOR_PLAN, AGENCY_PLAN] as const;
+export const PLANS = [FREE_PLAN, PRO_PLAN] as const;
+
+// Feature → minimum plan (Phase 4 will enforce; this is the source of truth)
+export const FEATURE_PLAN: Record<string, "free" | "pro"> = {
+  age_gate:        "free",
+  active_badge:    "pro",
+  country_blocking: "pro",
+  analytics:       "pro",
+  custom_domains:  "pro",
+  team_access:     "pro",
+  win_back:        "pro",
+  badge_removal:   "pro",
+};
 
 export function getLinkCap(plan: string): number {
   switch (plan) {
-    case "creator":
-      return CREATOR_PLAN.links;
-    case "agency":
-      return AGENCY_PLAN.tiers[0].links; // smallest tier (10); Phase 4 will use real tier
+    case "pro":
+      return PRO_PLAN.tiers[0].links; // smallest tier (1); Phase 4 will use real tier
     default:
       return FREE_PLAN.links;
   }
