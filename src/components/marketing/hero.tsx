@@ -55,9 +55,9 @@ export function Hero() {
               color: '#0A0A0A',
             }}
           >
-            One link.
+            Move your audience anywhere,
             <br />
-            Your entire world.
+            safely and instantly.
           </h1>
 
           {/* Subhead — forced two-line break */}
@@ -70,9 +70,9 @@ export function Hero() {
               maxWidth: 620,
             }}
           >
-            One link for everything you do.
+            Made for influencer agencies. One link hub for everything you do.
             <br />
-            Fast, beautiful, and built to keep your accounts safe.
+            Fast, beautiful, and engineered to keep your accounts safe.
           </p>
 
           {/*
