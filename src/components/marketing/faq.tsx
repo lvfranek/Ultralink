@@ -21,7 +21,7 @@ const FAQS = [
   {
     question: "Will using Ultralink get my Instagram or TikTok banned?",
     answer:
-      "No — and this is something we take seriously. Many link-in-bio tools use 'link cloaking,' which means they show Instagram or TikTok's crawlers a different URL than your real visitors see. This violates platform terms of service and leads to permanent bans. Ultralink explicitly does not cloak. Crawlers and users always see the same destination. Your account is safe.",
+      "No — and this is something we take seriously. Many link-in-bio tools use link cloaking, which means they show Instagram or TikTok's crawlers a different URL than your real visitors see. This violates platform terms of service and leads to permanent bans. Ultralink explicitly does not cloak. Crawlers and users always see the same destination. Your account is safe.",
   },
   {
     question: "What is Win-Back?",
@@ -51,6 +51,7 @@ export function FAQ() {
       aria-labelledby="faq-heading"
       style={{ maxWidth: 1140, margin: '0 auto', padding: '72px 24px 80px' }}
     >
+      {/* Section header — floating on dark, like Features */}
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
         <h2
           id="faq-heading"
@@ -66,88 +67,120 @@ export function FAQ() {
         </h2>
       </div>
 
-      <dl
+      {/* White card accordion */}
+      <div
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
+          background: '#fff',
+          borderRadius: 28,
+          border: '1px solid rgba(0,0,0,.06)',
           maxWidth: 760,
           margin: '0 auto',
+          overflow: 'hidden',
         }}
       >
-        {FAQS.map((faq, i) => {
-          const isOpen = openIndex === i;
-          return (
-            <div
-              key={faq.question}
-              style={{
-                borderRadius: 14,
-                border: '1px solid rgba(255,255,255,.10)',
-                background: '#1A1A1A',
-                transition: 'border-color 0.15s',
-                ...(isOpen ? { borderColor: 'rgba(255,255,255,.20)' } : {}),
-              }}
-            >
-              <dt>
-                <button
-                  onClick={() => toggle(i)}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '18px 22px',
-                    textAlign: 'left',
-                    gap: 16,
-                    cursor: 'pointer',
-                    background: 'none',
-                    border: 'none',
-                    fontFamily: 'inherit',
-                  }}
-                  aria-expanded={isOpen}
-                  aria-controls={`faq-answer-${i}`}
-                  id={`faq-question-${i}`}
-                >
-                  <span style={{ fontSize: 14, fontWeight: 500, color: '#ffffff', flex: 1 }}>
-                    {faq.question}
-                  </span>
-                  <svg
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    style={{
-                      width: 16,
-                      height: 16,
-                      flexShrink: 0,
-                      color: '#9A9A9A',
-                      transition: 'transform 0.22s ease',
-                      transform: isOpen ? 'rotate(180deg)' : 'none',
-                    }}
-                    aria-hidden="true"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 8l5 5 5-5" />
-                  </svg>
-                </button>
-              </dt>
-              <dd
-                id={`faq-answer-${i}`}
-                role="region"
-                aria-labelledby={`faq-question-${i}`}
+        <dl style={{ margin: 0 }}>
+          {FAQS.map((faq, i) => {
+            const isOpen = openIndex === i;
+            const isLast = i === FAQS.length - 1;
+
+            return (
+              <div
+                key={faq.question}
                 style={{
-                  overflow: 'hidden',
-                  maxHeight: isOpen ? 400 : 0,
-                  transition: 'max-height 0.25s ease',
+                  borderBottom: isLast ? 'none' : '1px solid rgba(0,0,0,.06)',
                 }}
               >
-                <p style={{ padding: '0 22px 20px', fontSize: 14, color: '#9A9A9A', lineHeight: 1.7, margin: 0 }}>
-                  {faq.answer}
-                </p>
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
+                <dt>
+                  <button
+                    onClick={() => toggle(i)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '20px 28px',
+                      textAlign: 'left',
+                      gap: 16,
+                      cursor: 'pointer',
+                      background: isOpen ? 'rgba(0,0,0,.015)' : 'transparent',
+                      border: 'none',
+                      fontFamily: 'inherit',
+                      transition: 'background 0.15s',
+                    }}
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-answer-${i}`}
+                    id={`faq-question-${i}`}
+                  >
+                    <span
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 500,
+                        color: '#0A0A0A',
+                        flex: 1,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {faq.question}
+                    </span>
+                    <span
+                      style={{
+                        flexShrink: 0,
+                        width: 28,
+                        height: 28,
+                        borderRadius: '50%',
+                        background: 'rgba(0,0,0,.05)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <svg
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.75"
+                        style={{
+                          width: 14,
+                          height: 14,
+                          color: '#6B6B6B',
+                          transition: 'transform 0.22s cubic-bezier(0.32,0.72,0,1)',
+                          transform: isOpen ? 'rotate(180deg)' : 'none',
+                        }}
+                        aria-hidden="true"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 8l5 5 5-5" />
+                      </svg>
+                    </span>
+                  </button>
+                </dt>
+
+                <dd
+                  id={`faq-answer-${i}`}
+                  role="region"
+                  aria-labelledby={`faq-question-${i}`}
+                  style={{
+                    overflow: 'hidden',
+                    maxHeight: isOpen ? 500 : 0,
+                    transition: 'max-height 0.28s cubic-bezier(0.32,0.72,0,1)',
+                  }}
+                >
+                  <p
+                    style={{
+                      padding: '0 28px 22px',
+                      fontSize: 14,
+                      color: '#5a5a5a',
+                      lineHeight: 1.72,
+                      margin: 0,
+                    }}
+                  >
+                    {faq.answer}
+                  </p>
+                </dd>
+              </div>
+            );
+          })}
+        </dl>
+      </div>
     </section>
   );
 }

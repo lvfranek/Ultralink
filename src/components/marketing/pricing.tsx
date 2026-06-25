@@ -11,10 +11,10 @@ import {
 
 const GRADIENT = 'linear-gradient(110deg,#FBC2A4 0%,#F7A8C4 33%,#C9A7F2 66%,#A7C7F7 100%)';
 
-function CheckIcon({ muted }: { muted?: boolean }) {
+function CheckIcon() {
   return (
     <svg viewBox="0 0 16 16" fill="none" style={{ width: 16, height: 16, flexShrink: 0 }} aria-hidden="true">
-      <circle cx="8" cy="8" r="7" stroke="currentColor" strokeOpacity={muted ? 0.2 : 0.3} />
+      <circle cx="8" cy="8" r="7" stroke="currentColor" strokeOpacity={0.2} />
       <path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -42,7 +42,7 @@ export function Pricing() {
       aria-labelledby="pricing-heading"
       style={{ maxWidth: 1140, margin: '0 auto', padding: '72px 24px' }}
     >
-      {/* Header */}
+      {/* Floating header on dark — same pattern as Features, FAQ */}
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
         <h2
           id="pricing-heading"
@@ -97,7 +97,7 @@ export function Pricing() {
               {i === "monthly" ? "Monthly" : "Annual"}
               {i === "annual" && (
                 <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.75 }}>
-                  −25%
+                  -25%
                 </span>
               )}
             </button>
@@ -105,37 +105,38 @@ export function Pricing() {
         </div>
       </div>
 
-      {/* Two-card grid */}
+      {/* Two-card grid — paddingTop gives room for the Recommended badge */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
           gap: 20,
-          maxWidth: 860,
+          maxWidth: 820,
           margin: '0 auto',
+          paddingTop: 14,
         }}
       >
-        {/* Free card */}
+        {/* Free — white card */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            padding: 32,
+            padding: '28px 28px 24px',
             borderRadius: 20,
-            background: '#1A1A1A',
-            border: '1px solid rgba(255,255,255,.10)',
+            background: '#ffffff',
+            border: '1px solid rgba(0,0,0,.08)',
           }}
         >
-          <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9A9A9A', margin: '0 0 10px' }}>
+          <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(10,10,10,.4)', margin: '0 0 10px' }}>
             {FREE_PLAN.name}
           </p>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, marginBottom: 4 }}>
-            <span style={{ fontSize: 52, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>$0</span>
-            <span style={{ color: '#9A9A9A', fontSize: 14, marginBottom: 8 }}>/mo</span>
+            <span style={{ fontSize: 48, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em', lineHeight: 1 }}>$0</span>
+            <span style={{ color: 'rgba(10,10,10,.35)', fontSize: 14, marginBottom: 6 }}>/mo</span>
           </div>
-          <p style={{ fontSize: 12, color: '#9A9A9A', margin: '0 0 32px' }}>Free forever</p>
+          <p style={{ fontSize: 12, color: 'rgba(10,10,10,.35)', margin: '0 0 24px' }}>Free forever</p>
 
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: 9, flex: 1 }}>
             {FREE_PLAN.features.map((f) => (
               <li
                 key={f.text}
@@ -144,10 +145,10 @@ export function Pricing() {
                   alignItems: 'center',
                   gap: 10,
                   fontSize: 14,
-                  color: f.included ? '#C8C8C8' : 'rgba(154,154,154,0.35)',
+                  color: f.included ? '#0A0A0A' : 'rgba(10,10,10,.25)',
                 }}
               >
-                <span style={{ color: f.included ? '#10b981' : 'rgba(154,154,154,0.3)' }}>
+                <span style={{ color: f.included ? '#10b981' : 'rgba(10,10,10,.18)' }}>
                   {f.included ? <CheckIcon /> : <XIcon />}
                 </span>
                 {f.text}
@@ -162,12 +163,12 @@ export function Pricing() {
               alignItems: 'center',
               justifyContent: 'center',
               width: '100%',
-              padding: '13px 0',
+              padding: '12px 0',
               fontSize: 14,
               fontWeight: 600,
               borderRadius: 11,
-              border: '1px solid rgba(255,255,255,.18)',
-              color: '#ffffff',
+              border: '1px solid rgba(0,0,0,.12)',
+              color: '#0A0A0A',
               textDecoration: 'none',
               background: 'transparent',
               boxSizing: 'border-box',
@@ -177,9 +178,9 @@ export function Pricing() {
           </Link>
         </div>
 
-        {/* Pro card — gradient glow border */}
+        {/* Pro — white card, gradient border, Recommended badge on the top border edge */}
         <div style={{ position: 'relative', isolation: 'isolate' }}>
-          {/* Glow layer — sits behind the card, never clipped */}
+          {/* Pastel glow */}
           <div
             aria-hidden="true"
             style={{
@@ -188,12 +189,12 @@ export function Pricing() {
               borderRadius: 36,
               background: GRADIENT,
               filter: 'blur(28px)',
-              opacity: 0.55,
+              opacity: 0.45,
               zIndex: 0,
               pointerEvents: 'none',
             }}
           />
-          {/* Gradient border frame */}
+          {/* Gradient border frame — position relative so badge anchors here */}
           <div
             style={{
               position: 'relative',
@@ -203,56 +204,65 @@ export function Pricing() {
               background: GRADIENT,
             }}
           >
-            {/* Card inner */}
+            {/* Badge sitting centered on the top border edge */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 2,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  padding: '4px 16px',
+                  borderRadius: 999,
+                  background: '#ffffff',
+                  color: '#0A0A0A',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  boxShadow: '0 1px 6px rgba(0,0,0,.10)',
+                }}
+              >
+                Recommended
+              </span>
+            </div>
+
+            {/* White inner card */}
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                padding: 32,
+                padding: '28px 28px 24px',
                 borderRadius: 20,
-                background: '#1A1A1A',
+                background: '#ffffff',
               }}
             >
-              {/* Recommended pill */}
-              <div style={{ marginBottom: 12 }}>
-                <span
-                  style={{
-                    display: 'inline-block',
-                    padding: '4px 14px',
-                    borderRadius: 999,
-                    background: 'rgba(255,255,255,0.10)',
-                    border: '1px solid rgba(255,255,255,.18)',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: '#ffffff',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                  }}
-                >
-                  Recommended
-                </span>
-              </div>
-
-              <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#ffffff', margin: '0 0 10px' }}>
+              <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(10,10,10,.4)', margin: '0 0 10px' }}>
                 {PRO_PLAN.name}
               </p>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, marginBottom: 4 }}>
-                <span style={{ fontSize: 52, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                <span style={{ fontSize: 48, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em', lineHeight: 1 }}>
                   ${proPrice}
                 </span>
-                <span style={{ color: '#9A9A9A', fontSize: 14, marginBottom: 8 }}>/mo</span>
+                <span style={{ color: 'rgba(10,10,10,.35)', fontSize: 14, marginBottom: 6 }}>/mo</span>
               </div>
-              <p style={{ fontSize: 12, color: '#9A9A9A', margin: '0 0 20px' }}>
+              <p style={{ fontSize: 12, color: 'rgba(10,10,10,.35)', margin: '0 0 16px' }}>
                 {interval === "annual"
                   ? `Billed $${selectedTier.annualPrice}/yr`
                   : "Billed monthly"}
               </p>
 
               {/* Volume selector */}
-              <div style={{ marginBottom: 28 }}>
+              <div style={{ marginBottom: 20 }}>
                 <label
                   htmlFor="pro-links"
-                  style={{ display: 'block', fontSize: 12, color: '#9A9A9A', marginBottom: 6, fontWeight: 500 }}
+                  style={{ display: 'block', fontSize: 12, color: 'rgba(10,10,10,.4)', marginBottom: 6, fontWeight: 500 }}
                 >
                   Number of link pages
                 </label>
@@ -262,9 +272,9 @@ export function Pricing() {
                   onChange={(e) => setProTierIndex(Number(e.target.value))}
                   style={{
                     width: '100%',
-                    background: 'rgba(255,255,255,0.07)',
-                    border: '1px solid rgba(255,255,255,.18)',
-                    color: '#ffffff',
+                    background: 'rgba(0,0,0,.03)',
+                    border: '1px solid rgba(0,0,0,.10)',
+                    color: '#0A0A0A',
                     fontSize: 14,
                     borderRadius: 9,
                     padding: '10px 12px',
@@ -273,14 +283,14 @@ export function Pricing() {
                   }}
                 >
                   {PRO_PLAN.tiers.map((tier, i) => (
-                    <option key={tier.links} value={i} style={{ background: '#1A1A1A' }}>
+                    <option key={tier.links} value={i}>
                       {tier.links} {tier.links === 1 ? "link page" : "link pages"}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: 9, flex: 1 }}>
                 {PRO_PLAN.features.map((f) => (
                   <li
                     key={f.text}
@@ -289,7 +299,7 @@ export function Pricing() {
                       alignItems: 'center',
                       gap: 10,
                       fontSize: 14,
-                      color: '#C8C8C8',
+                      color: '#0A0A0A',
                     }}
                   >
                     <span style={{ color: '#10b981' }}>
@@ -307,14 +317,14 @@ export function Pricing() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   width: '100%',
-                  padding: '13px 0',
+                  padding: '12px 0',
                   fontSize: 14,
                   fontWeight: 600,
                   borderRadius: 11,
                   border: 'none',
-                  color: '#0A0A0A',
+                  color: '#ffffff',
                   textDecoration: 'none',
-                  background: '#ffffff',
+                  background: '#0A0A0A',
                   boxSizing: 'border-box',
                   cursor: 'pointer',
                 }}
@@ -326,7 +336,7 @@ export function Pricing() {
         </div>
       </div>
 
-      <p style={{ textAlign: 'center', fontSize: 12, color: '#9A9A9A', marginTop: 28 }}>
+      <p style={{ textAlign: 'center', fontSize: 12, color: '#9A9A9A', marginTop: 24 }}>
         All prices in USD. Cancel any time.
       </p>
     </section>
