@@ -74,16 +74,16 @@ body {
   background: var(--text-subtle);
 }
 
-/* Dark theme token override — applied to legal pages (privacy, terms) */
+/* Dark theme token override — applied to dashboard and legal pages */
 .dark-theme {
   --bg: #0A0A0A;
-  --surface: #0A0A0A;
+  --surface: #111111;
   --surface-2: #1A1A1A;
-  --border: rgba(255,255,255,.08);
-  --border-strong: rgba(255,255,255,.15);
-  --gold: #cfcfcf;
-  --gold-bright: #ffffff;
-  --gold-dim: rgba(255,255,255,0.05);
+  --border: rgba(255,255,255,.10);
+  --border-strong: rgba(255,255,255,.18);
+  --gold: #FFFFFF;
+  --gold-bright: #EEEEEE;
+  --gold-dim: rgba(255,255,255,0.08);
   --text: #FFFFFF;
   --text-muted: #9A9A9A;
   --text-subtle: rgba(154,154,154,0.55);

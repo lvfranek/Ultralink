@@ -9,8 +9,6 @@ import {
   FONT_OPTIONS,
   BG_COLORS,
   BG_GRADIENTS,
-  CONTAINER_COLORS,
-  CONTAINER_GRADIENTS,
   BUTTON_COLOR_SWATCHES,
   BUTTON_GRADIENT_SWATCHES,
   BUTTON_CORNERS,
@@ -187,29 +185,21 @@ function PresetThumb({ presetKey, active }: { presetKey: Exclude<Theme['preset']
   const btnRadius = cornerRadius(t.button.corner);
   const btnShadow = shadowValue(t.button.shadow);
   const bg = t.pageBg.type === 'color' ? t.pageBg.value : t.pageBg.type === 'gradient' ? t.pageBg.value : '#0A0A0B';
-  const containerBg = t.containerBg.type !== 'none' ? t.containerBg.value : 'transparent';
 
   return (
     <div
       className={[
-        "relative w-full aspect-[9/16] rounded-lg overflow-hidden border-2 transition-all cursor-pointer",
-        active ? "border-gold shadow-[0_0_0_3px_rgba(201,168,106,0.25)]" : "border-border-strong hover:border-gold/40",
+        "relative rounded-lg overflow-hidden border-2 transition-all cursor-pointer",
+        active ? "border-gold shadow-[0_0_0_2px_rgba(201,168,106,0.25)]" : "border-border-strong hover:border-gold/40",
       ].join(" ")}
-      style={{ background: bg }}
+      style={{ width: 120, height: 192, background: bg, flexShrink: 0 }}
     >
-      {/* Container panel (if any) */}
-      {t.containerBg.type !== 'none' && (
-        <div
-          className="absolute inset-x-2 bottom-2 top-8 rounded"
-          style={{ background: containerBg }}
-        />
-      )}
       {/* Avatar stub */}
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white/10 border border-white/20" />
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white/10 border border-white/20" />
       {/* Name stub */}
-      <div className="absolute top-9 left-1/2 -translate-x-1/2 w-10 h-1.5 rounded-full" style={{ background: t.title.color, opacity: 0.8 }} />
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-12 h-1.5 rounded-full" style={{ background: t.title.color, opacity: 0.8 }} />
       {/* Buttons */}
-      <div className="absolute bottom-4 left-3 right-3 space-y-1.5">
+      <div className="absolute bottom-5 left-3 right-3 space-y-2">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
@@ -218,7 +208,7 @@ function PresetThumb({ presetKey, active }: { presetKey: Exclude<Theme['preset']
               background: t.button.fill.value,
               borderRadius: btnRadius,
               boxShadow: btnShadow,
-              opacity: i === 1 ? 1 : i === 2 ? 0.7 : 0.45,
+              opacity: i === 1 ? 1 : i === 2 ? 0.65 : 0.35,
             }}
           />
         ))}
@@ -286,16 +276,6 @@ export function DesignTab({ theme, userId, onChange }: DesignTabProps) {
     }
   }
 
-  // containerBg helpers
-  function setContainerBgType(type: Theme['containerBg']['type']) {
-    const defaults: Record<Theme['containerBg']['type'], string> = {
-      none:     '',
-      color:    CONTAINER_COLORS[0].value,
-      gradient: CONTAINER_GRADIENTS[0].value,
-    };
-    onChange(patch({ containerBg: { type, value: defaults[type] } }));
-  }
-
   // button helpers
   function setButtonFillType(type: Theme['button']['fill']['type']) {
     const defaults: Record<Theme['button']['fill']['type'], string> = {
@@ -306,26 +286,24 @@ export function DesignTab({ theme, userId, onChange }: DesignTabProps) {
   }
 
   return (
-    <div className="space-y-1 py-2">
+    <div className="space-y-1 py-2 overflow-hidden">
 
       {/* ── PRESETS ── */}
       <div>
         <SectionLabel>Presets</SectionLabel>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-wrap gap-3">
           {(Object.keys(PRESETS) as Exclude<Theme['preset'], 'custom'>[]).map((key) => (
             <button
               key={key}
               type="button"
               onClick={() => applyPreset(key)}
-              className="flex flex-col gap-2 cursor-pointer group"
+              className="flex flex-col gap-1.5 cursor-pointer group"
+              style={{ width: 120 }}
             >
               <PresetThumb presetKey={key} active={theme.preset === key} />
-              <div className="text-left">
-                <p className={`text-xs font-semibold ${theme.preset === key ? 'text-gold' : 'text-text-muted group-hover:text-text'} transition-colors`}>
-                  {PRESET_META[key].label}
-                </p>
-                <p className="text-[10px] text-text-subtle leading-snug">{PRESET_META[key].description}</p>
-              </div>
+              <p className={`text-xs font-semibold text-left ${theme.preset === key ? 'text-gold' : 'text-text-muted group-hover:text-text'} transition-colors`}>
+                {PRESET_META[key].label}
+              </p>
             </button>
           ))}
         </div>
@@ -408,42 +386,6 @@ export function DesignTab({ theme, userId, onChange }: DesignTabProps) {
             </div>
           )}
         </div>
-      </div>
-
-      <Divider />
-
-      {/* ── CONTAINER BACKGROUND ── */}
-      <div>
-        <SectionLabel>Container Background</SectionLabel>
-        <p className="text-xs text-text-subtle mb-3 -mt-1">The panel behind your link stack (optional).</p>
-        <SegmentedControl
-          options={[
-            { id: 'none'     as const, label: 'None' },
-            { id: 'color'    as const, label: 'Color' },
-            { id: 'gradient' as const, label: 'Gradient' },
-          ]}
-          value={theme.containerBg.type}
-          onChange={setContainerBgType}
-        />
-        {theme.containerBg.type === 'color' && (
-          <div className="mt-3">
-            <ColorSwatches
-              swatches={CONTAINER_COLORS}
-              selected={theme.containerBg.value}
-              onSelect={(v) => onChange(patch({ containerBg: { type: 'color', value: v } }))}
-              withCustom
-            />
-          </div>
-        )}
-        {theme.containerBg.type === 'gradient' && (
-          <div className="mt-3">
-            <GradientSwatches
-              swatches={CONTAINER_GRADIENTS}
-              selected={theme.containerBg.value}
-              onSelect={(v) => onChange(patch({ containerBg: { type: 'gradient', value: v } }))}
-            />
-          </div>
-        )}
       </div>
 
       <Divider />

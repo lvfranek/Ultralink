@@ -3,22 +3,11 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import type { Page } from "@/lib/supabase/types";
-import { togglePageActive, deletePage } from "@/app/actions/pages";
+import { deletePage } from "@/app/actions/pages";
 
 interface LinksListProps {
   pages: Page[];
   siteUrl: string;
-}
-
-function StatusDot({ active }: { active: boolean }) {
-  return (
-    <span
-      className={`inline-block w-2 h-2 rounded-full shrink-0 ${
-        active ? "bg-emerald-500" : "bg-border-strong"
-      }`}
-      aria-label={active ? "Active" : "Inactive"}
-    />
-  );
 }
 
 function KebabMenu({ page }: { page: Page }) {
@@ -51,7 +40,7 @@ function KebabMenu({ page }: { page: Page }) {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} aria-hidden="true" />
-          <div className="absolute right-0 top-full mt-1 z-20 w-36 bg-white border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_4px_20px_rgba(0,0,0,0.10)]">
+          <div className="absolute right-0 top-full mt-1 z-20 w-36 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_4px_20px_rgba(0,0,0,0.40)]">
             <Link
               href={`/dashboard/links/${page.id}`}
               className="flex items-center gap-2 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface transition-colors"
@@ -82,7 +71,7 @@ function KebabMenu({ page }: { page: Page }) {
                     type="button"
                     onClick={() => { setOpen(false); setShowConfirm(false); handleDelete(); }}
                     disabled={deleting}
-                    className="flex-1 py-1 text-xs text-red-500 hover:text-red-600 border border-red-200 rounded hover:bg-red-50 transition-colors cursor-pointer"
+                    className="flex-1 py-1 text-xs text-red-400 hover:text-red-300 border border-red-800/50 rounded hover:bg-red-950/30 transition-colors cursor-pointer"
                   >
                     {deleting ? "…" : "Yes"}
                   </button>
@@ -104,8 +93,6 @@ function KebabMenu({ page }: { page: Page }) {
 }
 
 function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
-  const [active, setActive] = useState(page.is_active);
-  const [toggling, startToggle] = useTransition();
   const [copied, setCopied] = useState(false);
 
   const pageUrl = `${siteUrl}/${page.slug}`;
@@ -114,15 +101,6 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
     await navigator.clipboard.writeText(pageUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
-  };
-
-  const handleToggle = () => {
-    const next = !active;
-    setActive(next);
-    startToggle(async () => {
-      const result = await togglePageActive(page.id, next);
-      if ("error" in result) setActive(active);
-    });
   };
 
   return (
@@ -138,8 +116,6 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
           <circle cx="10.5" cy="11.5" r="1" />
         </svg>
       </div>
-
-      <StatusDot active={active} />
 
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-text truncate">
@@ -168,26 +144,6 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        {/* Active toggle */}
-        <button
-          type="button"
-          role="switch"
-          aria-checked={active}
-          aria-label={active ? "Deactivate" : "Activate"}
-          onClick={handleToggle}
-          disabled={toggling}
-          className={[
-            "relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text focus-visible:ring-offset-2 focus-visible:ring-offset-bg cursor-pointer disabled:cursor-wait",
-            active ? "bg-gold" : "bg-surface-2 border border-border-strong",
-          ].join(" ")}
-        >
-          <span
-            className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform duration-200 shadow-sm ${
-              active ? "translate-x-4" : "translate-x-0.5"
-            }`}
-          />
-        </button>
-
         <KebabMenu page={page} />
       </div>
     </div>
@@ -210,8 +166,6 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
       return 0;
     });
 
-  const activeCount = pages.filter((p) => p.is_active).length;
-
   return (
     <div>
       {/* Counts + sort */}
@@ -219,8 +173,6 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
         <p className="text-sm text-text-muted">
           <span className="text-text font-medium">{pages.length}</span>{" "}
           {pages.length === 1 ? "link" : "links"}
-          {" · "}
-          <span className="text-text font-medium">{activeCount}</span> active
         </p>
         <div className="ml-auto">
           <select
@@ -249,10 +201,10 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
         </svg>
         <input
           type="search"
-          placeholder="Search by slug or title…"
+          placeholder="Search links…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-white border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-text/20 focus:border-text/30 transition-colors"
+          className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-text/20 focus:border-text/30 transition-colors"
         />
       </div>
 
@@ -262,7 +214,7 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
           {search ? "No links match your search." : ""}
         </p>
       ) : (
-        <div className="bg-white border border-border rounded-[var(--radius-lg)] shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface-2 border border-border rounded-[var(--radius-lg)]">
           {filtered.map((page) => (
             <PageRow key={page.id} page={page} siteUrl={siteUrl} />
           ))}

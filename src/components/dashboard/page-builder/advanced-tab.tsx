@@ -33,7 +33,7 @@ export function AdvancedTab({ page, onChange }: AdvancedTabProps) {
           onClick={() => onChange({ age_gate_enabled: !page.age_gate_enabled })}
           className={[
             "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold cursor-pointer flex-shrink-0",
-            page.age_gate_enabled ? "bg-gold" : "bg-surface-2 border border-border-strong",
+            page.age_gate_enabled ? "bg-emerald-500" : "bg-surface-2 border border-border-strong",
           ].join(" ")}
         >
           <span

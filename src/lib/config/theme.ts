@@ -1,7 +1,6 @@
 export type Theme = {
   preset: 'max_conversion' | 'stack' | 'cover' | 'aesthetic' | 'custom';
   pageBg: { type: 'color' | 'gradient' | 'image'; value: string; overlay: number };
-  containerBg: { type: 'none' | 'color' | 'gradient'; value: string };
   button: {
     fill: { type: 'color' | 'gradient'; value: string };
     textColor: string;
@@ -52,23 +51,6 @@ export const BG_GRADIENTS = [
   { label: 'Dark Wine',  value: 'linear-gradient(135deg, #1A0A0E 0%, #0A0A0B 100%)' },
   { label: 'Noir',       value: 'linear-gradient(180deg, #080A10 0%, #0A0A0B 100%)' },
   { label: 'Dusk',       value: 'linear-gradient(135deg, #0D0A1A 0%, #0A0A0B 50%, #1A0A0A 100%)' },
-] as const;
-
-// ─── CONTAINER BACKGROUND ─────────────────────────────────────────────────────
-
-export const CONTAINER_COLORS = [
-  { label: 'Surface',     value: '#141417' },
-  { label: 'Glass',       value: 'rgba(255,255,255,0.05)' },
-  { label: 'Glass Light', value: 'rgba(255,255,255,0.09)' },
-  { label: 'Onyx',        value: '#1C1C20' },
-  { label: 'Wine',        value: '#1A0A0E' },
-  { label: 'Navy',        value: '#0A0E1A' },
-] as const;
-
-export const CONTAINER_GRADIENTS = [
-  { label: 'Dark Glass', value: 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)' },
-  { label: 'Gold Tint',  value: 'linear-gradient(180deg, rgba(201,168,106,0.10) 0%, rgba(201,168,106,0.02) 100%)' },
-  { label: 'Noir',       value: 'linear-gradient(180deg, #141417 0%, #0A0A0B 100%)' },
 ] as const;
 
 // ─── BUTTON OPTIONS ───────────────────────────────────────────────────────────
@@ -160,7 +142,6 @@ export function pageBgStyle(pageBg: Theme['pageBg']): string {
 export const DEFAULT_THEME: Theme = {
   preset: 'stack',
   pageBg: { type: 'color', value: '#0A0A0B', overlay: 0 },
-  containerBg: { type: 'none', value: '' },
   button: {
     fill: { type: 'color', value: '#1C1C20' },
     textColor: '#F5F3EF',
@@ -179,7 +160,6 @@ export const PRESETS: Record<Exclude<Theme['preset'], 'custom'>, Theme> = {
   max_conversion: {
     preset: 'max_conversion',
     pageBg: { type: 'color', value: '#0A0A0B', overlay: 0 },
-    containerBg: { type: 'none', value: '' },
     button: {
       fill: { type: 'color', value: '#E6C878' },
       textColor: '#0A0A0B',
@@ -194,7 +174,6 @@ export const PRESETS: Record<Exclude<Theme['preset'], 'custom'>, Theme> = {
   stack: {
     preset: 'stack',
     pageBg: { type: 'color', value: '#0A0A0B', overlay: 0 },
-    containerBg: { type: 'none', value: '' },
     button: {
       fill: { type: 'color', value: '#1C1C20' },
       textColor: '#F5F3EF',
@@ -209,7 +188,6 @@ export const PRESETS: Record<Exclude<Theme['preset'], 'custom'>, Theme> = {
   cover: {
     preset: 'cover',
     pageBg: { type: 'color', value: '#111827', overlay: 0 },
-    containerBg: { type: 'color', value: 'rgba(255,255,255,0.05)' },
     button: {
       fill: { type: 'color', value: 'rgba(255,255,255,0.08)' },
       textColor: '#F5F3EF',
@@ -224,7 +202,6 @@ export const PRESETS: Record<Exclude<Theme['preset'], 'custom'>, Theme> = {
   aesthetic: {
     preset: 'aesthetic',
     pageBg: { type: 'gradient', value: 'linear-gradient(135deg, #0A0A0B 0%, #1A1208 50%, #0A0A0B 100%)', overlay: 0 },
-    containerBg: { type: 'none', value: '' },
     button: {
       fill: { type: 'gradient', value: 'linear-gradient(135deg, #C9A86A 0%, #E6C878 100%)' },
       textColor: '#0A0A0B',
@@ -255,7 +232,6 @@ export function resolveTheme(raw: Record<string, unknown> | null | undefined): T
 
   const r = raw as Record<string, unknown>;
   const pageBgRaw = (r.pageBg ?? {}) as Record<string, unknown>;
-  const containerBgRaw = (r.containerBg ?? {}) as Record<string, unknown>;
   const buttonRaw = (r.button ?? {}) as Record<string, unknown>;
   const fillRaw = (buttonRaw.fill ?? {}) as Record<string, unknown>;
   const titleRaw = (r.title ?? {}) as Record<string, unknown>;
@@ -267,10 +243,6 @@ export function resolveTheme(raw: Record<string, unknown> | null | undefined): T
       type: (pageBgRaw.type as Theme['pageBg']['type']) ?? DEFAULT_THEME.pageBg.type,
       value: (pageBgRaw.value as string) ?? DEFAULT_THEME.pageBg.value,
       overlay: typeof pageBgRaw.overlay === 'number' ? pageBgRaw.overlay : DEFAULT_THEME.pageBg.overlay,
-    },
-    containerBg: {
-      type: (containerBgRaw.type as Theme['containerBg']['type']) ?? DEFAULT_THEME.containerBg.type,
-      value: (containerBgRaw.value as string) ?? DEFAULT_THEME.containerBg.value,
     },
     button: {
       fill: {

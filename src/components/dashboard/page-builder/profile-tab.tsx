@@ -9,10 +9,10 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 interface ProfileTabProps {
-  page: Pick<Page, "title" | "bio" | "avatar_url" | "avatar_style" | "active_badge">;
+  page: Pick<Page, "title" | "bio" | "avatar_url" | "avatar_style" | "active_badge" | "age_gate_enabled">;
   plan: Plan;
   userId: string;
-  onChange: (patch: Partial<Pick<Page, "title" | "bio" | "avatar_url" | "avatar_style" | "active_badge">>) => void;
+  onChange: (patch: Partial<Pick<Page, "title" | "bio" | "avatar_url" | "avatar_style" | "active_badge" | "age_gate_enabled">>) => void;
 }
 
 export function ProfileTab({ page, plan, userId, onChange }: ProfileTabProps) {
@@ -133,26 +133,26 @@ export function ProfileTab({ page, plan, userId, onChange }: ProfileTabProps) {
 
       {/* Avatar style */}
       <div>
-        <label className="block text-sm font-medium text-text-muted mb-3">
+        <label className="block text-sm font-medium text-text-muted mb-2">
           Avatar style
         </label>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex gap-2">
           {(["circle", "hero"] as AvatarStyle[]).map((style) => (
             <button
               key={style}
               type="button"
               onClick={() => onChange({ avatar_style: style })}
               className={[
-                "flex flex-col items-center gap-2 p-4 rounded-[var(--radius)] border text-sm font-medium transition-all cursor-pointer",
+                "flex flex-col items-center gap-1 p-2 rounded-[var(--radius-sm)] border text-xs font-medium transition-all cursor-pointer w-16",
                 page.avatar_style === style
                   ? "border-gold/60 bg-gold-dim text-gold"
                   : "border-border-strong bg-surface text-text-muted hover:border-gold/30",
               ].join(" ")}
             >
               {style === "circle" ? (
-                <div className="w-10 h-10 rounded-full bg-surface-2 border border-border-strong" />
+                <div className="w-6 h-6 rounded-full bg-surface-2 border border-border-strong" />
               ) : (
-                <div className="w-full h-8 rounded-sm bg-gradient-to-b from-surface-2 to-bg border border-border-strong" />
+                <div className="w-10 h-4 rounded-sm bg-gradient-to-b from-surface-2 to-bg border border-border-strong" />
               )}
               <span className="capitalize">{style}</span>
             </button>
@@ -161,7 +161,7 @@ export function ProfileTab({ page, plan, userId, onChange }: ProfileTabProps) {
       </div>
 
       {/* Name */}
-      <div>
+      <div className="max-w-xs">
         <label htmlFor="prof-title" className="block text-sm font-medium text-text-muted mb-1.5">
           Name
         </label>
@@ -171,7 +171,7 @@ export function ProfileTab({ page, plan, userId, onChange }: ProfileTabProps) {
           value={page.title}
           onChange={(e) => onChange({ title: e.target.value })}
           placeholder="Your name or brand"
-          className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/40 transition-colors"
+          className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/40 transition-colors"
         />
       </div>
 
@@ -213,7 +213,7 @@ export function ProfileTab({ page, plan, userId, onChange }: ProfileTabProps) {
             onClick={() => onChange({ active_badge: !page.active_badge })}
             className={[
               "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold cursor-pointer",
-              page.active_badge ? "bg-gold" : "bg-surface-2 border border-border-strong",
+              page.active_badge ? "bg-emerald-500" : "bg-surface-2 border border-border-strong",
             ].join(" ")}
           >
             <span
@@ -228,6 +228,62 @@ export function ProfileTab({ page, plan, userId, onChange }: ProfileTabProps) {
             Upgrade →
           </a>
         )}
+      </div>
+
+      {/* Age gate */}
+      <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-[var(--radius)]">
+        <div>
+          <p className="text-sm font-medium text-text">18+ Age gate</p>
+          <p className="text-xs text-text-muted mt-0.5">
+            Shows a full-screen age confirmation before revealing your page
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={page.age_gate_enabled}
+          onClick={() => onChange({ age_gate_enabled: !page.age_gate_enabled })}
+          className={[
+            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold cursor-pointer flex-shrink-0",
+            page.age_gate_enabled ? "bg-emerald-500" : "bg-surface-2 border border-border-strong",
+          ].join(" ")}
+        >
+          <span
+            className={`inline-block h-4 w-4 rounded-full bg-white transition-transform duration-200 shadow-sm ${page.age_gate_enabled ? "translate-x-6" : "translate-x-1"}`}
+          />
+        </button>
+      </div>
+
+      {page.age_gate_enabled && (
+        <div className="px-4 py-3 bg-gold-dim border border-gold/20 rounded-[var(--radius)] text-xs text-text-muted leading-relaxed">
+          When enabled, visitors see a consent screen before accessing your page.
+          The confirmation is remembered for their browser session.
+        </div>
+      )}
+
+      {/* Phase 5 stubs */}
+      <div className="mt-2 space-y-3">
+        <p className="text-xs font-medium text-text-subtle uppercase tracking-widest">Coming in Phase 5</p>
+        {[
+          { label: "Custom Domain", description: "Point your own domain (e.g. links.yourbrand.com) to this page." },
+          { label: "Geo-Blocking", description: "Restrict access to specific countries or regions." },
+          { label: "Win-Back", description: "Show a prompt to visitors who start to leave, offering a second destination." },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="flex items-start justify-between p-4 bg-surface border border-border rounded-[var(--radius)] opacity-60"
+          >
+            <div>
+              <p className="text-sm font-medium text-text flex items-center gap-2">
+                {item.label}
+                <span className="text-[10px] px-1.5 py-0.5 bg-surface-2 text-text-subtle border border-border-strong rounded font-semibold uppercase tracking-wider">
+                  Phase 5
+                </span>
+              </p>
+              <p className="text-xs text-text-muted mt-0.5">{item.description}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Crop modal */}

@@ -43,10 +43,6 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
     return '#000000'; // image background — fade to black
   })();
 
-  // ── Container background ──────────────────────────────────────────────────────
-  const hasContainer = t.containerBg.type !== 'none' && t.containerBg.value;
-  const containerBg = hasContainer ? t.containerBg.value : undefined;
-
   // ── Button styles ─────────────────────────────────────────────────────────────
   const btnBg = t.button.fill.value;
   const btnColor = t.button.textColor;
@@ -197,11 +193,8 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
           </div>
         )}
 
-        {/* Link stack — wrapped in optional container panel */}
-        <div
-          className={`w-full ${hasContainer ? (isPreview ? 'rounded-xl p-3' : 'rounded-2xl p-4') : ''} ${isPreview ? "space-y-2" : "space-y-3"}`}
-          style={hasContainer ? { background: containerBg } : undefined}
-        >
+        {/* Link stack */}
+        <div className={`w-full ${isPreview ? "space-y-2" : "space-y-3"}`}>
           {links.length > 0 ? (
             <nav
               className={`w-full ${isPreview ? "space-y-2" : "space-y-3"}`}

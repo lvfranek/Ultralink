@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 
 type Mode = "signin" | "signup";
 
+
 function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" style={{ width: 20, height: 20 }} aria-hidden="true">
@@ -25,9 +26,9 @@ function isValidEmail(email: string) {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,.15)',
-  color: '#ffffff',
+  background: 'rgba(0,0,0,0.04)',
+  border: '1px solid rgba(0,0,0,.12)',
+  color: '#0A0A0A',
   borderRadius: 8,
   padding: '12px 14px',
   fontSize: 14,
@@ -38,7 +39,7 @@ const inputStyle: React.CSSProperties = {
 
 const inputErrorStyle: React.CSSProperties = {
   ...inputStyle,
-  border: '1px solid rgba(239,68,68,0.6)',
+  border: '1px solid rgba(220,38,38,0.5)',
 };
 
 export function LoginForm() {
@@ -163,245 +164,113 @@ export function LoginForm() {
         overflow: 'hidden',
       }}
     >
-      <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: 380 }}>
-        {/* Logo */}
+      <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: 400 }}>
+        {/* Logo — on dark background */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
           <Logo href="/" iconSize={32} onDark />
         </div>
 
-        {/* Card */}
+        {/* White card — matches homepage hero card */}
         <div
           style={{
-            background: '#1A1A1A',
-            border: '1px solid rgba(255,255,255,.10)',
-            borderRadius: 16,
-            padding: 28,
+            background: '#fff',
+            border: '1px solid rgba(0,0,0,.06)',
+            borderRadius: 28,
+            padding: '32px 28px',
           }}
         >
-          {/* Username claim context */}
-          {prefilledUsername && (
+            {/* Username claim context */}
+            {prefilledUsername && (
+              <div
+                style={{
+                  marginBottom: 20,
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  background: 'rgba(0,0,0,0.04)',
+                  border: '1px solid rgba(0,0,0,.08)',
+                }}
+              >
+                <p style={{ fontSize: 12, color: '#6B6B6B', margin: 0, fontWeight: 500 }}>
+                  Claiming{" "}
+                  <span style={{ fontWeight: 700, color: '#0A0A0A' }}>ultralink.bio/{prefilledUsername}</span>
+                </p>
+              </div>
+            )}
+
+            {/* Mode toggle */}
             <div
+              role="tablist"
+              aria-label="Authentication mode"
               style={{
-                marginBottom: 20,
-                padding: '10px 14px',
-                borderRadius: 8,
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,.10)',
+                display: 'flex',
+                background: 'rgba(0,0,0,0.06)',
+                borderRadius: 10,
+                padding: 4,
+                marginBottom: 24,
+                gap: 4,
               }}
             >
-              <p style={{ fontSize: 12, color: '#9A9A9A', margin: 0, fontWeight: 500 }}>
-                Claiming{" "}
-                <span style={{ fontWeight: 700, color: '#ffffff' }}>ultralink.bio/{prefilledUsername}</span>
-              </p>
-            </div>
-          )}
-
-          {/* Mode toggle */}
-          <div
-            role="tablist"
-            aria-label="Authentication mode"
-            style={{
-              display: 'flex',
-              background: 'rgba(255,255,255,0.05)',
-              borderRadius: 8,
-              padding: 4,
-              marginBottom: 24,
-              gap: 4,
-            }}
-          >
-            {(["signup", "signin"] as Mode[]).map((m) => (
-              <button
-                key={m}
-                role="tab"
-                aria-selected={mode === m}
-                onClick={() => handleModeSwitch(m)}
-                style={{
-                  flex: 1,
-                  padding: '8px 12px',
-                  fontSize: 14,
-                  fontWeight: 500,
-                  borderRadius: 6,
-                  border: mode === m ? '1px solid rgba(255,255,255,.15)' : 'none',
-                  background: mode === m ? 'rgba(255,255,255,0.08)' : 'transparent',
-                  color: mode === m ? '#ffffff' : '#9A9A9A',
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {m === "signup" ? "Create account" : "Sign in"}
-              </button>
-            ))}
-          </div>
-
-          {/* Heading */}
-          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#ffffff', margin: '0 0 4px' }}>
-            {mode === "signup" ? "Create your account" : "Welcome back"}
-          </h1>
-          <p style={{ fontSize: 14, color: '#9A9A9A', margin: '0 0 24px' }}>
-            {mode === "signup"
-              ? "Start for free. No credit card required."
-              : "Sign in to continue to your dashboard."}
-          </p>
-
-          {/* Google OAuth */}
-          <button
-            type="button"
-            onClick={handleGoogleAuth}
-            disabled={googleLoading || loading}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 10,
-              padding: '12px 16px',
-              borderRadius: 8,
-              border: '1px solid rgba(255,255,255,.15)',
-              fontSize: 14,
-              fontWeight: 500,
-              color: '#ffffff',
-              background: 'rgba(255,255,255,0.05)',
-              cursor: googleLoading || loading ? 'not-allowed' : 'pointer',
-              opacity: googleLoading || loading ? 0.5 : 1,
-              marginBottom: 20,
-              fontFamily: 'inherit',
-              transition: 'all 0.15s',
-            }}
-          >
-            {googleLoading ? (
-              <span
-                style={{
-                  display: 'inline-block',
-                  width: 16,
-                  height: 16,
-                  border: '2px solid currentColor',
-                  borderTopColor: 'transparent',
-                  borderRadius: '50%',
-                  animation: 'spin 0.75s linear infinite',
-                }}
-                aria-hidden="true"
-              />
-            ) : (
-              <GoogleIcon />
-            )}
-            Continue with Google
-          </button>
-
-          {/* Divider */}
-          <div style={{ position: 'relative', margin: '20px 0' }}>
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }} aria-hidden="true">
-              <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,.10)' }} />
-            </div>
-            <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
-              <span style={{ padding: '0 12px', background: '#1A1A1A', fontSize: 12, color: '#9A9A9A' }}>
-                or continue with email
-              </span>
-            </div>
-          </div>
-
-          {/* Email/password form */}
-          <form onSubmit={handleEmailAuth} style={{ display: 'flex', flexDirection: 'column', gap: 16 }} noValidate>
-            <div>
-              <label htmlFor="email" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#9A9A9A', marginBottom: 6 }}>
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => { setEmail(e.target.value); clearMessages(); }}
-                onBlur={() => setEmailTouched(true)}
-                placeholder="you@example.com"
-                autoComplete="email"
-                required
-                disabled={loading}
-                style={emailError ? inputErrorStyle : inputStyle}
-              />
-              {emailError && (
-                <p style={{ marginTop: 6, fontSize: 12, color: '#ef4444' }}>{emailError}</p>
-              )}
+              {(["signup", "signin"] as Mode[]).map((m) => (
+                <button
+                  key={m}
+                  role="tab"
+                  aria-selected={mode === m}
+                  onClick={() => handleModeSwitch(m)}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    borderRadius: 7,
+                    border: 'none',
+                    background: mode === m ? '#0A0A0A' : 'transparent',
+                    color: mode === m ? '#ffffff' : '#9a9a9a',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {m === "signup" ? "Create account" : "Sign in"}
+                </button>
+              ))}
             </div>
 
-            <div>
-              <label htmlFor="password" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#9A9A9A', marginBottom: 6 }}>
-                Password
-                {mode === "signup" && (
-                  <span style={{ fontWeight: 400, color: 'rgba(154,154,154,0.7)', marginLeft: 4 }}>(min. 8 characters)</span>
-                )}
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); clearMessages(); }}
-                onBlur={() => setPasswordTouched(true)}
-                placeholder={mode === "signup" ? "At least 8 characters" : "Your password"}
-                autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                required
-                disabled={loading}
-                style={passwordError ? inputErrorStyle : inputStyle}
-              />
-              {passwordError && (
-                <p style={{ marginTop: 6, fontSize: 12, color: '#ef4444' }}>{passwordError}</p>
-              )}
-            </div>
+            {/* Heading */}
+            <h1 style={{ fontSize: 20, fontWeight: 600, color: '#0A0A0A', margin: '0 0 4px' }}>
+              {mode === "signup" ? "Create your account" : "Welcome back"}
+            </h1>
+            <p style={{ fontSize: 14, color: '#6B6B6B', margin: '0 0 24px' }}>
+              {mode === "signup"
+                ? "Start for free. No credit card required."
+                : "Sign in to continue to your dashboard."}
+            </p>
 
-            {error && (
-              <div
-                role="alert"
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: 8,
-                  background: 'rgba(239,68,68,0.10)',
-                  border: '1px solid rgba(239,68,68,0.30)',
-                  fontSize: 14,
-                  color: '#f87171',
-                }}
-              >
-                {error}
-              </div>
-            )}
-
-            {successMessage && (
-              <div
-                role="status"
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: 8,
-                  background: 'rgba(16,185,129,0.10)',
-                  border: '1px solid rgba(16,185,129,0.30)',
-                  fontSize: 14,
-                  color: '#34d399',
-                }}
-              >
-                {successMessage}
-              </div>
-            )}
-
+            {/* Google OAuth */}
             <button
-              type="submit"
-              disabled={loading || googleLoading}
+              type="button"
+              onClick={handleGoogleAuth}
+              disabled={googleLoading || loading}
               style={{
                 width: '100%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 8,
-                padding: '14px 0',
-                fontSize: 15,
-                fontWeight: 600,
-                borderRadius: 10,
-                border: 'none',
-                background: '#ffffff',
+                gap: 10,
+                padding: '12px 16px',
+                borderRadius: 8,
+                border: '1px solid rgba(0,0,0,.12)',
+                fontSize: 14,
+                fontWeight: 500,
                 color: '#0A0A0A',
-                cursor: loading || googleLoading ? 'not-allowed' : 'pointer',
-                opacity: loading || googleLoading ? 0.6 : 1,
+                background: 'rgba(0,0,0,0.03)',
+                cursor: googleLoading || loading ? 'not-allowed' : 'pointer',
+                opacity: googleLoading || loading ? 0.5 : 1,
+                marginBottom: 20,
                 fontFamily: 'inherit',
-                transition: 'opacity 0.15s',
+                transition: 'all 0.15s',
               }}
             >
-              {loading && (
+              {googleLoading ? (
                 <span
                   style={{
                     display: 'inline-block',
@@ -414,20 +283,153 @@ export function LoginForm() {
                   }}
                   aria-hidden="true"
                 />
+              ) : (
+                <GoogleIcon />
               )}
-              {mode === "signup" ? "Create account" : "Sign in"}
+              Continue with Google
             </button>
-          </form>
+
+            {/* Divider */}
+            <div style={{ position: 'relative', margin: '20px 0' }}>
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }} aria-hidden="true">
+                <div style={{ width: '100%', borderTop: '1px solid rgba(0,0,0,.08)' }} />
+              </div>
+              <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+                <span style={{ padding: '0 12px', background: '#fff', fontSize: 12, color: '#9a9a9a' }}>
+                  or continue with email
+                </span>
+              </div>
+            </div>
+
+            {/* Email/password form */}
+            <form onSubmit={handleEmailAuth} style={{ display: 'flex', flexDirection: 'column', gap: 16 }} noValidate>
+              <div>
+                <label htmlFor="email" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6B6B6B', marginBottom: 6 }}>
+                  Email address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); clearMessages(); }}
+                  onBlur={() => setEmailTouched(true)}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  required
+                  disabled={loading}
+                  style={emailError ? inputErrorStyle : inputStyle}
+                />
+                {emailError && (
+                  <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>{emailError}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="password" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6B6B6B', marginBottom: 6 }}>
+                  Password
+                  {mode === "signup" && (
+                    <span style={{ fontWeight: 400, color: '#9a9a9a', marginLeft: 4 }}>(min. 8 characters)</span>
+                  )}
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); clearMessages(); }}
+                  onBlur={() => setPasswordTouched(true)}
+                  placeholder={mode === "signup" ? "At least 8 characters" : "Your password"}
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                  required
+                  disabled={loading}
+                  style={passwordError ? inputErrorStyle : inputStyle}
+                />
+                {passwordError && (
+                  <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>{passwordError}</p>
+                )}
+              </div>
+
+              {error && (
+                <div
+                  role="alert"
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'rgba(220,38,38,0.08)',
+                    border: '1px solid rgba(220,38,38,0.25)',
+                    fontSize: 14,
+                    color: '#b91c1c',
+                  }}
+                >
+                  {error}
+                </div>
+              )}
+
+              {successMessage && (
+                <div
+                  role="status"
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'rgba(5,150,105,0.08)',
+                    border: '1px solid rgba(5,150,105,0.25)',
+                    fontSize: 14,
+                    color: '#047857',
+                  }}
+                >
+                  {successMessage}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading || googleLoading}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  padding: '14px 0',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  borderRadius: 10,
+                  border: 'none',
+                  background: '#0A0A0A',
+                  color: '#ffffff',
+                  cursor: loading || googleLoading ? 'not-allowed' : 'pointer',
+                  opacity: loading || googleLoading ? 0.6 : 1,
+                  fontFamily: 'inherit',
+                  transition: 'opacity 0.15s',
+                }}
+              >
+                {loading && (
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: 16,
+                      height: 16,
+                      border: '2px solid currentColor',
+                      borderTopColor: 'transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 0.75s linear infinite',
+                    }}
+                    aria-hidden="true"
+                  />
+                )}
+                {mode === "signup" ? "Create account" : "Sign in"}
+              </button>
+            </form>
         </div>
 
         {/* Bottom links */}
-        <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: '#9A9A9A' }}>
+
+        <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: '#6B6B6B' }}>
           By continuing, you agree to our{" "}
-          <Link href="/terms" style={{ color: '#cfcfcf', textDecoration: 'underline', textUnderlineOffset: 2 }}>
+          <Link href="/terms" style={{ color: '#9a9a9a', textDecoration: 'underline', textUnderlineOffset: 2 }}>
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" style={{ color: '#cfcfcf', textDecoration: 'underline', textUnderlineOffset: 2 }}>
+          <Link href="/privacy" style={{ color: '#9a9a9a', textDecoration: 'underline', textUnderlineOffset: 2 }}>
             Privacy Policy
           </Link>
           .

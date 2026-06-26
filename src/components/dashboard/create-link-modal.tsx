@@ -101,7 +101,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
         <div
-          className="w-full max-w-md bg-white border border-border rounded-[var(--radius-lg)] shadow-[0_8px_40px_rgba(0,0,0,0.12)] overflow-hidden"
+          className="w-full max-w-md bg-surface-2 border border-border rounded-[var(--radius-lg)] shadow-[0_8px_40px_rgba(0,0,0,0.5)] overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -198,7 +198,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
 
             {/* Server error */}
             {state && "error" in state && (
-              <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-red-50 border border-red-200 text-sm text-red-600">
+              <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-red-950/30 border border-red-800/40 text-sm text-red-400">
                 {state.error}
               </div>
             )}
@@ -227,7 +227,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                 <button
                   type="button"
                   onClick={handleSubmitAttempt}
-                  className="flex-1 py-3 text-sm font-semibold text-bg bg-gold/50 rounded-[var(--radius)] cursor-pointer hover:bg-gold/60 transition-colors"
+                  className="flex-1 py-3 text-sm font-medium text-text-subtle bg-surface border border-border rounded-[var(--radius)] cursor-pointer hover:bg-surface-2 transition-colors"
                 >
                   Create link
                 </button>

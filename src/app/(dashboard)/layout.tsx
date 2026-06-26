@@ -21,7 +21,7 @@ export default async function DashboardLayout({
     .single();
 
   return (
-    <div className="flex min-h-screen bg-bg">
+    <div className="flex min-h-screen bg-bg dark-theme">
       <Sidebar user={user} displayName={profile?.display_name} />
       <main className="flex-1 lg:overflow-y-auto pt-14 lg:pt-0">
         {children}

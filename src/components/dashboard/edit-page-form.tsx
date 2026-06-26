@@ -197,7 +197,7 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
             onClick={() => setIsActive((v) => !v)}
             className={[
               "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text focus-visible:ring-offset-2 focus-visible:ring-offset-bg cursor-pointer",
-              isActive ? "bg-gold" : "bg-border-strong",
+              isActive ? "bg-emerald-500" : "bg-border-strong",
             ].join(" ")}
           >
             <span
@@ -210,14 +210,14 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
 
         {/* Server error */}
         {state && "error" in state && (
-          <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-red-50 border border-red-200 text-sm text-red-600">
+          <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-red-950/30 border border-red-800/40 text-sm text-red-400">
             {state.error}
           </div>
         )}
 
         {/* Success */}
         {saveSuccess && (
-          <div role="status" className="p-3 rounded-[var(--radius-sm)] bg-emerald-50 border border-emerald-200 text-sm text-emerald-700">
+          <div role="status" className="p-3 rounded-[var(--radius-sm)] bg-emerald-950/30 border border-emerald-800/40 text-sm text-emerald-400">
             Changes saved!
           </div>
         )}
@@ -242,13 +242,13 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
           <button
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
-            className="px-4 py-2 text-sm text-red-500 border border-red-200 rounded-[var(--radius)] hover:bg-red-50 transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm text-red-400 border border-red-800/40 rounded-[var(--radius)] hover:bg-red-950/30 transition-colors cursor-pointer"
           >
             Delete this page
           </button>
         ) : (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-[var(--radius)] space-y-3">
-            <p className="text-sm text-red-600 font-medium">
+          <div className="p-4 bg-red-950/20 border border-red-800/40 rounded-[var(--radius)] space-y-3">
+            <p className="text-sm text-red-400 font-medium">
               Are you sure? This cannot be undone.
             </p>
             <p className="text-xs text-text-muted">
@@ -259,7 +259,7 @@ export function EditPageForm({ page, siteUrl }: EditPageFormProps) {
                 type="button"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="px-4 py-2 text-sm text-red-500 border border-red-200 rounded-[var(--radius)] hover:bg-red-100 transition-colors cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 text-sm text-red-400 border border-red-800/40 rounded-[var(--radius)] hover:bg-red-950/30 transition-colors cursor-pointer disabled:opacity-50"
               >
                 {deleting ? "Deleting…" : "Yes, delete"}
               </button>

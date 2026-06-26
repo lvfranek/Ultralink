@@ -30,7 +30,7 @@ function NavItem({
   const cls = [
     "flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius)] text-sm font-medium transition-all duration-150",
     active
-      ? "bg-gold text-bg"
+      ? "bg-white/[.08] text-text"
       : disabled
       ? "text-text-subtle cursor-not-allowed opacity-60"
       : "text-text-muted hover:text-text hover:bg-surface-2 cursor-pointer",
@@ -104,7 +104,7 @@ function AccountMenu({ user, displayName }: { user: User; displayName?: string |
             onClick={() => setOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-white border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_8px_30px_rgba(0,0,0,0.1)]">
+          <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
             <button
               type="button"
               onClick={() => { setOpen(false); router.push("/login"); }}
@@ -191,15 +191,14 @@ export function Sidebar({ user, displayName }: SidebarProps) {
   ];
 
   const bottomItems = [
-    { href: "mailto:support@ultralink.bio", label: "Help" },
-    { href: "mailto:support@ultralink.bio?subject=Feedback", label: "Feedback" },
-    { href: "https://t.me/ultralink", label: "Join Telegram" },
+    { href: "mailto:support@ultralink.bio?subject=Feedback", label: "Give feedback" },
+    { href: "https://t.me/ultralink", label: "Latest Updates" },
   ];
 
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-border">
-        <Logo href="/dashboard" iconSize={24} />
+      <div className="h-14 flex items-center px-4 border-b border-border shrink-0">
+        <Logo href="/dashboard" iconSize={24} onDark />
       </div>
 
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
@@ -248,8 +247,8 @@ export function Sidebar({ user, displayName }: SidebarProps) {
       </aside>
 
       {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 h-14 bg-white border-b border-border flex items-center justify-between px-4">
-        <Logo href="/dashboard" iconSize={22} />
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 h-14 bg-bg border-b border-border flex items-center justify-between px-4">
+        <Logo href="/dashboard" iconSize={22} onDark />
         <button
           type="button"
           onClick={() => setMobileOpen((v) => !v)}
@@ -273,7 +272,7 @@ export function Sidebar({ user, displayName }: SidebarProps) {
             onClick={() => setMobileOpen(false)}
             aria-hidden="true"
           />
-          <div className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-white border-r border-border overflow-y-auto">
+          <div className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-bg border-r border-border overflow-y-auto">
             <SidebarContent onClose={() => setMobileOpen(false)} />
           </div>
         </>
