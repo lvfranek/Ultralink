@@ -1,154 +1,30 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
+import { HexColorPicker } from "react-colorful";
 import { createClient } from "@/lib/supabase/client";
 import {
   type Theme,
+  type PresetKey,
+  type LinkStyle,
   PRESETS,
   PRESET_META,
   FONT_OPTIONS,
-  BG_COLORS,
-  BG_GRADIENTS,
-  BUTTON_COLOR_SWATCHES,
-  BUTTON_GRADIENT_SWATCHES,
   BUTTON_CORNERS,
-  BUTTON_SHADOWS,
-  TEXT_COLOR_SWATCHES,
   ANIMATIONS,
   cornerRadius,
-  shadowValue,
 } from "@/lib/config/theme";
+import { FieldRow } from "./panel-primitives";
 
-interface DesignTabProps {
-  theme: Theme;
-  userId: string;
-  onChange: (theme: Theme) => void;
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+
+function patchTheme(theme: Theme, partial: Partial<Theme>): Theme {
+  return { ...theme, ...partial, preset: "custom" as const };
 }
 
-// ─── SMALL SHARED PRIMITIVES ──────────────────────────────────────────────────
+// ─── SHARED PRIMITIVES ────────────────────────────────────────────────────────
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-xs font-semibold text-text-subtle uppercase tracking-widest mb-3">
-      {children}
-    </p>
-  );
-}
-
-function SubLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-xs font-medium text-text-muted mb-2">{children}</p>
-  );
-}
-
-function Divider() {
-  return <div className="border-t border-border my-6" />;
-}
-
-/** A row of coloured swatches with an optional "custom" colour picker. */
-function ColorSwatches({
-  swatches,
-  selected,
-  onSelect,
-  withCustom = false,
-}: {
-  swatches: readonly { label: string; value: string }[];
-  selected: string;
-  onSelect: (v: string) => void;
-  withCustom?: boolean;
-}) {
-  const pickerRef = useRef<HTMLInputElement>(null);
-  const isCustom = withCustom && !swatches.some((s) => s.value === selected);
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      {swatches.map((s) => (
-        <button
-          key={s.value}
-          type="button"
-          title={s.label}
-          onClick={() => onSelect(s.value)}
-          className={[
-            "w-7 h-7 rounded-full border-2 transition-all cursor-pointer flex-shrink-0",
-            selected === s.value
-              ? "border-gold scale-110 shadow-[0_0_0_2px_rgba(201,168,106,0.35)]"
-              : "border-transparent hover:border-border-strong",
-          ].join(" ")}
-          style={{ background: s.value }}
-          aria-label={s.label}
-          aria-pressed={selected === s.value}
-        />
-      ))}
-      {withCustom && (
-        <>
-          <button
-            type="button"
-            title="Custom colour"
-            onClick={() => pickerRef.current?.click()}
-            className={[
-              "w-7 h-7 rounded-full border-2 transition-all cursor-pointer flex-shrink-0 flex items-center justify-center",
-              isCustom
-                ? "border-gold scale-110 shadow-[0_0_0_2px_rgba(201,168,106,0.35)]"
-                : "border-border-strong bg-surface-2 hover:border-gold/40",
-            ].join(" ")}
-            style={isCustom ? { background: selected } : undefined}
-            aria-label="Custom colour"
-          >
-            {!isCustom && (
-              <svg viewBox="0 0 14 14" className="w-3 h-3 text-text-subtle" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M7 1v12M1 7h12" strokeLinecap="round" />
-              </svg>
-            )}
-          </button>
-          <input
-            ref={pickerRef}
-            type="color"
-            value={isCustom ? selected : "#C9A86A"}
-            onChange={(e) => onSelect(e.target.value)}
-            className="sr-only"
-            aria-hidden="true"
-          />
-        </>
-      )}
-    </div>
-  );
-}
-
-/** A row of gradient swatches (no custom picker — keep it curated). */
-function GradientSwatches({
-  swatches,
-  selected,
-  onSelect,
-}: {
-  swatches: readonly { label: string; value: string }[];
-  selected: string;
-  onSelect: (v: string) => void;
-}) {
-  return (
-    <div className="grid grid-cols-3 gap-2">
-      {swatches.map((s) => (
-        <button
-          key={s.value}
-          type="button"
-          title={s.label}
-          onClick={() => onSelect(s.value)}
-          className={[
-            "h-8 rounded-[var(--radius-sm)] border-2 transition-all cursor-pointer text-[10px] font-medium text-white/70",
-            selected === s.value
-              ? "border-gold shadow-[0_0_0_2px_rgba(201,168,106,0.35)] scale-[1.03]"
-              : "border-transparent hover:border-border-strong",
-          ].join(" ")}
-          style={{ background: s.value }}
-          aria-label={s.label}
-          aria-pressed={selected === s.value}
-        />
-      ))}
-    </div>
-  );
-}
-
-/** Segmented control for 2-3 short options. */
-function SegmentedControl<T extends string>({
+export function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
@@ -178,38 +54,157 @@ function SegmentedControl<T extends string>({
   );
 }
 
-// ─── PRESET MINI-THUMBNAIL ────────────────────────────────────────────────────
+// ─── COLOR PICKER FIELD ───────────────────────────────────────────────────────
 
-function PresetThumb({ presetKey, active }: { presetKey: Exclude<Theme['preset'], 'custom'>; active: boolean }) {
-  const t = PRESETS[presetKey];
-  const btnRadius = cornerRadius(t.button.corner);
-  const btnShadow = shadowValue(t.button.shadow);
-  const bg = t.pageBg.type === 'color' ? t.pageBg.value : t.pageBg.type === 'gradient' ? t.pageBg.value : '#0A0A0B';
+export function ColorPickerField({
+  label,
+  value,
+  onChange,
+  inline = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  inline?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleBlur = useCallback((e: React.FocusEvent) => {
+    if (!containerRef.current?.contains(e.relatedTarget as Node)) {
+      setOpen(false);
+    }
+  }, []);
+
+  return (
+    <div className="relative" ref={containerRef} onBlur={handleBlur}>
+      {!inline && <p className="text-xs font-medium text-text-muted mb-2">{label}</p>}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-strong rounded-[var(--radius-sm)] cursor-pointer hover:border-gold/40 transition-colors"
+      >
+        <span
+          className="w-4 h-4 rounded-sm flex-shrink-0 border border-black/10"
+          style={{ background: value }}
+        />
+        <span className="text-xs text-text font-mono uppercase">{value}</span>
+      </button>
+      {open && (
+        <div className="absolute z-50 mt-1 right-0 bg-surface border border-border-strong rounded-[var(--radius)] shadow-xl p-3">
+          <HexColorPicker color={value} onChange={onChange} />
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (/^#[0-9a-fA-F]{0,6}$/.test(v)) onChange(v.length === 7 ? v : value);
+            }}
+            className="mt-2 w-full bg-surface-2 border border-border-strong text-text font-mono text-xs rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gold/40 uppercase"
+            maxLength={7}
+            spellCheck={false}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── GRADIENT BUILDER ─────────────────────────────────────────────────────────
+
+const GRADIENT_DIRECTIONS = [
+  { angle: 0,   label: "↑" },
+  { angle: 45,  label: "↗" },
+  { angle: 90,  label: "→" },
+  { angle: 135, label: "↘" },
+];
+
+function parseGradient(css: string): { stop1: string; stop2: string; angle: number } {
+  const angleMatch = css.match(/(\d+)deg/);
+  const angle = angleMatch ? parseInt(angleMatch[1]) : 135;
+  const colors = css.match(/#[0-9a-fA-F]{3,8}/g) ?? ["#06AEEF", "#A78BFA"];
+  return { stop1: colors[0] ?? "#06AEEF", stop2: colors[1] ?? "#A78BFA", angle };
+}
+
+function buildGradient(stop1: string, stop2: string, angle: number): string {
+  return `linear-gradient(${angle}deg, ${stop1} 0%, ${stop2} 100%)`;
+}
+
+export function GradientBuilder({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const parsed = parseGradient(value);
+  const [stop1, setStop1] = useState(parsed.stop1);
+  const [stop2, setStop2] = useState(parsed.stop2);
+  const [angle, setAngle] = useState(parsed.angle);
+
+  function update(s1: string, s2: string, a: number) {
+    setStop1(s1);
+    setStop2(s2);
+    setAngle(a);
+    onChange(buildGradient(s1, s2, a));
+  }
+
+  return (
+    <div className="space-y-3">
+      <div
+        className="w-full h-7 rounded-[var(--radius-sm)] border border-border-strong"
+        style={{ background: buildGradient(stop1, stop2, angle) }}
+      />
+      <div className="grid grid-cols-2 gap-3">
+        <ColorPickerField label="Start" value={stop1} onChange={(v) => update(v, stop2, angle)} />
+        <ColorPickerField label="End" value={stop2} onChange={(v) => update(stop1, v, angle)} />
+      </div>
+      <div className="flex gap-1">
+        {GRADIENT_DIRECTIONS.map((d) => (
+          <button
+            key={d.angle}
+            type="button"
+            onClick={() => update(stop1, stop2, d.angle)}
+            className={[
+              "flex-1 py-1.5 text-sm border rounded-[var(--radius-sm)] transition-all cursor-pointer font-medium",
+              angle === d.angle
+                ? "border-gold/60 bg-gold-dim text-gold"
+                : "border-border-strong bg-surface text-text-muted hover:border-gold/30",
+            ].join(" ")}
+          >
+            {d.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── PRESET THUMBNAIL ─────────────────────────────────────────────────────────
+
+function PresetThumb({ presetKey, active }: { presetKey: PresetKey; active: boolean }) {
+  const preset = PRESETS[presetKey];
+  const bg = preset.theme.pageBg.type !== "image" ? preset.theme.pageBg.value : "#FFFFFF";
+  const btnBg = preset.linkStyle.fillValue;
+  const btnRadius = cornerRadius(preset.linkStyle.corner);
+  const nameColor = preset.theme.colors.name;
 
   return (
     <div
       className={[
-        "relative rounded-lg overflow-hidden border-2 transition-all cursor-pointer",
+        "relative rounded-lg overflow-hidden border-2 transition-all cursor-pointer w-full",
         active ? "border-gold shadow-[0_0_0_2px_rgba(201,168,106,0.25)]" : "border-border-strong hover:border-gold/40",
       ].join(" ")}
-      style={{ width: 120, height: 192, background: bg, flexShrink: 0 }}
+      style={{ aspectRatio: "5/8", background: bg }}
     >
-      {/* Avatar stub */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white/10 border border-white/20" />
-      {/* Name stub */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-12 h-1.5 rounded-full" style={{ background: t.title.color, opacity: 0.8 }} />
-      {/* Buttons */}
-      <div className="absolute bottom-5 left-3 right-3 space-y-2">
+      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-black/10 border border-black/10" />
+      <div className="absolute top-9 left-1/2 -translate-x-1/2 w-10 h-1.5 rounded-full" style={{ background: nameColor, opacity: 0.8 }} />
+      <div className="absolute bottom-3 left-2 right-2 space-y-1.5">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="w-full h-3"
-            style={{
-              background: t.button.fill.value,
-              borderRadius: btnRadius,
-              boxShadow: btnShadow,
-              opacity: i === 1 ? 1 : i === 2 ? 0.65 : 0.35,
-            }}
+            className="w-full h-2.5"
+            style={{ background: btnBg, borderRadius: btnRadius, opacity: i === 1 ? 1 : i === 2 ? 0.65 : 0.35 }}
           />
         ))}
       </div>
@@ -217,41 +212,33 @@ function PresetThumb({ presetKey, active }: { presetKey: Exclude<Theme['preset']
   );
 }
 
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
+// ─── CONTENT SECTIONS (used inside SettingsCards in page-builder) ─────────────
 
-export function DesignTab({ theme, userId, onChange }: DesignTabProps) {
+interface ThemeProps {
+  theme: Theme;
+  userId: string;
+  onChange: (theme: Theme) => void;
+  onPresetApply: (key: PresetKey, linkStyle: LinkStyle) => void;
+}
+
+export function PresetsContent({ theme, userId, onChange, onPresetApply }: ThemeProps) {
   const [bgUploading, setBgUploading] = useState(false);
   const [bgUploadError, setBgUploadError] = useState<string | null>(null);
   const bgFileRef = useRef<HTMLInputElement>(null);
 
-  function patch(partial: Partial<Theme>): Theme {
-    return { ...theme, ...partial, preset: 'custom' };
+  function applyPreset(key: PresetKey) {
+    const preset = PRESETS[key];
+    onChange(preset.theme);
+    onPresetApply(key, preset.linkStyle);
   }
 
-  function applyPreset(key: Exclude<Theme['preset'], 'custom'>) {
-    onChange(PRESETS[key]);
-  }
-
-  // pageBg helpers
-  function setPageBgType(type: Theme['pageBg']['type']) {
-    const defaults: Record<Theme['pageBg']['type'], { value: string; overlay: number }> = {
-      color:    { value: BG_COLORS[0].value,    overlay: 0 },
-      gradient: { value: BG_GRADIENTS[0].value, overlay: 0 },
-      image:    { value: theme.pageBg.type === 'image' ? theme.pageBg.value : '', overlay: 0.4 },
+  function setPageBgType(type: Theme["pageBg"]["type"]) {
+    const defaults: Record<Theme["pageBg"]["type"], { value: string; overlay: number }> = {
+      color:    { value: "#FFFFFF", overlay: 0 },
+      gradient: { value: "linear-gradient(135deg, #06AEEF 0%, #A78BFA 100%)", overlay: 0 },
+      image:    { value: theme.pageBg.type === "image" ? theme.pageBg.value : "", overlay: 0.4 },
     };
-    onChange(patch({ pageBg: { type, ...defaults[type] } }));
-  }
-
-  function setPageBgColor(value: string) {
-    onChange(patch({ pageBg: { ...theme.pageBg, type: 'color', value } }));
-  }
-
-  function setPageBgGradient(value: string) {
-    onChange(patch({ pageBg: { ...theme.pageBg, type: 'gradient', value } }));
-  }
-
-  function setPageBgOverlay(overlay: number) {
-    onChange(patch({ pageBg: { ...theme.pageBg, overlay } }));
+    onChange(patchTheme(theme, { pageBg: { type, ...defaults[type] } }));
   }
 
   async function handleBgImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -270,77 +257,58 @@ export function DesignTab({ theme, userId, onChange }: DesignTabProps) {
       const { error } = await supabase.storage.from("media").upload(filename, file, { contentType: file.type, upsert: true });
       if (error) { setBgUploadError(error.message); return; }
       const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(filename);
-      onChange(patch({ pageBg: { type: 'image', value: publicUrl, overlay: theme.pageBg.overlay > 0 ? theme.pageBg.overlay : 0.4 } }));
+      onChange(patchTheme(theme, { pageBg: { type: "image", value: publicUrl, overlay: theme.pageBg.overlay > 0 ? theme.pageBg.overlay : 0.4 } }));
     } finally {
       setBgUploading(false);
     }
   }
 
-  // button helpers
-  function setButtonFillType(type: Theme['button']['fill']['type']) {
-    const defaults: Record<Theme['button']['fill']['type'], string> = {
-      color:    BUTTON_COLOR_SWATCHES[5].value,
-      gradient: BUTTON_GRADIENT_SWATCHES[0].value,
-    };
-    onChange(patch({ button: { ...theme.button, fill: { type, value: defaults[type] } } }));
-  }
-
   return (
-    <div className="space-y-1 py-2 overflow-hidden">
-
-      {/* ── PRESETS ── */}
-      <div>
-        <SectionLabel>Presets</SectionLabel>
-        <div className="flex flex-wrap gap-3">
-          {(Object.keys(PRESETS) as Exclude<Theme['preset'], 'custom'>[]).map((key) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => applyPreset(key)}
-              className="flex flex-col gap-1.5 cursor-pointer group"
-              style={{ width: 120 }}
-            >
-              <PresetThumb presetKey={key} active={theme.preset === key} />
-              <p className={`text-xs font-semibold text-left ${theme.preset === key ? 'text-gold' : 'text-text-muted group-hover:text-text'} transition-colors`}>
-                {PRESET_META[key].label}
-              </p>
-            </button>
-          ))}
-        </div>
+    <div className="space-y-4">
+      {/* 2×2 preset grid */}
+      <div className="grid grid-cols-2 gap-2.5">
+        {(Object.keys(PRESETS) as PresetKey[]).map((key) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => applyPreset(key)}
+            className="flex flex-col gap-1.5 cursor-pointer group text-left"
+          >
+            <PresetThumb presetKey={key} active={theme.preset === key} />
+            <p className={`text-xs font-medium ${theme.preset === key ? "text-gold" : "text-text-muted group-hover:text-text"} transition-colors`}>
+              {PRESET_META[key].label}
+            </p>
+          </button>
+        ))}
       </div>
 
-      <Divider />
-
-      {/* ── PAGE BACKGROUND ── */}
-      <div>
-        <SectionLabel>Page Background</SectionLabel>
+      {/* Page background */}
+      <div className="pt-1" style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
+        <p className="text-xs text-text-subtle mb-2 pt-3">Background</p>
         <SegmentedControl
           options={[
-            { id: 'color' as const,    label: 'Color' },
-            { id: 'gradient' as const, label: 'Gradient' },
-            { id: 'image' as const,    label: 'Image' },
+            { id: "color" as const,    label: "Color" },
+            { id: "gradient" as const, label: "Gradient" },
+            { id: "image" as const,    label: "Image" },
           ]}
           value={theme.pageBg.type}
           onChange={setPageBgType}
         />
-
         <div className="mt-3">
-          {theme.pageBg.type === 'color' && (
-            <ColorSwatches
-              swatches={BG_COLORS}
-              selected={theme.pageBg.value}
-              onSelect={setPageBgColor}
-              withCustom
+          {theme.pageBg.type === "color" && (
+            <ColorPickerField
+              label="Background color"
+              value={theme.pageBg.value}
+              onChange={(v) => onChange(patchTheme(theme, { pageBg: { ...theme.pageBg, type: "color", value: v } }))}
             />
           )}
-          {theme.pageBg.type === 'gradient' && (
-            <GradientSwatches
-              swatches={BG_GRADIENTS}
-              selected={theme.pageBg.value}
-              onSelect={setPageBgGradient}
+          {theme.pageBg.type === "gradient" && (
+            <GradientBuilder
+              value={theme.pageBg.value}
+              onChange={(v) => onChange(patchTheme(theme, { pageBg: { ...theme.pageBg, type: "gradient", value: v } }))}
             />
           )}
-          {theme.pageBg.type === 'image' && (
+          {theme.pageBg.type === "image" && (
             <div className="space-y-3">
               <input
                 ref={bgFileRef}
@@ -355,7 +323,7 @@ export function DesignTab({ theme, userId, onChange }: DesignTabProps) {
                   <img
                     src={theme.pageBg.value}
                     alt="Background"
-                    className="w-14 h-14 rounded-[var(--radius-sm)] object-cover border border-border-strong flex-shrink-0"
+                    className="w-12 h-12 rounded-[var(--radius-sm)] object-cover border border-border-strong flex-shrink-0"
                   />
                 )}
                 <button
@@ -369,8 +337,8 @@ export function DesignTab({ theme, userId, onChange }: DesignTabProps) {
               </div>
               {bgUploadError && <p className="text-xs text-red-400">{bgUploadError}</p>}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <SubLabel>Overlay (legibility)</SubLabel>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs text-text-muted">Overlay</p>
                   <span className="text-xs text-text-subtle">{Math.round(theme.pageBg.overlay * 100)}%</span>
                 </div>
                 <input
@@ -379,7 +347,7 @@ export function DesignTab({ theme, userId, onChange }: DesignTabProps) {
                   max={0.7}
                   step={0.05}
                   value={theme.pageBg.overlay}
-                  onChange={(e) => setPageBgOverlay(parseFloat(e.target.value))}
+                  onChange={(e) => onChange(patchTheme(theme, { pageBg: { ...theme.pageBg, overlay: parseFloat(e.target.value) } }))}
                   className="w-full accent-gold h-1.5 cursor-pointer"
                 />
               </div>
@@ -387,205 +355,84 @@ export function DesignTab({ theme, userId, onChange }: DesignTabProps) {
           )}
         </div>
       </div>
-
-      <Divider />
-
-      {/* ── BUTTONS ── */}
-      <div className="space-y-5">
-        <SectionLabel>Buttons</SectionLabel>
-
-        {/* Fill */}
-        <div>
-          <SubLabel>Fill</SubLabel>
-          <SegmentedControl
-            options={[
-              { id: 'color'    as const, label: 'Color' },
-              { id: 'gradient' as const, label: 'Gradient' },
-            ]}
-            value={theme.button.fill.type}
-            onChange={setButtonFillType}
-          />
-          <div className="mt-3">
-            {theme.button.fill.type === 'color' && (
-              <ColorSwatches
-                swatches={BUTTON_COLOR_SWATCHES}
-                selected={theme.button.fill.value}
-                onSelect={(v) => onChange(patch({ button: { ...theme.button, fill: { type: 'color', value: v } } }))}
-                withCustom
-              />
-            )}
-            {theme.button.fill.type === 'gradient' && (
-              <GradientSwatches
-                swatches={BUTTON_GRADIENT_SWATCHES}
-                selected={theme.button.fill.value}
-                onSelect={(v) => onChange(patch({ button: { ...theme.button, fill: { type: 'gradient', value: v } } }))}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Text colour */}
-        <div>
-          <SubLabel>Text colour</SubLabel>
-          <ColorSwatches
-            swatches={TEXT_COLOR_SWATCHES}
-            selected={theme.button.textColor}
-            onSelect={(v) => onChange(patch({ button: { ...theme.button, textColor: v } }))}
-            withCustom
-          />
-        </div>
-
-        {/* Corners */}
-        <div>
-          <SubLabel>Corners</SubLabel>
-          <div className="grid grid-cols-4 gap-2">
-            {BUTTON_CORNERS.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => onChange(patch({ button: { ...theme.button, corner: c.id } }))}
-                className={[
-                  "flex flex-col items-center gap-1.5 py-3 px-2 border text-xs font-medium transition-all cursor-pointer",
-                  theme.button.corner === c.id
-                    ? "border-gold/60 bg-gold-dim text-gold rounded-[var(--radius-sm)]"
-                    : "border-border-strong bg-surface text-text-muted hover:border-gold/30 rounded-[var(--radius-sm)]",
-                ].join(" ")}
-              >
-                <div
-                  className="w-8 h-5 bg-surface-2 border border-border-strong"
-                  style={{ borderRadius: c.radius }}
-                />
-                <span className="truncate">{c.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Shadow */}
-        <div>
-          <SubLabel>Shadow</SubLabel>
-          <div className="flex gap-2">
-            {BUTTON_SHADOWS.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => onChange(patch({ button: { ...theme.button, shadow: s.id } }))}
-                className={[
-                  "flex-1 py-2.5 text-xs font-medium border rounded-[var(--radius-sm)] transition-all cursor-pointer",
-                  theme.button.shadow === s.id
-                    ? "border-gold/60 bg-gold-dim text-gold"
-                    : "border-border-strong bg-surface text-text-muted hover:border-gold/30",
-                ].join(" ")}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Font */}
-        <div>
-          <SubLabel>Font</SubLabel>
-          <div className="grid grid-cols-2 gap-1.5">
-            {FONT_OPTIONS.map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => onChange(patch({ button: { ...theme.button, font: f.id } }))}
-                className={[
-                  "px-3 py-2 text-xs border rounded-[var(--radius-sm)] transition-all cursor-pointer text-left truncate",
-                  theme.button.font === f.id
-                    ? "border-gold/60 bg-gold-dim text-gold"
-                    : "border-border-strong bg-surface text-text-muted hover:border-gold/30",
-                ].join(" ")}
-                style={{ fontFamily: `var(${f.variable})` }}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <Divider />
-
-      {/* ── TEXT ── */}
-      <div className="space-y-5">
-        <SectionLabel>Text</SectionLabel>
-
-        {/* Title font */}
-        <div>
-          <SubLabel>Title font</SubLabel>
-          <div className="grid grid-cols-2 gap-1.5">
-            {FONT_OPTIONS.map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => onChange(patch({ title: { ...theme.title, font: f.id } }))}
-                className={[
-                  "px-3 py-2 text-xs border rounded-[var(--radius-sm)] transition-all cursor-pointer text-left truncate",
-                  theme.title.font === f.id
-                    ? "border-gold/60 bg-gold-dim text-gold"
-                    : "border-border-strong bg-surface text-text-muted hover:border-gold/30",
-                ].join(" ")}
-                style={{ fontFamily: `var(${f.variable})` }}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Title colour */}
-        <div>
-          <SubLabel>Title colour</SubLabel>
-          <ColorSwatches
-            swatches={TEXT_COLOR_SWATCHES}
-            selected={theme.title.color}
-            onSelect={(v) => onChange(patch({ title: { ...theme.title, color: v } }))}
-            withCustom
-          />
-        </div>
-
-        {/* Body colour */}
-        <div>
-          <SubLabel>Body text colour</SubLabel>
-          <ColorSwatches
-            swatches={TEXT_COLOR_SWATCHES}
-            selected={theme.text.color}
-            onSelect={(v) => onChange(patch({ text: { color: v } }))}
-            withCustom
-          />
-        </div>
-      </div>
-
-      <Divider />
-
-      {/* ── ANIMATION ── */}
-      <div>
-        <SectionLabel>Animation</SectionLabel>
-        <p className="text-xs text-text-subtle mb-3 -mt-1">Plays on button hover. Off by default.</p>
-        <div className="grid grid-cols-4 gap-2">
-          {ANIMATIONS.map((a) => (
-            <button
-              key={a.id}
-              type="button"
-              onClick={() => onChange(patch({ animation: a.id }))}
-              className={[
-                "py-2 text-xs font-medium border rounded-[var(--radius-sm)] transition-all cursor-pointer",
-                theme.animation === a.id
-                  ? "border-gold/60 bg-gold-dim text-gold"
-                  : "border-border-strong bg-surface text-text-muted hover:border-gold/30",
-              ].join(" ")}
-            >
-              {a.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Bottom spacer */}
-      <div className="h-4" />
     </div>
   );
 }
+
+interface TypographyProps {
+  theme: Theme;
+  onChange: (theme: Theme) => void;
+}
+
+export function TypographyContent({ theme, onChange }: TypographyProps) {
+  const titleFont = FONT_OPTIONS.find((f) => f.id === theme.fonts.title);
+  const bodyFont  = FONT_OPTIONS.find((f) => f.id === theme.fonts.body);
+
+  return (
+    <div>
+      <FieldRow label="Title">
+        <select
+          value={theme.fonts.title}
+          onChange={(e) => onChange(patchTheme(theme, { fonts: { ...theme.fonts, title: e.target.value } }))}
+          className="bg-surface-2 border border-border-strong text-text rounded-[var(--radius-sm)] px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
+          style={{ fontFamily: titleFont ? `var(${titleFont.variable}), system-ui, sans-serif` : undefined }}
+        >
+          {FONT_OPTIONS.map((f) => (
+            <option key={f.id} value={f.id}>{f.label}</option>
+          ))}
+        </select>
+      </FieldRow>
+      <FieldRow label="Body">
+        <select
+          value={theme.fonts.body}
+          onChange={(e) => onChange(patchTheme(theme, { fonts: { ...theme.fonts, body: e.target.value } }))}
+          className="bg-surface-2 border border-border-strong text-text rounded-[var(--radius-sm)] px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
+          style={{ fontFamily: bodyFont ? `var(${bodyFont.variable}), system-ui, sans-serif` : undefined }}
+        >
+          {FONT_OPTIONS.map((f) => (
+            <option key={f.id} value={f.id}>{f.label}</option>
+          ))}
+        </select>
+      </FieldRow>
+    </div>
+  );
+}
+
+interface ColorsProps {
+  theme: Theme;
+  onChange: (theme: Theme) => void;
+}
+
+export function ColorsContent({ theme, onChange }: ColorsProps) {
+  return (
+    <div>
+      <FieldRow label="Name">
+        <ColorPickerField
+          label="Name color"
+          value={theme.colors.name}
+          onChange={(v) => onChange(patchTheme(theme, { colors: { ...theme.colors, name: v } }))}
+          inline
+        />
+      </FieldRow>
+      <FieldRow label="@handle">
+        <ColorPickerField
+          label="Handle color"
+          value={theme.colors.handle}
+          onChange={(v) => onChange(patchTheme(theme, { colors: { ...theme.colors, handle: v } }))}
+          inline
+        />
+      </FieldRow>
+      <FieldRow label="Icons">
+        <ColorPickerField
+          label="Icons color"
+          value={theme.colors.icons}
+          onChange={(v) => onChange(patchTheme(theme, { colors: { ...theme.colors, icons: v } }))}
+          inline
+        />
+      </FieldRow>
+    </div>
+  );
+}
+
+// ─── RE-EXPORT helpers used in links-tab ─────────────────────────────────────
+export { BUTTON_CORNERS, ANIMATIONS };

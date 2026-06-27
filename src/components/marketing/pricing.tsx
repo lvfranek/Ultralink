@@ -172,7 +172,10 @@ export function Pricing() {
               textDecoration: 'none',
               background: 'transparent',
               boxSizing: 'border-box',
+              transition: 'opacity 0.15s, transform 0.15s',
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7'; e.currentTarget.style.transform = 'scale(0.97)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)'; }}
           >
             Get started free
           </Link>
@@ -327,7 +330,10 @@ export function Pricing() {
                   background: '#0A0A0A',
                   boxSizing: 'border-box',
                   cursor: 'pointer',
+                  transition: 'opacity 0.15s, transform 0.15s',
                 }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8'; e.currentTarget.style.transform = 'scale(0.97)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)'; }}
               >
                 Get Pro
               </Link>

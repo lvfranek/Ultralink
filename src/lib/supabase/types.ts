@@ -36,6 +36,12 @@ export interface PageLink {
   icon: string | null;
   thumbnail_url: string | null;
   is_adult: boolean;
+  // per-link style columns (added in migration)
+  fill_type: string;
+  fill_value: string;
+  text_color: string;
+  corner: string;
+  animation: string;
   created_at: string;
 }
 

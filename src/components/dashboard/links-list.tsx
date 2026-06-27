@@ -26,7 +26,10 @@ function KebabMenu({ page }: { page: Page }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="p-1.5 rounded-[var(--radius-sm)] text-text-subtle hover:text-text hover:bg-surface-2 transition-colors cursor-pointer"
+        className="p-1.5 rounded-lg transition-colors cursor-pointer"
+        style={{ color: "#9A9A9A" }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,.08)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
         aria-label="More options"
         aria-expanded={open}
       >
@@ -40,10 +43,13 @@ function KebabMenu({ page }: { page: Page }) {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} aria-hidden="true" />
-          <div className="absolute right-0 top-full mt-1 z-20 w-36 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_4px_20px_rgba(0,0,0,0.40)]">
+          <div className="absolute right-0 top-full mt-1 z-20 w-36 rounded-[10px] py-1 shadow-[0_4px_20px_rgba(0,0,0,0.60)]" style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.10)" }}>
             <Link
               href={`/dashboard/links/${page.id}`}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm transition-colors"
+              style={{ color: "#9A9A9A" }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,.06)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
               onClick={() => setOpen(false)}
             >
               <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -51,7 +57,7 @@ function KebabMenu({ page }: { page: Page }) {
               </svg>
               Edit
             </Link>
-            <div className="border-t border-border mx-2 my-1" />
+            <div className="mx-2 my-1" style={{ borderTop: "1px solid rgba(255,255,255,.08)" }} />
             {!showConfirm ? (
               <button
                 type="button"
@@ -104,33 +110,25 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
   };
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0 hover:bg-surface/60 transition-colors group first:rounded-t-[var(--radius-lg)] last:rounded-b-[var(--radius-lg)]">
-      {/* Drag handle */}
-      <div className="cursor-grab text-text-subtle opacity-0 group-hover:opacity-40 transition-opacity shrink-0" aria-hidden="true">
-        <svg viewBox="0 0 16 16" className="w-4 h-4" fill="currentColor">
-          <circle cx="5.5" cy="4.5" r="1" />
-          <circle cx="10.5" cy="4.5" r="1" />
-          <circle cx="5.5" cy="8" r="1" />
-          <circle cx="10.5" cy="8" r="1" />
-          <circle cx="5.5" cy="11.5" r="1" />
-          <circle cx="10.5" cy="11.5" r="1" />
-        </svg>
-      </div>
-
+    <div
+      className="flex items-center gap-3 p-4 group"
+      style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, marginBottom: 8 }}
+    >
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-text truncate">
-          {page.title || <span className="text-text-subtle italic">Untitled</span>}
+        <p className="text-sm font-medium truncate" style={{ color: "#ffffff" }}>
+          {page.title || <span className="italic" style={{ color: "#9A9A9A" }}>Untitled</span>}
         </p>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <span className="text-xs text-text-subtle truncate">{pageUrl}</span>
+        <div className="flex items-center gap-1.5 mt-1">
+          <span className="text-xs truncate" style={{ color: "#9A9A9A" }}>{pageUrl}</span>
           <button
             type="button"
             onClick={handleCopy}
-            className="shrink-0 p-0.5 rounded text-text-subtle hover:text-text transition-colors cursor-pointer"
+            className="shrink-0 p-0.5 rounded transition-colors cursor-pointer"
+            style={{ color: copied ? "#34d399" : "#9A9A9A" }}
             aria-label="Copy link"
           >
             {copied ? (
-              <svg viewBox="0 0 14 14" className="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <svg viewBox="0 0 14 14" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path d="M2 7l3.5 3.5L12 3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             ) : (
@@ -170,15 +168,16 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
     <div>
       {/* Counts + sort */}
       <div className="flex items-center gap-3 mb-4">
-        <p className="text-sm text-text-muted">
-          <span className="text-text font-medium">{pages.length}</span>{" "}
+        <p className="text-sm" style={{ color: "#9A9A9A" }}>
+          <span className="font-medium" style={{ color: "#ffffff" }}>{pages.length}</span>{" "}
           {pages.length === 1 ? "link" : "links"}
         </p>
         <div className="ml-auto">
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as "manual" | "newest")}
-            className="bg-surface-2 border border-border-strong text-text-muted text-xs rounded-[var(--radius-sm)] px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-text/20 cursor-pointer"
+            className="text-xs rounded-xl px-2.5 py-1.5 focus:outline-none cursor-pointer"
+            style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.08)", color: "#9A9A9A" }}
           >
             <option value="newest">Newest</option>
             <option value="manual">Manual order</option>
@@ -187,10 +186,11 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
       </div>
 
       {/* Search */}
-      <div className="relative mb-4">
+      <div className="relative mb-5">
         <svg
           viewBox="0 0 16 16"
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-subtle pointer-events-none"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+          style={{ color: "#9A9A9A" }}
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
@@ -204,17 +204,23 @@ export function LinksList({ pages, siteUrl }: LinksListProps) {
           placeholder="Search links…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-text/20 focus:border-text/30 transition-colors"
+          className="w-full pl-9 pr-4 py-2.5 text-sm focus:outline-none transition-colors"
+          style={{
+            background: "#1A1A1A",
+            border: "1px solid rgba(255,255,255,.08)",
+            borderRadius: 12,
+            color: "#ffffff",
+          }}
         />
       </div>
 
       {/* List */}
       {filtered.length === 0 ? (
-        <p className="text-center text-sm text-text-subtle py-8">
+        <p className="text-center text-sm py-8" style={{ color: "#9A9A9A" }}>
           {search ? "No links match your search." : ""}
         </p>
       ) : (
-        <div className="bg-surface-2 border border-border rounded-[var(--radius-lg)]">
+        <div>
           {filtered.map((page) => (
             <PageRow key={page.id} page={page} siteUrl={siteUrl} />
           ))}

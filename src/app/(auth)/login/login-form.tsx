@@ -229,6 +229,8 @@ export function LoginForm() {
                     fontFamily: 'inherit',
                     transition: 'all 0.15s',
                   }}
+                  onMouseEnter={(e) => { if (mode !== m) { e.currentTarget.style.color = '#0A0A0A'; e.currentTarget.style.background = 'rgba(0,0,0,.06)'; } }}
+                  onMouseLeave={(e) => { if (mode !== m) { e.currentTarget.style.color = '#9a9a9a'; e.currentTarget.style.background = 'transparent'; } }}
                 >
                   {m === "signup" ? "Create account" : "Sign in"}
                 </button>
@@ -267,8 +269,10 @@ export function LoginForm() {
                 opacity: googleLoading || loading ? 0.5 : 1,
                 marginBottom: 20,
                 fontFamily: 'inherit',
-                transition: 'all 0.15s',
+                transition: 'opacity 0.15s, transform 0.15s, background 0.15s',
               }}
+              onMouseEnter={(e) => { if (!googleLoading && !loading) { e.currentTarget.style.background = 'rgba(0,0,0,.07)'; e.currentTarget.style.transform = 'scale(0.98)'; } }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.03)'; e.currentTarget.style.transform = 'scale(1)'; }}
             >
               {googleLoading ? (
                 <span
@@ -399,8 +403,10 @@ export function LoginForm() {
                   cursor: loading || googleLoading ? 'not-allowed' : 'pointer',
                   opacity: loading || googleLoading ? 0.6 : 1,
                   fontFamily: 'inherit',
-                  transition: 'opacity 0.15s',
+                  transition: 'opacity 0.15s, transform 0.15s',
                 }}
+                onMouseEnter={(e) => { if (!loading && !googleLoading) { e.currentTarget.style.opacity = '0.82'; e.currentTarget.style.transform = 'scale(0.98)'; } }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = loading || googleLoading ? '0.6' : '1'; e.currentTarget.style.transform = 'scale(1)'; }}
               >
                 {loading && (
                   <span

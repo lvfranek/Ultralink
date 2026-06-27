@@ -111,7 +111,10 @@ export function Header() {
                 fontSize: 14,
                 textDecoration: "none",
                 whiteSpace: "nowrap",
+                transition: "opacity 0.15s, transform 0.15s",
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.82"; e.currentTarget.style.transform = "scale(0.97)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "scale(1)"; }}
             >
               Sign up for free
             </Link>

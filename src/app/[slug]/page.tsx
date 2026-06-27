@@ -70,27 +70,13 @@ export default async function BioPage({ params }: Props) {
       {/* Age gate overlay (client component, uses sessionStorage) */}
       {typedPage.age_gate_enabled && <AgeGate slug={slug} />}
 
-      {/* Public page */}
+      {/* Public page — footer is rendered inside ProfilePageView on the themed background */}
       <ProfilePageView
         page={typedPage}
         links={activeLinks}
         socials={socials}
         theme={typedPage.theme as Record<string, unknown>}
       />
-
-      {/* Footer */}
-      <footer className="w-full flex items-center justify-center gap-4 py-6 mt-4">
-        <a href="/privacy" className="text-xs text-text-subtle hover:text-text-muted transition-colors">Privacy</a>
-        <span className="text-text-subtle text-xs">·</span>
-        <a href="/terms" className="text-xs text-text-subtle hover:text-text-muted transition-colors">Terms</a>
-        <span className="text-text-subtle text-xs">·</span>
-        <a
-          href={`mailto:report@ultralink.bio?subject=Report: ${encodeURIComponent(slug)}`}
-          className="text-xs text-text-subtle hover:text-text-muted transition-colors"
-        >
-          Report
-        </a>
-      </footer>
     </>
   );
 }

@@ -27,7 +27,10 @@ async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createCli
 
 export async function addLink(
   pageId: string,
-  data: { label: string; url: string; icon?: string; thumbnail_url?: string; is_adult?: boolean }
+  data: {
+    label: string; url: string; icon?: string; thumbnail_url?: string; is_adult?: boolean;
+    fill_type?: string; fill_value?: string; text_color?: string; corner?: string; animation?: string;
+  }
 ): Promise<LinkActionResult> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -55,6 +58,11 @@ export async function addLink(
       icon: data.icon ?? null,
       thumbnail_url: data.thumbnail_url ?? null,
       is_adult: data.is_adult ?? false,
+      fill_type: data.fill_type ?? 'color',
+      fill_value: data.fill_value ?? '#06AEEF',
+      text_color: data.text_color ?? '#FFFFFF',
+      corner: data.corner ?? 'pill',
+      animation: data.animation ?? 'none',
       position: nextPos,
     })
     .select()
@@ -68,7 +76,11 @@ export async function addLink(
 
 export async function updateLink(
   id: string,
-  data: { label?: string; url?: string; icon?: string | null; thumbnail_url?: string | null; is_adult?: boolean; is_active?: boolean }
+  data: {
+    label?: string; url?: string; icon?: string | null; thumbnail_url?: string | null;
+    is_adult?: boolean; is_active?: boolean;
+    fill_type?: string; fill_value?: string; text_color?: string; corner?: string; animation?: string;
+  }
 ): Promise<LinkActionResult> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -98,6 +110,11 @@ export async function updateLink(
       ...(data.thumbnail_url !== undefined ? { thumbnail_url: data.thumbnail_url } : {}),
       ...(data.is_adult !== undefined ? { is_adult: data.is_adult } : {}),
       ...(data.is_active !== undefined ? { is_active: data.is_active } : {}),
+      ...(data.fill_type !== undefined ? { fill_type: data.fill_type } : {}),
+      ...(data.fill_value !== undefined ? { fill_value: data.fill_value } : {}),
+      ...(data.text_color !== undefined ? { text_color: data.text_color } : {}),
+      ...(data.corner !== undefined ? { corner: data.corner } : {}),
+      ...(data.animation !== undefined ? { animation: data.animation } : {}),
     })
     .eq("id", id);
 
@@ -148,6 +165,35 @@ export async function reorderLinks(
   const results = await Promise.all(updates);
   const failed = results.find((r) => r.error);
   if (failed?.error) return { error: failed.error.message };
+
+  revalidatePath(`/dashboard/links/${pageId}`);
+  return { ok: true };
+}
+
+/** Apply a preset's default link style to all links on a page at once. */
+export async function applyPresetToLinks(
+  pageId: string,
+  style: { fill_type: string; fill_value: string; text_color: string; corner: string; animation: string }
+): Promise<LinkActionResult> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const owns = await verifyPageOwnership(supabase, pageId, user.id);
+  if (!owns) return { error: "Page not found." };
+
+  const { error } = await supabase
+    .from("page_links")
+    .update({
+      fill_type: style.fill_type,
+      fill_value: style.fill_value,
+      text_color: style.text_color,
+      corner: style.corner,
+      animation: style.animation,
+    })
+    .eq("page_id", pageId);
+
+  if (error) return { error: error.message };
 
   revalidatePath(`/dashboard/links/${pageId}`);
   return { ok: true };

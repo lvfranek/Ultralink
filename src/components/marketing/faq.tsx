@@ -102,11 +102,13 @@ export function FAQ() {
                       textAlign: 'left',
                       gap: 16,
                       cursor: 'pointer',
-                      background: isOpen ? 'rgba(0,0,0,.015)' : 'transparent',
+                      background: isOpen ? 'rgba(0,0,0,.03)' : 'transparent',
                       border: 'none',
                       fontFamily: 'inherit',
                       transition: 'background 0.15s',
                     }}
+                    onMouseEnter={(e) => { if (!isOpen) e.currentTarget.style.background = 'rgba(0,0,0,.03)'; }}
+                    onMouseLeave={(e) => { if (!isOpen) e.currentTarget.style.background = 'transparent'; }}
                     aria-expanded={isOpen}
                     aria-controls={`faq-answer-${i}`}
                     id={`faq-question-${i}`}

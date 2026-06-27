@@ -27,6 +27,25 @@ export function NoCloaking() {
       aria-labelledby="no-cloaking-heading"
       style={{ maxWidth: 1140, margin: '0 auto', padding: '72px 24px' }}
     >
+      {/* Floating heading — matches Features / Pricing pattern */}
+      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+        <h2
+          id="no-cloaking-heading"
+          style={{
+            fontWeight: 500,
+            letterSpacing: '-0.02em',
+            fontSize: 'clamp(28px, 4vw, 40px)',
+            color: '#ffffff',
+            margin: '0 0 10px',
+          }}
+        >
+          We don&apos;t cloak your links.
+        </h2>
+        <p style={{ color: '#9A9A9A', fontSize: 17, margin: '0 auto', maxWidth: 600 }}>
+          Your account stays alive because we do redirects the honest way.
+        </p>
+      </div>
+
       {/* White card — same language as hero */}
       <div
         style={{
@@ -38,25 +57,6 @@ export function NoCloaking() {
           overflow: 'visible',
         }}
       >
-        {/* Header */}
-        <div style={{ marginBottom: 40 }}>
-          <h2
-            id="no-cloaking-heading"
-            style={{
-              fontWeight: 500,
-              letterSpacing: '-0.02em',
-              fontSize: 'clamp(26px, 4vw, 38px)',
-              color: '#0A0A0A',
-              margin: '0 0 10px',
-            }}
-          >
-            We don&apos;t cloak your links.
-          </h2>
-          <p style={{ color: '#6B6B6B', fontSize: 17, margin: 0, maxWidth: 520 }}>
-            Your account stays alive because we do redirects the honest way.
-          </p>
-        </div>
-
         {/* Two-column content */}
         <div
           style={{

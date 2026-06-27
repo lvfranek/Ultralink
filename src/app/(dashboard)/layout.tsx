@@ -21,11 +21,15 @@ export default async function DashboardLayout({
     .single();
 
   return (
-    <div className="flex min-h-screen bg-bg dark-theme">
-      <Sidebar user={user} displayName={profile?.display_name} />
-      <main className="flex-1 lg:overflow-y-auto pt-14 lg:pt-0">
-        {children}
-      </main>
-    </div>
+    <>
+      {/* Lock html/body to #131313 so macOS scroll-bounce never reveals white */}
+      <style>{`html, body { background: #131313 !important; }`}</style>
+      <div className="flex min-h-screen dark-theme" style={{ background: "#131313" }}>
+        <Sidebar user={user} displayName={profile?.display_name} />
+        <main className="flex-1 lg:overflow-y-auto pt-14 lg:pt-0">
+          {children}
+        </main>
+      </div>
+    </>
   );
 }

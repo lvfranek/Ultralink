@@ -1,15 +1,23 @@
+// ─── PAGE-LEVEL THEME ─────────────────────────────────────────────────────────
+
 export type Theme = {
-  preset: 'max_conversion' | 'stack' | 'cover' | 'aesthetic' | 'custom';
+  preset: 'glacier' | 'sunset' | 'mint' | 'lilac' | 'custom';
   pageBg: { type: 'color' | 'gradient' | 'image'; value: string; overlay: number };
-  button: {
-    fill: { type: 'color' | 'gradient'; value: string };
-    textColor: string;
-    corner: 'square' | 'rounded' | 'more' | 'pill';
-    shadow: 'none' | 'subtle' | 'medium';
-    font: string;
+  fonts: { title: string; body: string };
+  colors: {
+    name: string;
+    handle: string;
+    icons: string;
   };
-  title: { color: string; font: string };
-  text: { color: string };
+};
+
+// ─── PER-LINK STYLE ───────────────────────────────────────────────────────────
+
+export type LinkStyle = {
+  fillType: 'color' | 'gradient';
+  fillValue: string;
+  textColor: string;
+  corner: 'square' | 'rounded' | 'more' | 'pill';
   animation: 'none' | 'bounce' | 'shake' | 'pulse';
 };
 
@@ -36,44 +44,15 @@ export function fontVar(id: string): string {
 // ─── BACKGROUND OPTIONS ───────────────────────────────────────────────────────
 
 export const BG_COLORS = [
-  { label: 'Void',      value: '#0A0A0B' },
-  { label: 'Charcoal',  value: '#141417' },
-  { label: 'Deep Wine', value: '#1A0A0E' },
-  { label: 'Deep Navy', value: '#0A0E1A' },
-  { label: 'Espresso',  value: '#0F0B07' },
-  { label: 'Ink',       value: '#080A10' },
+  { label: 'White',      value: '#FFFFFF' },
+  { label: 'Void',       value: '#0A0A0B' },
+  { label: 'Charcoal',   value: '#141417' },
+  { label: 'Deep Navy',  value: '#0A0E1A' },
+  { label: 'Blush',      value: '#FFF0F0' },
+  { label: 'Mint',       value: '#F0FFF8' },
 ] as const;
 
-export const BG_GRADIENTS = [
-  { label: 'Black Gold', value: 'linear-gradient(135deg, #0A0A0B 0%, #1A1208 50%, #0A0A0B 100%)' },
-  { label: 'Midnight',   value: 'linear-gradient(180deg, #0A0E1A 0%, #0A0A0B 100%)' },
-  { label: 'Obsidian',   value: 'linear-gradient(135deg, #141417 0%, #0A0A0B 100%)' },
-  { label: 'Dark Wine',  value: 'linear-gradient(135deg, #1A0A0E 0%, #0A0A0B 100%)' },
-  { label: 'Noir',       value: 'linear-gradient(180deg, #080A10 0%, #0A0A0B 100%)' },
-  { label: 'Dusk',       value: 'linear-gradient(135deg, #0D0A1A 0%, #0A0A0B 50%, #1A0A0A 100%)' },
-] as const;
-
-// ─── BUTTON OPTIONS ───────────────────────────────────────────────────────────
-
-export const BUTTON_COLOR_SWATCHES = [
-  { label: 'Gold',       value: '#C9A86A' },
-  { label: 'Bright Gold',value: '#E6C878' },
-  { label: 'White',      value: '#F5F3EF' },
-  { label: 'Off-white',  value: '#E8E6E2' },
-  { label: 'Black',      value: '#0A0A0B' },
-  { label: 'Surface',    value: '#1C1C20' },
-  { label: 'Slate',      value: '#374151' },
-  { label: 'Wine',       value: '#881337' },
-] as const;
-
-export const BUTTON_GRADIENT_SWATCHES = [
-  { label: 'Gold',    value: 'linear-gradient(135deg, #C9A86A 0%, #E6C878 100%)' },
-  { label: 'Silver',  value: 'linear-gradient(135deg, #8E9BAB 0%, #C0CAD4 100%)' },
-  { label: 'Dark',    value: 'linear-gradient(135deg, #1C1C20 0%, #2A2A30 100%)' },
-  { label: 'Wine',    value: 'linear-gradient(135deg, #881337 0%, #BE123C 100%)' },
-  { label: 'Ocean',   value: 'linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%)' },
-  { label: 'Smoke',   value: 'linear-gradient(135deg, #374151 0%, #6B7280 100%)' },
-] as const;
+// ─── BUTTON / LINK CORNER OPTIONS ────────────────────────────────────────────
 
 export const BUTTON_CORNERS = [
   { id: 'square'  as const, label: 'Square',  radius: '0px' },
@@ -81,25 +60,6 @@ export const BUTTON_CORNERS = [
   { id: 'more'    as const, label: 'More',    radius: '1rem' },
   { id: 'pill'    as const, label: 'Pill',    radius: '9999px' },
 ];
-
-export const BUTTON_SHADOWS = [
-  { id: 'none'   as const, label: 'None',   value: 'none' },
-  { id: 'subtle' as const, label: 'Subtle', value: '0 1px 4px rgba(0,0,0,0.40)' },
-  { id: 'medium' as const, label: 'Medium', value: '0 4px 16px rgba(0,0,0,0.55)' },
-];
-
-// ─── TEXT COLOR SWATCHES ──────────────────────────────────────────────────────
-
-export const TEXT_COLOR_SWATCHES = [
-  { label: 'Snow',       value: '#F5F3EF' },
-  { label: 'Off-white',  value: '#E8E6E2' },
-  { label: 'Muted',      value: '#9A9AA2' },
-  { label: 'Gold',       value: '#C9A86A' },
-  { label: 'Bright Gold',value: '#E6C878' },
-  { label: 'Black',      value: '#0A0A0B' },
-] as const;
-
-// ─── ANIMATION ────────────────────────────────────────────────────────────────
 
 export const ANIMATIONS = [
   { id: 'none'   as const, label: 'None' },
@@ -110,15 +70,11 @@ export const ANIMATIONS = [
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
-export function cornerRadius(corner: Theme['button']['corner']): string {
+export function cornerRadius(corner: LinkStyle['corner']): string {
   return BUTTON_CORNERS.find((c) => c.id === corner)?.radius ?? '0.5rem';
 }
 
-export function shadowValue(shadow: Theme['button']['shadow']): string {
-  return BUTTON_SHADOWS.find((s) => s.id === shadow)?.value ?? 'none';
-}
-
-export function animClass(anim: Theme['animation']): string {
+export function animClass(anim: LinkStyle['animation']): string {
   return anim === 'none' ? '' : `theme-anim-${anim}`;
 }
 
@@ -129,138 +85,134 @@ export function gradientEndColor(gradientValue: string): string {
   return '#0A0A0B';
 }
 
-/** Resolve the CSS `background` value for a pageBg entry. */
-export function pageBgStyle(pageBg: Theme['pageBg']): string {
-  if (pageBg.type === 'color') return pageBg.value;
-  if (pageBg.type === 'gradient') return pageBg.value;
-  // image — the component wraps it in a container with overlay, handled in JSX
-  return '#0A0A0B';
-}
+// ─── DEFAULT LINK STYLE ───────────────────────────────────────────────────────
+
+export const DEFAULT_LINK_STYLE: LinkStyle = {
+  fillType: 'color',
+  fillValue: '#06AEEF',
+  textColor: '#FFFFFF',
+  corner: 'pill',
+  animation: 'none',
+};
 
 // ─── DEFAULT THEME ────────────────────────────────────────────────────────────
 
 export const DEFAULT_THEME: Theme = {
-  preset: 'stack',
-  pageBg: { type: 'color', value: '#0A0A0B', overlay: 0 },
-  button: {
-    fill: { type: 'color', value: '#1C1C20' },
-    textColor: '#F5F3EF',
-    corner: 'rounded',
-    shadow: 'subtle',
-    font: 'inter',
-  },
-  title: { color: '#F5F3EF', font: 'inter' },
-  text: { color: '#9A9AA2' },
-  animation: 'none',
+  preset: 'glacier',
+  pageBg: { type: 'color', value: '#FFFFFF', overlay: 0 },
+  fonts: { title: 'inter', body: 'inter' },
+  colors: { name: '#0A0A0A', handle: '#5A5A5A', icons: '#0A0A0A' },
 };
 
 // ─── PRESETS ──────────────────────────────────────────────────────────────────
 
-export const PRESETS: Record<Exclude<Theme['preset'], 'custom'>, Theme> = {
-  max_conversion: {
-    preset: 'max_conversion',
-    pageBg: { type: 'color', value: '#0A0A0B', overlay: 0 },
-    button: {
-      fill: { type: 'color', value: '#E6C878' },
-      textColor: '#0A0A0B',
-      corner: 'pill',
-      shadow: 'none',
-      font: 'inter',
+export type PresetKey = Exclude<Theme['preset'], 'custom'>;
+
+export type PresetDef = {
+  theme: Theme;
+  linkStyle: LinkStyle;
+};
+
+export const PRESETS: Record<PresetKey, PresetDef> = {
+  glacier: {
+    theme: {
+      preset: 'glacier',
+      pageBg: { type: 'color', value: '#FFFFFF', overlay: 0 },
+      fonts: { title: 'inter', body: 'inter' },
+      colors: { name: '#0A0A0A', handle: '#5A5A5A', icons: '#0A0A0A' },
     },
-    title: { color: '#F5F3EF', font: 'inter' },
-    text: { color: '#9A9AA2' },
-    animation: 'none',
+    linkStyle: { fillType: 'color', fillValue: '#06AEEF', textColor: '#FFFFFF', corner: 'pill', animation: 'none' },
   },
-  stack: {
-    preset: 'stack',
-    pageBg: { type: 'color', value: '#0A0A0B', overlay: 0 },
-    button: {
-      fill: { type: 'color', value: '#1C1C20' },
-      textColor: '#F5F3EF',
-      corner: 'rounded',
-      shadow: 'subtle',
-      font: 'inter',
+  sunset: {
+    theme: {
+      preset: 'sunset',
+      pageBg: { type: 'color', value: '#FFFFFF', overlay: 0 },
+      fonts: { title: 'inter', body: 'inter' },
+      colors: { name: '#0A0A0A', handle: '#5A5A5A', icons: '#0A0A0A' },
     },
-    title: { color: '#F5F3EF', font: 'inter' },
-    text: { color: '#9A9AA2' },
-    animation: 'none',
+    linkStyle: { fillType: 'color', fillValue: '#FF5A4E', textColor: '#FFFFFF', corner: 'rounded', animation: 'none' },
   },
-  cover: {
-    preset: 'cover',
-    pageBg: { type: 'color', value: '#111827', overlay: 0 },
-    button: {
-      fill: { type: 'color', value: 'rgba(255,255,255,0.08)' },
-      textColor: '#F5F3EF',
-      corner: 'rounded',
-      shadow: 'subtle',
-      font: 'inter',
+  mint: {
+    theme: {
+      preset: 'mint',
+      pageBg: { type: 'color', value: '#FFFFFF', overlay: 0 },
+      fonts: { title: 'inter', body: 'inter' },
+      colors: { name: '#0A0A0A', handle: '#5A5A5A', icons: '#0A0A0A' },
     },
-    title: { color: '#F5F3EF', font: 'inter' },
-    text: { color: '#9A9AA2' },
-    animation: 'none',
+    linkStyle: { fillType: 'color', fillValue: '#34C28B', textColor: '#FFFFFF', corner: 'rounded', animation: 'none' },
   },
-  aesthetic: {
-    preset: 'aesthetic',
-    pageBg: { type: 'gradient', value: 'linear-gradient(135deg, #0A0A0B 0%, #1A1208 50%, #0A0A0B 100%)', overlay: 0 },
-    button: {
-      fill: { type: 'gradient', value: 'linear-gradient(135deg, #C9A86A 0%, #E6C878 100%)' },
-      textColor: '#0A0A0B',
-      corner: 'more',
-      shadow: 'medium',
-      font: 'playfair',
+  lilac: {
+    theme: {
+      preset: 'lilac',
+      pageBg: { type: 'color', value: '#FFFFFF', overlay: 0 },
+      fonts: { title: 'inter', body: 'inter' },
+      colors: { name: '#0A0A0A', handle: '#5A5A5A', icons: '#0A0A0A' },
     },
-    title: { color: '#E6C878', font: 'playfair' },
-    text: { color: '#9A9AA2' },
-    animation: 'none',
+    linkStyle: { fillType: 'color', fillValue: '#A78BFA', textColor: '#FFFFFF', corner: 'rounded', animation: 'none' },
   },
 };
 
-// ─── PRESET DESCRIPTIONS ──────────────────────────────────────────────────────
-
-export const PRESET_META: Record<Exclude<Theme['preset'], 'custom'>, { label: string; description: string }> = {
-  max_conversion: { label: 'Max Conversion', description: 'Minimal · High-contrast · Drives a single tap' },
-  stack:          { label: 'Stack',           description: 'Classic · Clean · Highly readable' },
-  cover:          { label: 'Cover',           description: 'Image-forward · Soft container panel' },
-  aesthetic:      { label: 'Aesthetic',       description: 'Editorial luxury · Antique gold · Premium' },
+export const PRESET_META: Record<PresetKey, { label: string }> = {
+  glacier: { label: 'Glacier' },
+  sunset:  { label: 'Sunset' },
+  mint:    { label: 'Mint' },
+  lilac:   { label: 'Lilac' },
 };
 
-// ─── SAFE MERGE ───────────────────────────────────────────────────────────────
+// ─── LINK STYLE RESOLVER ──────────────────────────────────────────────────────
 
-/** Merge raw DB value (possibly partial or empty) with DEFAULT_THEME, crash-safe. */
+/** Map DB row fields to LinkStyle (handles missing/defaulted columns). */
+export function resolveLinkStyle(row: {
+  fill_type?: string | null;
+  fill_value?: string | null;
+  text_color?: string | null;
+  corner?: string | null;
+  animation?: string | null;
+}): LinkStyle {
+  return {
+    fillType: (row.fill_type as LinkStyle['fillType']) ?? DEFAULT_LINK_STYLE.fillType,
+    fillValue: row.fill_value ?? DEFAULT_LINK_STYLE.fillValue,
+    textColor: row.text_color ?? DEFAULT_LINK_STYLE.textColor,
+    corner: (row.corner as LinkStyle['corner']) ?? DEFAULT_LINK_STYLE.corner,
+    animation: (row.animation as LinkStyle['animation']) ?? DEFAULT_LINK_STYLE.animation,
+  };
+}
+
+// ─── SAFE THEME MERGE ─────────────────────────────────────────────────────────
+
+/** Merge raw DB value with DEFAULT_THEME; silently drops removed fields (button/title/text/animation/containerBg). */
 export function resolveTheme(raw: Record<string, unknown> | null | undefined): Theme {
   if (!raw || typeof raw !== 'object' || Object.keys(raw).length === 0) return DEFAULT_THEME;
 
   const r = raw as Record<string, unknown>;
   const pageBgRaw = (r.pageBg ?? {}) as Record<string, unknown>;
-  const buttonRaw = (r.button ?? {}) as Record<string, unknown>;
-  const fillRaw = (buttonRaw.fill ?? {}) as Record<string, unknown>;
-  const titleRaw = (r.title ?? {}) as Record<string, unknown>;
-  const textRaw = (r.text ?? {}) as Record<string, unknown>;
+  const fontsRaw = (r.fonts ?? {}) as Record<string, unknown>;
+  const colorsRaw = (r.colors ?? {}) as Record<string, unknown>;
+
+  const validPresets: PresetKey[] = ['glacier', 'sunset', 'mint', 'lilac'];
+  const rawPreset = r.preset as string;
+  const preset: Theme['preset'] =
+    rawPreset === 'custom'
+      ? 'custom'
+      : validPresets.includes(rawPreset as PresetKey)
+      ? (rawPreset as PresetKey)
+      : DEFAULT_THEME.preset;
 
   return {
-    preset: (r.preset as Theme['preset']) ?? DEFAULT_THEME.preset,
+    preset,
     pageBg: {
       type: (pageBgRaw.type as Theme['pageBg']['type']) ?? DEFAULT_THEME.pageBg.type,
       value: (pageBgRaw.value as string) ?? DEFAULT_THEME.pageBg.value,
       overlay: typeof pageBgRaw.overlay === 'number' ? pageBgRaw.overlay : DEFAULT_THEME.pageBg.overlay,
     },
-    button: {
-      fill: {
-        type: (fillRaw.type as Theme['button']['fill']['type']) ?? DEFAULT_THEME.button.fill.type,
-        value: (fillRaw.value as string) ?? DEFAULT_THEME.button.fill.value,
-      },
-      textColor: (buttonRaw.textColor as string) ?? DEFAULT_THEME.button.textColor,
-      corner: (buttonRaw.corner as Theme['button']['corner']) ?? DEFAULT_THEME.button.corner,
-      shadow: (buttonRaw.shadow as Theme['button']['shadow']) ?? DEFAULT_THEME.button.shadow,
-      font: (buttonRaw.font as string) ?? DEFAULT_THEME.button.font,
+    fonts: {
+      title: (fontsRaw.title as string) ?? DEFAULT_THEME.fonts.title,
+      body:  (fontsRaw.body  as string) ?? DEFAULT_THEME.fonts.body,
     },
-    title: {
-      color: (titleRaw.color as string) ?? DEFAULT_THEME.title.color,
-      font: (titleRaw.font as string) ?? DEFAULT_THEME.title.font,
+    colors: {
+      name:   (colorsRaw.name   as string) ?? DEFAULT_THEME.colors.name,
+      handle: (colorsRaw.handle as string) ?? DEFAULT_THEME.colors.handle,
+      icons:  (colorsRaw.icons  as string) ?? DEFAULT_THEME.colors.icons,
     },
-    text: {
-      color: (textRaw.color as string) ?? DEFAULT_THEME.text.color,
-    },
-    animation: (r.animation as Theme['animation']) ?? DEFAULT_THEME.animation,
   };
 }
