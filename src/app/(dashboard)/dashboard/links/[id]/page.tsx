@@ -8,7 +8,7 @@ import type { Page, PageLink, PageSocial, Plan } from "@/lib/supabase/types";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Edit page — Dashboard",
+  title: "Ultralink Dashboard",
   robots: { index: false, follow: false },
 };
 

@@ -5,6 +5,7 @@ import { AvatarCropModal } from "./avatar-crop-modal";
 import { createClient } from "@/lib/supabase/client";
 import type { Page, AvatarStyle } from "@/lib/supabase/types";
 import { FieldRow } from "./panel-primitives";
+import { SegmentedControl } from "./design-tab";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -110,25 +111,16 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
 
       {uploadError && <p className="text-xs text-red-400 pb-1">{uploadError}</p>}
 
-      {/* Avatar style row */}
+      {/* Avatar style row — segmented control, full flex-1 width */}
       <FieldRow label="Style">
-        <div className="flex gap-0.5 p-0.5 rounded-[var(--radius-sm)] border border-border" style={{ background: "rgba(255,255,255,.04)" }}>
-          {(["circle", "hero"] as AvatarStyle[]).map((style) => (
-            <button
-              key={style}
-              type="button"
-              onClick={() => onChange({ avatar_style: style })}
-              className={[
-                "px-3 py-1 text-xs font-medium rounded transition-all cursor-pointer capitalize",
-                page.avatar_style === style
-                  ? "bg-surface-2 text-text border border-border-strong"
-                  : "text-text-muted hover:text-text",
-              ].join(" ")}
-            >
-              {style}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={[
+            { id: "circle" as AvatarStyle, label: "Circle" },
+            { id: "hero"   as AvatarStyle, label: "Hero" },
+          ]}
+          value={page.avatar_style ?? "circle"}
+          onChange={(v) => onChange({ avatar_style: v })}
+        />
       </FieldRow>
 
       {page.avatar_style === "hero" && !page.avatar_url && (
@@ -137,27 +129,32 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
         </p>
       )}
 
-      {/* Name row */}
+      {/* Name row — full flex-1 width */}
       <FieldRow label="Name">
         <input
           type="text"
           value={page.title ?? ""}
           onChange={(e) => onChange({ title: e.target.value })}
           placeholder="Your name or brand"
-          className="w-44 bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 text-right"
+          className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
         />
       </FieldRow>
 
-      {/* Bio — multi-line, stacked */}
-      <div className="pt-3">
-        <label className="block text-sm text-text-muted mb-1.5">Bio</label>
-        <textarea
-          value={page.bio ?? ""}
-          onChange={(e) => onChange({ bio: e.target.value })}
-          placeholder="Tell visitors what you're about"
-          rows={3}
-          className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-gold/40 transition-colors"
-        />
+      {/* Bio — label-left layout matching Name's indentation */}
+      <div
+        className="flex gap-3 py-2.5"
+        style={{ borderTop: "1px solid rgba(255,255,255,.06)", alignItems: "flex-start" }}
+      >
+        <span className="text-sm text-text-muted flex-shrink-0 min-w-[72px] pt-1.5">Bio</span>
+        <div className="flex-1">
+          <textarea
+            value={page.bio ?? ""}
+            onChange={(e) => onChange({ bio: e.target.value })}
+            placeholder="Tell visitors what you're about"
+            rows={3}
+            className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-gold/40 transition-colors"
+          />
+        </div>
       </div>
 
       {cropSrc && (

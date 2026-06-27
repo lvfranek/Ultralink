@@ -142,7 +142,6 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
   const titleLabel = FONT_OPTIONS.find((f) => f.id === theme.fonts.title)?.label ?? theme.fonts.title;
   const bodyLabel  = FONT_OPTIONS.find((f) => f.id === theme.fonts.body)?.label ?? theme.fonts.body;
   const typographySummary = `${titleLabel} / ${bodyLabel}`;
-  const visibilitySummary = local.active_badge ? "Active" : "Off";
 
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: "#131313" }}>
@@ -207,7 +206,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
             </div>
 
             {(isDirty || hasLinksDirty) && (
-              <span className={`text-xs flex-shrink-0 ${hasLinksDirty ? "text-red-400 font-medium" : "text-text-subtle"}`}>
+              <span className="text-xs flex-shrink-0 font-medium" style={{ color: "#FF6B6B" }}>
                 Unsaved
               </span>
             )}
@@ -224,8 +223,12 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
               <button
                 type="submit"
                 disabled={!canSave || pending}
-                className="px-4 py-1.5 text-xs font-semibold rounded-full transition-colors disabled:opacity-40 cursor-pointer"
+                className="px-4 py-1.5 text-xs font-semibold rounded-full transition-all disabled:opacity-40 cursor-pointer"
                 style={{ background: "#ffffff", color: "#000000" }}
+                onMouseEnter={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#F0F0F0"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "#ffffff"; }}
+                onMouseDown={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.transform = "scale(0.98)"; }}
+                onMouseUp={(e) => { e.currentTarget.style.transform = ""; }}
               >
                 {pending ? "Saving…" : saveSuccess ? "Saved!" : "Save"}
               </button>
@@ -262,6 +265,18 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
                         borderRadius: 999,
                         background: activeTab === tab ? "#ffffff" : "transparent",
                         color: activeTab === tab ? "#000000" : "#9A9A9A",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeTab !== tab) {
+                          e.currentTarget.style.color = "#ffffff";
+                          e.currentTarget.style.background = "rgba(255,255,255,.04)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeTab !== tab) {
+                          e.currentTarget.style.color = "#9A9A9A";
+                          e.currentTarget.style.background = "transparent";
+                        }
                       }}
                     >
                       {tab}
@@ -322,7 +337,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
                   />
                 </SettingsCard>
 
-                {/* 2. Theme */}
+                {/* 2. Theme (includes color controls at bottom) */}
                 <SettingsCard title="Theme" summary={themeSummary}>
                   <PresetsContent
                     theme={theme}
@@ -330,6 +345,10 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
                     onChange={handleThemeChange}
                     onPresetApply={handlePresetApply}
                   />
+                  <div className="mt-4 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                    <p className="text-xs text-text-subtle mb-2">Colors</p>
+                    <ColorsContent theme={theme} onChange={handleThemeChange} />
+                  </div>
                 </SettingsCard>
 
                 {/* 3. Typography */}
@@ -337,14 +356,10 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
                   <TypographyContent theme={theme} onChange={handleThemeChange} />
                 </SettingsCard>
 
-                {/* 4. Colors */}
-                <SettingsCard title="Colors" summary="3 set">
-                  <ColorsContent theme={theme} onChange={handleThemeChange} />
-                </SettingsCard>
-
-                {/* 5. Visibility */}
-                <SettingsCard title="Visibility" summary={visibilitySummary}>
-                  <div className="flex items-center justify-between py-1">
+                {/* 4. Advanced — Active badge + Phase-5 stubs */}
+                <SettingsCard title="Advanced" summary="Coming soon">
+                  {/* Active now badge */}
+                  <div className="flex items-center justify-between py-1 mb-3">
                     <div>
                       <p className="text-sm font-medium text-text flex items-center gap-2">
                         Active now badge
@@ -382,11 +397,8 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
                       </a>
                     )}
                   </div>
-                </SettingsCard>
-
-                {/* 6. Advanced — Phase-5 stubs */}
-                <SettingsCard title="Advanced" summary="3 coming soon">
-                  <div className="space-y-1">
+                  {/* Phase-5 stubs */}
+                  <div className="space-y-1" style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
                     {[
                       { label: "Custom Domain", description: "Point your own domain (e.g. links.yourbrand.com) to this page." },
                       { label: "Geo-Blocking",  description: "Restrict access to specific countries or regions." },

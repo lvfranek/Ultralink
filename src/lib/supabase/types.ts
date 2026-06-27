@@ -4,6 +4,7 @@ export type AvatarStyle = "circle" | "hero";
 export interface Profile {
   id: string;
   plan: Plan;
+  username: string;
   display_name: string | null;
   created_at: string;
 }

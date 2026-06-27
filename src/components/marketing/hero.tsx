@@ -27,10 +27,9 @@ export function Hero() {
   return (
     <section
       style={{ background: '#0A0A0A' }}
-      className="px-4 sm:px-6"
       aria-label="Hero"
     >
-      <div style={{ maxWidth: 1140, margin: '0 auto', paddingTop: 88, paddingBottom: 56 }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '88px 24px 56px' }}>
         {/* White framed card — overflow:visible so the glow is never clipped */}
         <div
           style={{

@@ -112,9 +112,10 @@ export default function RootLayout({
         bebasNeue.variable,
         "h-full",
       ].join(" ")}
+      style={{ background: '#0A0A0A' }}
       suppressHydrationWarning
     >
-      <body className="min-h-dvh antialiased">{children}</body>
+      <body className="min-h-dvh antialiased" style={{ background: '#0A0A0A' }}>{children}</body>
     </html>
   );
 }

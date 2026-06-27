@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "signin" | "signup";
-
+type UsernameState = "idle" | "checking" | "available" | "taken" | "invalid";
 
 function GoogleIcon() {
   return (
@@ -23,6 +23,8 @@ function GoogleIcon() {
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -52,6 +54,7 @@ export function LoginForm() {
 
   const [mode, setMode] = useState<Mode>("signup");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState(prefilledUsername);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -60,10 +63,41 @@ export function LoginForm() {
 
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
+  const [usernameTouched, setUsernameTouched] = useState(false);
+
+  const [usernameState, setUsernameState] = useState<UsernameState>("idle");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (prefilledPlan) setMode("signup");
   }, [prefilledPlan]);
+
+  const checkUsername = useCallback(async (value: string) => {
+    if (!USERNAME_RE.test(value)) {
+      setUsernameState("invalid");
+      return;
+    }
+    setUsernameState("checking");
+    const { data } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("username", value)
+      .maybeSingle();
+    setUsernameState(data ? "taken" : "available");
+  }, [supabase]);
+
+  const handleUsernameChange = (value: string) => {
+    const sanitized = value.toLowerCase().replace(/[^a-z0-9_]/g, "");
+    setUsername(sanitized);
+    clearMessages();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (sanitized.length < 3) {
+      setUsernameState(sanitized.length === 0 ? "idle" : "invalid");
+      return;
+    }
+    setUsernameState("checking");
+    debounceRef.current = setTimeout(() => checkUsername(sanitized), 400);
+  };
 
   const emailError = emailTouched && !isValidEmail(email)
     ? "Enter a valid email address."
@@ -73,7 +107,14 @@ export function LoginForm() {
     ? "Password must be at least 8 characters."
     : null;
 
-  const isFormValid = isValidEmail(email) && password.length >= 8;
+  const usernameError = usernameTouched && (usernameState === "invalid" || (usernameState === "idle" && username.length === 0))
+    ? "3–20 characters, lowercase letters, numbers, underscores."
+    : usernameTouched && usernameState === "taken"
+    ? "That username is already taken."
+    : null;
+
+  const isFormValid = isValidEmail(email) && password.length >= 8 &&
+    (mode === "signin" || (USERNAME_RE.test(username) && usernameState === "available"));
 
   const clearMessages = () => {
     setError(null);
@@ -84,6 +125,7 @@ export function LoginForm() {
     setMode(m);
     setEmailTouched(false);
     setPasswordTouched(false);
+    setUsernameTouched(false);
     clearMessages();
   };
 
@@ -91,6 +133,7 @@ export function LoginForm() {
     e.preventDefault();
     setEmailTouched(true);
     setPasswordTouched(true);
+    if (mode === "signup") setUsernameTouched(true);
     if (!isFormValid) return;
 
     clearMessages();
@@ -104,12 +147,17 @@ export function LoginForm() {
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: {
-              username: prefilledUsername || undefined,
+              username,
               plan: prefilledPlan || undefined,
             },
           },
         });
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes("unique") || error.message.includes("duplicate")) {
+            throw new Error("That username was just taken. Please choose another.");
+          }
+          throw error;
+        }
         setSuccessMessage(
           "Check your email — we sent you a confirmation link to activate your account."
         );
@@ -180,7 +228,7 @@ export function LoginForm() {
           }}
         >
             {/* Username claim context */}
-            {prefilledUsername && (
+            {prefilledUsername && mode === "signup" && (
               <div
                 style={{
                   marginBottom: 20,
@@ -327,6 +375,56 @@ export function LoginForm() {
                   <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>{emailError}</p>
                 )}
               </div>
+
+              {/* Username field — signup only */}
+              {mode === "signup" && (
+                <div>
+                  <label htmlFor="username" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6B6B6B', marginBottom: 6 }}>
+                    Username
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      id="username"
+                      type="text"
+                      value={username}
+                      onChange={(e) => handleUsernameChange(e.target.value)}
+                      onBlur={() => setUsernameTouched(true)}
+                      placeholder="your_username"
+                      autoComplete="username"
+                      required
+                      disabled={loading}
+                      style={{
+                        ...(usernameError ? inputErrorStyle : inputStyle),
+                        paddingRight: 36,
+                      }}
+                    />
+                    {/* Availability indicator */}
+                    {usernameState === "checking" && (
+                      <span
+                        style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 14, height: 14, border: '2px solid #9a9a9a', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.75s linear infinite' }}
+                        aria-hidden="true"
+                      />
+                    )}
+                    {usernameState === "available" && (
+                      <svg style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 16, height: 16, color: '#059669' }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <path d="M3 8l3.5 3.5L13 4.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                    {usernameState === "taken" && (
+                      <svg style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 16, height: 16, color: '#dc2626' }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
+                      </svg>
+                    )}
+                  </div>
+                  {usernameError ? (
+                    <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>{usernameError}</p>
+                  ) : usernameState === "available" ? (
+                    <p style={{ marginTop: 6, fontSize: 12, color: '#059669' }}>Username is available.</p>
+                  ) : (
+                    <p style={{ marginTop: 6, fontSize: 12, color: '#9a9a9a' }}>3–20 characters, lowercase letters, numbers, underscores.</p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label htmlFor="password" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6B6B6B', marginBottom: 6 }}>

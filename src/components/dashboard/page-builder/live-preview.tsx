@@ -13,14 +13,39 @@ interface LivePreviewProps {
 
 export function LivePreview({ page, links, socials, theme }: LivePreviewProps) {
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ scrollbarWidth: "none" }} aria-label="Page preview">
-      <ProfilePageView
-        page={page}
-        links={links.filter((l) => l.is_active)}
-        socials={socials}
-        theme={theme}
-        isPreview
-      />
+    /* Dark canvas that frames the phone */
+    <div
+      className="absolute inset-0 flex items-center justify-center"
+      style={{ background: "#0D0D0D" }}
+      aria-label="Page preview"
+    >
+      {/* Phone frame — matches iPhone 14 proportions */}
+      <div
+        className="relative flex flex-col overflow-hidden"
+        style={{
+          width: 390,
+          height: "88%",
+          maxHeight: 844,
+          borderRadius: 44,
+          border: "2px solid rgba(255,255,255,0.14)",
+          boxShadow: "0 24px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.04)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Scrollable content — no scrollbar chrome */}
+        <div
+          className="absolute inset-0 overflow-y-auto"
+          style={{ scrollbarWidth: "none" }}
+        >
+          <ProfilePageView
+            page={page}
+            links={links.filter((l) => l.is_active)}
+            socials={socials}
+            theme={theme}
+            isPreview
+          />
+        </div>
+      </div>
     </div>
   );
 }

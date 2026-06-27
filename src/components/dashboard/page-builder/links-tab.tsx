@@ -332,49 +332,21 @@ function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirty
             {/* Corners */}
             <div>
               <p className="text-xs font-medium text-text-muted mb-2">Corners</p>
-              <div className="grid grid-cols-4 gap-2">
-                {BUTTON_CORNERS.map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => updateStyle({ corner: c.id })}
-                    className={[
-                      "flex flex-col items-center gap-1.5 py-3 px-2 border text-xs font-medium transition-all cursor-pointer",
-                      linkStyle.corner === c.id
-                        ? "border-gold/60 bg-gold-dim text-gold rounded-[var(--radius-sm)]"
-                        : "border-border-strong bg-surface text-text-muted hover:border-gold/30 rounded-[var(--radius-sm)]",
-                    ].join(" ")}
-                  >
-                    <div
-                      className="w-8 h-5 bg-surface-2 border border-border-strong"
-                      style={{ borderRadius: c.radius }}
-                    />
-                    <span className="truncate">{c.label}</span>
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                options={BUTTON_CORNERS.map((c) => ({ id: c.id, label: c.label }))}
+                value={linkStyle.corner}
+                onChange={(v) => updateStyle({ corner: v })}
+              />
             </div>
 
             {/* Animation */}
             <div>
               <p className="text-xs font-medium text-text-muted mb-2">Animation</p>
-              <div className="grid grid-cols-4 gap-2">
-                {ANIMATIONS.map((a) => (
-                  <button
-                    key={a.id}
-                    type="button"
-                    onClick={() => updateStyle({ animation: a.id })}
-                    className={[
-                      "py-2 text-xs font-medium border rounded-[var(--radius-sm)] transition-all cursor-pointer",
-                      linkStyle.animation === a.id
-                        ? "border-gold/60 bg-gold-dim text-gold"
-                        : "border-border-strong bg-surface text-text-muted hover:border-gold/30",
-                    ].join(" ")}
-                  >
-                    {a.label}
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                options={ANIMATIONS.map((a) => ({ id: a.id, label: a.label }))}
+                value={linkStyle.animation}
+                onChange={(v) => updateStyle({ animation: v })}
+              />
             </div>
           </div>
 

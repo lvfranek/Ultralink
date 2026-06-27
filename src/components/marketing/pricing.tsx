@@ -110,6 +110,7 @@ export function Pricing() {
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          alignItems: 'stretch',
           gap: 20,
           maxWidth: 820,
           margin: '0 auto',
@@ -121,6 +122,7 @@ export function Pricing() {
           style={{
             display: 'flex',
             flexDirection: 'column',
+            height: '100%',
             padding: '28px 28px 24px',
             borderRadius: 20,
             background: '#ffffff',
@@ -163,6 +165,7 @@ export function Pricing() {
               alignItems: 'center',
               justifyContent: 'center',
               width: '100%',
+              marginTop: 'auto',
               padding: '12px 0',
               fontSize: 14,
               fontWeight: 600,
@@ -182,7 +185,7 @@ export function Pricing() {
         </div>
 
         {/* Pro — white card, gradient border, Recommended badge on the top border edge */}
-        <div style={{ position: 'relative', isolation: 'isolate' }}>
+        <div style={{ position: 'relative', isolation: 'isolate', display: 'flex', flexDirection: 'column', height: '100%' }}>
           {/* Pastel glow */}
           <div
             aria-hidden="true"
@@ -205,6 +208,9 @@ export function Pricing() {
               borderRadius: 21,
               padding: 1.5,
               background: GRADIENT,
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             {/* Badge sitting centered on the top border edge */}
@@ -241,6 +247,7 @@ export function Pricing() {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
+                flex: 1,
                 padding: '28px 28px 24px',
                 borderRadius: 20,
                 background: '#ffffff',
@@ -320,6 +327,7 @@ export function Pricing() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   width: '100%',
+                  marginTop: 'auto',
                   padding: '12px 0',
                   fontSize: 14,
                   fontWeight: 600,

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Domains — Dashboard",
+  title: "Ultralink Dashboard",
   robots: { index: false, follow: false },
 };
 

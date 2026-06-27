@@ -11,6 +11,7 @@ import type { User } from "@supabase/supabase-js";
 interface SidebarProps {
   user: User;
   displayName?: string | null;
+  username?: string | null;
 }
 
 function NavItem({
@@ -63,7 +64,7 @@ function NavItem({
   );
 }
 
-function AccountMenu({ user, displayName }: { user: User; displayName?: string | null }) {
+function AccountMenu({ user, displayName, username }: { user: User; displayName?: string | null; username?: string | null }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -74,7 +75,7 @@ function AccountMenu({ user, displayName }: { user: User; displayName?: string |
     router.refresh();
   };
 
-  const name = displayName || user.email?.split("@")[0] || "Account";
+  const name = displayName || username || user.email?.split("@")[0] || "Account";
   const email = user.email ?? "";
 
   return (
@@ -116,14 +117,14 @@ function AccountMenu({ user, displayName }: { user: User; displayName?: string |
           <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
             <button
               type="button"
-              onClick={() => { setOpen(false); router.push("/login"); }}
+              onClick={() => { setOpen(false); router.push("/dashboard/account"); }}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
             >
               <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                <path d="M10 8H2m0 0l3-3M2 8l3 3" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M6 4V3a1 1 0 011-1h6a1 1 0 011 1v10a1 1 0 01-1 1H7a1 1 0 01-1-1v-1" strokeLinecap="round" />
+                <circle cx="8" cy="5" r="2.5" strokeLinecap="round" />
+                <path d="M2.5 13.5c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              Switch account
+              Account settings
             </button>
             <div className="border-t border-border mx-2 my-1" />
             <button
@@ -144,7 +145,7 @@ function AccountMenu({ user, displayName }: { user: User; displayName?: string |
   );
 }
 
-export function Sidebar({ user, displayName }: SidebarProps) {
+export function Sidebar({ user, displayName, username }: SidebarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -234,7 +235,7 @@ export function Sidebar({ user, displayName }: SidebarProps) {
       </div>
 
       <div className="p-3 mt-2">
-        <AccountMenu user={user} displayName={displayName} />
+        <AccountMenu user={user} displayName={displayName} username={username} />
       </div>
     </div>
   );

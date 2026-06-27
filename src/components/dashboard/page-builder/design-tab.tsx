@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
 import { HexColorPicker } from "react-colorful";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -28,24 +29,39 @@ export function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
+  className,
 }: {
   options: { id: T; label: string }[];
   value: T;
   onChange: (v: T) => void;
+  className?: string;
 }) {
   return (
-    <div className="flex gap-1 p-1 bg-surface rounded-[var(--radius-sm)] border border-border">
+    <div
+      className={`flex p-1 ${className ?? "w-full"}`}
+      style={{
+        background: "#1A1A1A",
+        border: "1px solid rgba(255,255,255,.08)",
+        borderRadius: 9999,
+      }}
+    >
       {options.map((o) => (
         <button
           key={o.id}
           type="button"
           onClick={() => onChange(o.id)}
-          className={[
-            "flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors cursor-pointer",
-            value === o.id
-              ? "bg-surface-2 text-text border border-border-strong"
-              : "text-text-muted hover:text-text",
-          ].join(" ")}
+          className="flex-1 px-3 py-1 text-xs font-medium transition-all duration-150 cursor-pointer"
+          style={{
+            borderRadius: 9999,
+            background: value === o.id ? "#ffffff" : "transparent",
+            color: value === o.id ? "#000000" : "#9A9A9A",
+          }}
+          onMouseEnter={(e) => {
+            if (value !== o.id) e.currentTarget.style.color = "#ffffff";
+          }}
+          onMouseLeave={(e) => {
+            if (value !== o.id) e.currentTarget.style.color = "#9A9A9A";
+          }}
         >
           {o.label}
         </button>
@@ -68,18 +84,84 @@ export function ColorPickerField({
   inline?: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties>({});
+  const [mounted, setMounted] = useState(false);
 
-  const handleBlur = useCallback((e: React.FocusEvent) => {
-    if (!containerRef.current?.contains(e.relatedTarget as Node)) {
-      setOpen(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  const updatePosition = useCallback(() => {
+    if (!triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const popoverH = 290;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    if (spaceBelow < popoverH + 8) {
+      setPopoverStyle({
+        position: "fixed",
+        bottom: window.innerHeight - rect.top + 4,
+        right: window.innerWidth - rect.right,
+        zIndex: 9999,
+      });
+    } else {
+      setPopoverStyle({
+        position: "fixed",
+        top: rect.bottom + 4,
+        right: window.innerWidth - rect.right,
+        zIndex: 9999,
+      });
     }
   }, []);
 
+  useLayoutEffect(() => {
+    if (open) updatePosition();
+  }, [open, updatePosition]);
+
+  const pickerContent = (
+    <>
+      {/* Click-outside overlay */}
+      <div
+        className="fixed inset-0"
+        style={{ zIndex: 9998 }}
+        onClick={() => setOpen(false)}
+      />
+      {/* Picker popover */}
+      <div
+        style={{
+          ...popoverStyle,
+          background: "var(--color-surface, #1A1A1A)",
+          border: "1px solid rgba(255,255,255,.12)",
+          borderRadius: "var(--radius, 0.75rem)",
+          padding: "0.75rem",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+        }}
+      >
+        <HexColorPicker color={value} onChange={onChange} />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (/^#[0-9a-fA-F]{0,6}$/.test(v)) onChange(v.length === 7 ? v : value);
+          }}
+          className="mt-2 w-full font-mono text-xs rounded px-2 py-1.5 focus:outline-none uppercase"
+          style={{
+            background: "rgba(255,255,255,.06)",
+            border: "1px solid rgba(255,255,255,.12)",
+            color: "#ffffff",
+          }}
+          maxLength={7}
+          spellCheck={false}
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
+    </>
+  );
+
   return (
-    <div className="relative" ref={containerRef} onBlur={handleBlur}>
+    <div className="relative">
       {!inline && <p className="text-xs font-medium text-text-muted mb-2">{label}</p>}
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-strong rounded-[var(--radius-sm)] cursor-pointer hover:border-gold/40 transition-colors"
@@ -90,22 +172,7 @@ export function ColorPickerField({
         />
         <span className="text-xs text-text font-mono uppercase">{value}</span>
       </button>
-      {open && (
-        <div className="absolute z-50 mt-1 right-0 bg-surface border border-border-strong rounded-[var(--radius)] shadow-xl p-3">
-          <HexColorPicker color={value} onChange={onChange} />
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => {
-              const v = e.target.value;
-              if (/^#[0-9a-fA-F]{0,6}$/.test(v)) onChange(v.length === 7 ? v : value);
-            }}
-            className="mt-2 w-full bg-surface-2 border border-border-strong text-text font-mono text-xs rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gold/40 uppercase"
-            maxLength={7}
-            spellCheck={false}
-          />
-        </div>
-      )}
+      {open && mounted && createPortal(pickerContent, document.body)}
     </div>
   );
 }
@@ -149,6 +216,8 @@ export function GradientBuilder({
     onChange(buildGradient(s1, s2, a));
   }
 
+  const angleOptions = GRADIENT_DIRECTIONS.map((d) => ({ id: String(d.angle) as string, label: d.label }));
+
   return (
     <div className="space-y-3">
       <div
@@ -159,18 +228,24 @@ export function GradientBuilder({
         <ColorPickerField label="Start" value={stop1} onChange={(v) => update(v, stop2, angle)} />
         <ColorPickerField label="End" value={stop2} onChange={(v) => update(stop1, v, angle)} />
       </div>
-      <div className="flex gap-1">
+      {/* Direction — pill segmented */}
+      <div
+        className="flex p-1 w-full"
+        style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.08)", borderRadius: 9999 }}
+      >
         {GRADIENT_DIRECTIONS.map((d) => (
           <button
             key={d.angle}
             type="button"
             onClick={() => update(stop1, stop2, d.angle)}
-            className={[
-              "flex-1 py-1.5 text-sm border rounded-[var(--radius-sm)] transition-all cursor-pointer font-medium",
-              angle === d.angle
-                ? "border-gold/60 bg-gold-dim text-gold"
-                : "border-border-strong bg-surface text-text-muted hover:border-gold/30",
-            ].join(" ")}
+            className="flex-1 py-1 text-sm font-medium transition-all duration-150 cursor-pointer"
+            style={{
+              borderRadius: 9999,
+              background: angle === d.angle ? "#ffffff" : "transparent",
+              color: angle === d.angle ? "#000000" : "#9A9A9A",
+            }}
+            onMouseEnter={(e) => { if (angle !== d.angle) e.currentTarget.style.color = "#ffffff"; }}
+            onMouseLeave={(e) => { if (angle !== d.angle) e.currentTarget.style.color = "#9A9A9A"; }}
           >
             {d.label}
           </button>
@@ -195,16 +270,16 @@ function PresetThumb({ presetKey, active }: { presetKey: PresetKey; active: bool
         "relative rounded-lg overflow-hidden border-2 transition-all cursor-pointer w-full",
         active ? "border-gold shadow-[0_0_0_2px_rgba(201,168,106,0.25)]" : "border-border-strong hover:border-gold/40",
       ].join(" ")}
-      style={{ aspectRatio: "5/8", background: bg }}
+      style={{ height: 90, background: bg }}
     >
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-black/10 border border-black/10" />
-      <div className="absolute top-9 left-1/2 -translate-x-1/2 w-10 h-1.5 rounded-full" style={{ background: nameColor, opacity: 0.8 }} />
-      <div className="absolute bottom-3 left-2 right-2 space-y-1.5">
-        {[1, 2, 3].map((i) => (
+      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-black/10 border border-black/10" />
+      <div className="absolute top-7 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full" style={{ background: nameColor, opacity: 0.8 }} />
+      <div className="absolute bottom-2 left-2 right-2 space-y-1">
+        {[1, 2].map((i) => (
           <div
             key={i}
-            className="w-full h-2.5"
-            style={{ background: btnBg, borderRadius: btnRadius, opacity: i === 1 ? 1 : i === 2 ? 0.65 : 0.35 }}
+            className="w-full h-2"
+            style={{ background: btnBg, borderRadius: btnRadius, opacity: i === 1 ? 1 : 0.5 }}
           />
         ))}
       </div>
@@ -265,17 +340,17 @@ export function PresetsContent({ theme, userId, onChange, onPresetApply }: Theme
 
   return (
     <div className="space-y-4">
-      {/* 2×2 preset grid */}
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* 2×2 preset grid — compact */}
+      <div className="grid grid-cols-2 gap-2">
         {(Object.keys(PRESETS) as PresetKey[]).map((key) => (
           <button
             key={key}
             type="button"
             onClick={() => applyPreset(key)}
-            className="flex flex-col gap-1.5 cursor-pointer group text-left"
+            className="flex flex-col gap-1 cursor-pointer group text-left"
           >
             <PresetThumb presetKey={key} active={theme.preset === key} />
-            <p className={`text-xs font-medium ${theme.preset === key ? "text-gold" : "text-text-muted group-hover:text-text"} transition-colors`}>
+            <p className={`text-[11px] font-medium ${theme.preset === key ? "text-gold" : "text-text-muted group-hover:text-text"} transition-colors`}>
               {PRESET_META[key].label}
             </p>
           </button>
