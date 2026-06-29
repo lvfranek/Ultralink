@@ -160,15 +160,16 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
 
   // ── Content shared between mobile and desktop ──────────────────────────────
 
-  const content = (
-    <div className="relative z-[1] w-full flex flex-col items-center px-4 pt-10 pb-8">
+  const heroActive = isHero && !!page.avatar_url;
 
-      {/* Hero avatar — only when photo is uploaded */}
-      {isHero && page.avatar_url && (
-        <div className="relative w-full mb-6 overflow-hidden" style={{ height: 200 }}>
+  const content = (
+    <>
+      {/* Hero — full-bleed: no side padding, flush to the very top */}
+      {heroActive && (
+        <div className="relative z-[1] w-full flex-shrink-0 overflow-hidden" style={{ height: 220 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={page.avatar_url}
+            src={page.avatar_url!}
             alt={page.title || page.slug}
             className="absolute inset-0 w-full h-full object-cover"
           />
@@ -178,6 +179,8 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
           />
         </div>
       )}
+
+    <div className={`relative z-[1] w-full flex flex-col items-center px-4 pb-8 ${heroActive ? "pt-4" : "pt-10"}`}>
 
       {/* Circle avatar — when not hero OR when hero but no photo yet (fallback) */}
       {(!isHero || !page.avatar_url) && (
@@ -278,6 +281,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
         )}
       </div>
     </div>
+    </>
   );
 
   // ── Layout ─────────────────────────────────────────────────────────────────
@@ -292,8 +296,13 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
       className={`flex flex-col ${isPreview ? "min-h-full" : "min-h-dvh"}`}
       style={{ position: "relative", zIndex: 1 }}
     >
-      {/* ── Mobile background (hidden on ≥768px) ── */}
-      <div className="md:hidden absolute inset-0 overflow-hidden" aria-hidden>
+      {/*
+       * Background layer.
+       * Preview: always render as mobile (full-bleed bg) — media queries fire
+       * on the viewport width, not the phone-frame width, so without this guard
+       * `md:hidden` would suppress the background on any desktop viewport.
+       */}
+      <div className={`${isPreview ? "" : "md:hidden "}absolute inset-0 overflow-hidden`} aria-hidden>
         <BgLayer pageBgIsImage={pageBgIsImage} value={t.pageBg.value} overlay={overlay} />
       </div>
 
@@ -323,18 +332,22 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
       )}
 
       {/* ── Content: full-bleed on mobile, centered card on desktop ── */}
-      <div className="relative flex-1 flex flex-col items-center md:justify-center md:py-12 md:px-4">
+      {/* Preview always uses mobile layout — no centering padding that would    */}
+      {/* bleed through the phone frame as dark canvas around the content.       */}
+      <div className={`relative flex-1 flex flex-col items-center${isPreview ? "" : " md:justify-center md:py-12 md:px-4"}`}>
         <div
           className={[
             "w-full relative overflow-hidden",
-            // Desktop card shape
+            // Desktop card shape (public page only)
             !isPreview && "md:max-w-[480px] md:rounded-[32px] md:shadow-[0_8px_64px_rgba(0,0,0,0.5)]",
           ].filter(Boolean).join(" ")}
         >
-          {/* Desktop card background (hidden on mobile — mobile bg handles that) */}
-          <div className="hidden md:block absolute inset-0" aria-hidden>
-            <BgLayer pageBgIsImage={pageBgIsImage} value={t.pageBg.value} overlay={overlay} />
-          </div>
+          {/* Desktop card background — suppressed in preview (mobile bg covers everything) */}
+          {!isPreview && (
+            <div className="hidden md:block absolute inset-0" aria-hidden>
+              <BgLayer pageBgIsImage={pageBgIsImage} value={t.pageBg.value} overlay={overlay} />
+            </div>
+          )}
 
           {content}
         </div>
@@ -382,18 +395,20 @@ function LinkButton({ link, index, isPreview }: { link: PageLink; index: number;
   const btnRadius = cornerRadius(ls.corner);
   const animCls = animClass(ls.animation);
 
+  const redirectHref = isPreview ? link.url : `/r/${link.id}`;
+
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     if (!link.is_adult || isPreview) return;
     if (typeof window === "undefined") return;
     const confirmed = sessionStorage.getItem(SESSION_KEY) === "1";
     if (confirmed) return;
     e.preventDefault();
-    showGate(link.url);
+    showGate(redirectHref);
   }
 
   return (
     <a
-      href={link.url}
+      href={redirectHref}
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}

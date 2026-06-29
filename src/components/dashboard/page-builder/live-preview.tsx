@@ -12,23 +12,54 @@ interface LivePreviewProps {
 }
 
 export function LivePreview({ page, links, socials, theme }: LivePreviewProps) {
+  const pageBgIsImage = theme.pageBg.type === "image" && !!theme.pageBg.value;
+
   return (
-    /* Dark canvas that frames the phone */
     <div
-      className="absolute inset-0 flex items-center justify-center"
-      style={{ background: "#0D0D0D" }}
+      className="absolute inset-0 flex items-center justify-center overflow-hidden"
       aria-label="Page preview"
     >
-      {/* Phone frame — matches iPhone 14 proportions */}
+      {/* Canvas background — mirrors the desktop public page backdrop */}
+      <div className="absolute inset-0" aria-hidden>
+        {page.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={page.avatar_url}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              filter: "blur(60px) saturate(1.1) brightness(0.65)",
+              transform: "scale(1.15)",
+            }}
+          />
+        ) : pageBgIsImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={theme.pageBg.value}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              filter: "blur(60px) saturate(1.1) brightness(0.65)",
+              transform: "scale(1.15)",
+            }}
+          />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{ background: theme.pageBg.value || "#0D0D0D" }}
+          />
+        )}
+      </div>
+
+      {/* Content frame — no border, just rounded clip + shadow for depth */}
       <div
-        className="relative flex flex-col overflow-hidden"
+        className="relative flex flex-col"
         style={{
           width: 390,
           height: "88%",
           maxHeight: 844,
           borderRadius: 44,
-          border: "2px solid rgba(255,255,255,0.14)",
-          boxShadow: "0 24px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.04)",
+          boxShadow: "0 24px 80px rgba(0,0,0,0.5)",
           overflow: "hidden",
         }}
       >

@@ -446,28 +446,38 @@ export function TypographyContent({ theme, onChange }: TypographyProps) {
   return (
     <div>
       <FieldRow label="Title">
-        <select
-          value={theme.fonts.title}
-          onChange={(e) => onChange(patchTheme(theme, { fonts: { ...theme.fonts, title: e.target.value } }))}
-          className="bg-surface-2 border border-border-strong text-text rounded-[var(--radius-sm)] px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
-          style={{ fontFamily: titleFont ? `var(${titleFont.variable}), system-ui, sans-serif` : undefined }}
-        >
-          {FONT_OPTIONS.map((f) => (
-            <option key={f.id} value={f.id}>{f.label}</option>
-          ))}
-        </select>
+        <div className="relative inline-flex items-center w-full">
+          <select
+            value={theme.fonts.title}
+            onChange={(e) => onChange(patchTheme(theme, { fonts: { ...theme.fonts, title: e.target.value } }))}
+            className="w-full appearance-none bg-surface-2 border border-border-strong text-text rounded-[var(--radius-sm)] pl-2.5 pr-7 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
+            style={{ fontFamily: titleFont ? `var(${titleFont.variable}), system-ui, sans-serif` : undefined }}
+          >
+            {FONT_OPTIONS.map((f) => (
+              <option key={f.id} value={f.id}>{f.label}</option>
+            ))}
+          </select>
+          <svg className="pointer-events-none absolute right-2 w-3.5 h-3.5 text-text-muted shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+            <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
       </FieldRow>
       <FieldRow label="Body">
-        <select
-          value={theme.fonts.body}
-          onChange={(e) => onChange(patchTheme(theme, { fonts: { ...theme.fonts, body: e.target.value } }))}
-          className="bg-surface-2 border border-border-strong text-text rounded-[var(--radius-sm)] px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
-          style={{ fontFamily: bodyFont ? `var(${bodyFont.variable}), system-ui, sans-serif` : undefined }}
-        >
-          {FONT_OPTIONS.map((f) => (
-            <option key={f.id} value={f.id}>{f.label}</option>
-          ))}
-        </select>
+        <div className="relative inline-flex items-center w-full">
+          <select
+            value={theme.fonts.body}
+            onChange={(e) => onChange(patchTheme(theme, { fonts: { ...theme.fonts, body: e.target.value } }))}
+            className="w-full appearance-none bg-surface-2 border border-border-strong text-text rounded-[var(--radius-sm)] pl-2.5 pr-7 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
+            style={{ fontFamily: bodyFont ? `var(${bodyFont.variable}), system-ui, sans-serif` : undefined }}
+          >
+            {FONT_OPTIONS.map((f) => (
+              <option key={f.id} value={f.id}>{f.label}</option>
+            ))}
+          </select>
+          <svg className="pointer-events-none absolute right-2 w-3.5 h-3.5 text-text-muted shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+            <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
       </FieldRow>
     </div>
   );

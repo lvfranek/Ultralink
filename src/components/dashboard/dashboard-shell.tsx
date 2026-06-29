@@ -22,8 +22,10 @@ export function DashboardShell({ pages, siteUrl, initialSlug, linkCap = 1 }: Das
         <div className="flex items-center gap-3 mb-8">
           <div className="flex-1">
             <h1 className="text-2xl font-bold" style={{ color: "#ffffff" }}>
-              Links {pages.length}
-              <span style={{ color: pages.length >= linkCap ? "#C47A3A" : "#6B6B6B" }}>/{linkCap}</span>
+              Links{" "}
+              <span style={{ color: "#6B6B6B", fontWeight: 500 }}>
+                {pages.length}/{linkCap}
+              </span>
             </h1>
           </div>
           <div className="flex items-center gap-2">

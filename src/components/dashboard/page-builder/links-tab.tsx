@@ -778,14 +778,14 @@ export function LinksTab({ pageId, userId, links, onLinksChange, socials, onSoci
         )}
       </SettingsCard>
 
-      {/* ── Small icons card (collapsed by default) ── */}
+      {/* ── Social icons card (collapsed by default) ── */}
       <SettingsCard
-        title="Small icons"
+        title="Social icons"
         summary={socials.length > 0 ? `${socials.length} icon${socials.length !== 1 ? "s" : ""}` : "None yet"}
       >
         {socials.length === 0 && !addingSocial && (
           <div className="text-center py-6 text-text-muted">
-            <p className="text-sm mb-1">No social links yet</p>
+            <p className="text-sm mb-1">No social icons yet</p>
             <p className="text-xs text-text-subtle">Add your social profiles below</p>
           </div>
         )}
@@ -851,7 +851,7 @@ export function LinksTab({ pageId, userId, links, onLinksChange, socials, onSoci
               onClick={() => setAddingSocial(true)}
               className="w-full py-2.5 border border-dashed border-border-strong/60 text-text-muted text-sm font-medium rounded-[var(--radius)] hover:border-border-strong hover:bg-surface transition-all cursor-pointer"
             >
-              + Add small icon
+              + Add social icon
             </button>
           )
         )}

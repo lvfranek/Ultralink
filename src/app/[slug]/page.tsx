@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
+import { after } from "next/server";
+import { headers } from "next/headers";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { captureEvent } from "@/lib/analytics";
 import { ProfilePageView } from "@/components/public/profile-page-view";
 import { AgeGate } from "@/components/public/age-gate";
 import type { Page, PageLink, PageSocial } from "@/lib/supabase/types";
@@ -46,6 +49,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BioPage({ params }: Props) {
   const { slug } = await params;
+
+  // Read request headers BEFORE after() — required by Next.js for Server Components
+  const reqHeaders = await headers();
+  const ua = reqHeaders.get("user-agent");
+  const country = reqHeaders.get("x-vercel-ip-country");
+  const referrer = reqHeaders.get("referer");
+
   const supabase = await createClient();
 
   const { data: page } = await supabase
@@ -56,6 +66,17 @@ export default async function BioPage({ params }: Props) {
     .single();
 
   if (!page) notFound();
+
+  // Fire-and-forget view capture — only reaches here if page exists
+  after(async () => {
+    await captureEvent({
+      page_id: page.id,
+      kind: "view",
+      country,
+      ua,
+      referrer,
+    });
+  });
 
   const typedPage = page as Page & { page_links: PageLink[]; page_socials: PageSocial[] };
 

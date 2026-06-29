@@ -114,11 +114,11 @@ function AccountMenu({ user, displayName, username }: { user: User; displayName?
             onClick={() => setOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+          <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 px-1 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
             <button
               type="button"
               onClick={() => { setOpen(false); router.push("/dashboard/account"); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface rounded-[var(--radius-sm)] transition-colors cursor-pointer"
             >
               <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                 <circle cx="8" cy="5" r="2.5" strokeLinecap="round" />
@@ -126,11 +126,11 @@ function AccountMenu({ user, displayName, username }: { user: User; displayName?
               </svg>
               Account settings
             </button>
-            <div className="border-t border-border mx-2 my-1" />
+            <div className="border-t border-border mx-1 my-1" />
             <button
               type="button"
               onClick={() => { setOpen(false); handleSignOut(); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-surface transition-colors cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-surface rounded-[var(--radius-sm)] transition-colors cursor-pointer"
             >
               <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                 <path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3" strokeLinecap="round" />
@@ -166,7 +166,7 @@ export function Sidebar({ user, displayName, username }: SidebarProps) {
     {
       href: "/dashboard/analytics",
       label: "Analytics",
-      disabled: true,
+      disabled: false,
       icon: <BarChart3 size={18} strokeWidth={1.75} aria-hidden="true" />,
     },
     {
@@ -243,7 +243,7 @@ export function Sidebar({ user, displayName, username }: SidebarProps) {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-60 shrink-0 min-h-screen" style={{ background: "#131313" }}>
+      <aside className="hidden lg:flex flex-col w-60 shrink-0 h-full" style={{ background: "#131313" }}>
         <SidebarContent />
       </aside>
 

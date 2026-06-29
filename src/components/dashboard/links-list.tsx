@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { Page } from "@/lib/supabase/types";
 import { deletePage } from "@/app/actions/pages";
 
@@ -15,7 +14,6 @@ interface LinksListProps {
 type SortKey = "manual" | "name-az" | "newest" | "oldest";
 
 function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
-  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -24,14 +22,14 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
   const pageUrl = `${siteUrl}/${page.slug}`;
 
   const handleCopy = async (e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.preventDefault();
     await navigator.clipboard.writeText(pageUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.preventDefault();
     startDelete(async () => {
       await deletePage(page.id);
     });
@@ -39,7 +37,7 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
 
   return (
     <div
-      className="flex items-center gap-3 p-4 group cursor-pointer"
+      className="flex items-center gap-3 p-4 group cursor-default"
       style={{
         background: hovered ? "#1F1F1F" : "#1A1A1A",
         border: "1px solid rgba(255,255,255,.08)",
@@ -47,23 +45,26 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
         marginBottom: 8,
         transition: "background 120ms",
       }}
-      onClick={() => router.push(`/dashboard/links/${page.id}`)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div className="flex-1 min-w-0">
         <p
           className="text-sm font-medium truncate"
-          style={{
-            color: "#ffffff",
-            textDecoration: hovered ? "underline" : "none",
-            textDecorationColor: "rgba(255,255,255,.3)",
-          }}
+          style={{ color: "#ffffff" }}
         >
           {page.title || <span className="italic" style={{ color: "#9A9A9A" }}>Untitled</span>}
         </p>
         <div className="flex items-center gap-1.5 mt-1">
-          <span className="text-xs truncate" style={{ color: "#9A9A9A" }}>{pageUrl}</span>
+          <a
+            href={pageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs truncate hover:underline"
+            style={{ color: "#9A9A9A", textUnderlineOffset: 2 }}
+          >
+            {pageUrl}
+          </a>
           <button
             type="button"
             onClick={handleCopy}
@@ -89,7 +90,6 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
         {/* Edit */}
         <Link
           href={`/dashboard/links/${page.id}`}
-          onClick={(e) => e.stopPropagation()}
           className="p-1.5 rounded-lg transition-colors cursor-pointer"
           style={{ color: "#9A9A9A" }}
           onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,.08)"; }}
@@ -105,7 +105,7 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
         {!showConfirm ? (
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); setShowConfirm(true); }}
+            onClick={() => setShowConfirm(true)}
             className="p-1.5 rounded-lg transition-colors cursor-pointer"
             style={{ color: "#9A9A9A" }}
             onMouseEnter={(e) => { e.currentTarget.style.color = "#ef4444"; e.currentTarget.style.background = "rgba(239,68,68,.08)"; }}
@@ -117,10 +117,7 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
             </svg>
           </button>
         ) : (
-          <div
-            className="flex items-center gap-1.5"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={handleDelete}
@@ -131,7 +128,7 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
             </button>
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); setShowConfirm(false); }}
+              onClick={() => setShowConfirm(false)}
               className="px-2 py-1 text-xs border rounded-lg transition-colors cursor-pointer"
               style={{ color: "#9A9A9A", borderColor: "rgba(255,255,255,.12)" }}
             >

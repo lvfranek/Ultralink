@@ -32,6 +32,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
   const [links, setLinks] = useState<PageLink[]>(initialLinks);
   const [socials, setSocials] = useState<PageSocial[]>(initialSocials);
   const [activeTab, setActiveTab] = useState<"page" | "links">("page");
+  const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
 
   const [local, setLocal] = useState<LocalPageState>({
     title: page.title,
@@ -211,6 +212,19 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
               </span>
             )}
 
+            {/* Mobile-only preview toggle */}
+            <button
+              type="button"
+              onClick={() => setMobileView((v) => v === "edit" ? "preview" : "edit")}
+              className="md:hidden flex-shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer"
+              style={{
+                background: mobileView === "preview" ? "rgba(255,255,255,.12)" : "rgba(255,255,255,.08)",
+                color: "#ffffff",
+              }}
+            >
+              {mobileView === "preview" ? "← Edit" : "Preview"}
+            </button>
+
             <form action={formAction} className="flex-shrink-0">
               <input type="hidden" name="slug" value={local.slug} />
               <input type="hidden" name="title" value={local.title ?? ""} />
@@ -238,14 +252,14 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
           {/* Body: middle preview + right settings panel */}
           <div className="flex-1 flex overflow-hidden">
 
-            {/* Middle: live preview — fills the full panel */}
-            <div className="hidden lg:flex flex-1 relative overflow-hidden">
+            {/* Middle: live preview — always visible on md+, mobile only in preview mode */}
+            <div className={`${mobileView === "preview" ? "flex" : "hidden md:flex"} flex-1 relative overflow-hidden`}>
               <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} />
             </div>
 
-            {/* Right: settings panel */}
+            {/* Right: settings panel — always visible on md+, mobile only in edit mode */}
             <div
-              className="w-full lg:w-96 flex flex-col overflow-hidden flex-shrink-0"
+              className={`${mobileView === "preview" ? "hidden md:flex" : "flex"} flex-col w-full md:w-80 xl:w-96 overflow-hidden flex-shrink-0`}
               style={{ borderLeft: "1px solid rgba(255,255,255,.05)" }}
             >
 

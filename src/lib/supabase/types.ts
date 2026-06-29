@@ -1,4 +1,4 @@
-export type Plan = "free" | "creator" | "agency";
+export type Plan = "free" | "pro" | "creator" | "agency";
 export type AvatarStyle = "circle" | "hero";
 
 export interface Profile {
@@ -62,4 +62,18 @@ export interface PageWithLinks extends Page {
 export interface PageWithData extends Page {
   page_links: PageLink[];
   page_socials: PageSocial[];
+}
+
+export type DeviceType = "mobile" | "tablet" | "desktop" | "bot" | "unknown";
+export type EventKind = "view" | "click";
+
+export interface Event {
+  id: number;
+  page_id: string;
+  link_id: string | null;
+  kind: EventKind;
+  country: string | null;
+  device: DeviceType;
+  referrer_host: string | null;
+  created_at: string;
 }

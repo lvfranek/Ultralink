@@ -16,13 +16,12 @@ export default async function AccountSettingsPage() {
   if (!user) redirect("/login");
 
   const [profileResult, pagesResult] = await Promise.all([
-    supabase.from("profiles").select("plan, username, display_name").eq("id", user.id).single(),
+    supabase.from("profiles").select("plan, username").eq("id", user.id).single(),
     supabase.from("pages").select("id", { count: "exact", head: true }).eq("owner_id", user.id),
   ]);
 
   const plan = (profileResult.data?.plan ?? "free") as Plan;
   const username = profileResult.data?.username ?? "";
-  const displayName = profileResult.data?.display_name ?? "";
   const linkCap = getLinkCap(plan);
   const linksUsed = pagesResult.count ?? 0;
 
@@ -31,7 +30,6 @@ export default async function AccountSettingsPage() {
       email={user.email ?? ""}
       plan={plan}
       username={username}
-      displayName={displayName}
       linkCap={linkCap}
       linksUsed={linksUsed}
     />

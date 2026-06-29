@@ -17,10 +17,7 @@ export async function checkUsernameAvailable(
   return { available: !data };
 }
 
-export async function updateProfile(
-  displayName: string,
-  username: string
-): Promise<{ error?: string }> {
+export async function updateUsername(username: string): Promise<{ error?: string }> {
   if (!USERNAME_RE.test(username)) {
     return { error: "Invalid username format." };
   }
@@ -31,13 +28,22 @@ export async function updateProfile(
   const { available } = await checkUsernameAvailable(username, user.id);
   if (!available) return { error: "That username is already taken." };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("profiles")
-    .update({ username, display_name: displayName || null })
-    .eq("id", user.id);
+    .update({ username })
+    .eq("id", user.id)
+    .select("id");
 
   if (error) return { error: error.message };
-  revalidatePath("/dashboard/account");
+  if (!data || data.length === 0) {
+    // Row missing or RLS blocked the update — upsert as fallback
+    const { error: upsertError } = await supabase
+      .from("profiles")
+      .upsert({ id: user.id, username }, { onConflict: "id" });
+    if (upsertError) return { error: upsertError.message };
+  }
+
+  revalidatePath("/dashboard/account", "layout");
   revalidatePath("/dashboard", "layout");
   return {};
 }

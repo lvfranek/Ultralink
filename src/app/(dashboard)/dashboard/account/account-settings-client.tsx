@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { updateProfile, updateEmail, updatePassword } from "@/app/actions/account";
+import { updateUsername, updateEmail, updatePassword } from "@/app/actions/account";
 import type { Plan } from "@/lib/supabase/types";
 
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
@@ -151,10 +151,10 @@ function PlanCard({ plan, linksUsed, linkCap }: { plan: Plan; linksUsed: number;
 
 // ─── Profile card ─────────────────────────────────────────────────────────────
 
-function ProfileCard({ initialUsername, initialDisplayName }: { initialUsername: string; initialDisplayName: string }) {
-  const supabase = createClient();
+function ProfileCard({ initialUsername }: { initialUsername: string }) {
+  const router = useRouter();
+  const supabaseRef = useRef(createClient());
   const [username, setUsername] = useState(initialUsername);
-  const [displayName, setDisplayName] = useState(initialDisplayName);
   const [usernameState, setUsernameState] = useState<UsernameState>("unchanged");
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<{ type: "error" | "success"; msg: string } | null>(null);
@@ -164,9 +164,9 @@ function ProfileCard({ initialUsername, initialDisplayName }: { initialUsername:
     if (!USERNAME_RE.test(value)) { setUsernameState("invalid"); return; }
     if (value === initialUsername) { setUsernameState("unchanged"); return; }
     setUsernameState("checking");
-    const { data } = await supabase.from("profiles").select("id").eq("username", value).maybeSingle();
+    const { data } = await supabaseRef.current.from("profiles").select("id").eq("username", value).maybeSingle();
     setUsernameState(data ? "taken" : "available");
-  }, [supabase, initialUsername]);
+  }, [initialUsername]);
 
   const handleUsernameChange = (value: string) => {
     const s = value.toLowerCase().replace(/[^a-z0-9_]/g, "");
@@ -179,20 +179,24 @@ function ProfileCard({ initialUsername, initialDisplayName }: { initialUsername:
     debounceRef.current = setTimeout(() => checkUsername(s), 400);
   };
 
-  const usernameOk = usernameState === "unchanged" || usernameState === "available";
-  const changed = username !== initialUsername || displayName !== initialDisplayName;
-  const canSave = changed && usernameOk;
+  const canSave = username !== initialUsername && usernameState === "available";
 
   const handleSave = async () => {
     if (!canSave) return;
     setSaving(true);
     setStatus(null);
-    const result = await updateProfile(displayName, username);
-    setSaving(false);
-    if (result.error) {
-      setStatus({ type: "error", msg: result.error });
-    } else {
-      setStatus({ type: "success", msg: "Profile saved." });
+    try {
+      const result = await updateUsername(username);
+      if (result.error) {
+        setStatus({ type: "error", msg: result.error });
+      } else {
+        setStatus({ type: "success", msg: "Username saved." });
+        router.refresh();
+      }
+    } catch (e) {
+      setStatus({ type: "error", msg: e instanceof Error ? e.message : "Something went wrong." });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -202,7 +206,7 @@ function ProfileCard({ initialUsername, initialDisplayName }: { initialUsername:
     ? { color: "#ef4444", text: "That username is already taken." }
     : usernameState === "available"
     ? { color: "#10b981", text: "Username is available." }
-    : { color: "#6B6B6B", text: "Your username identifies your account. Page URLs are set per page." };
+    : { color: "#6B6B6B", text: "3–20 characters, lowercase letters, numbers, underscores." };
 
   return (
     <div style={card}>
@@ -233,21 +237,10 @@ function ProfileCard({ initialUsername, initialDisplayName }: { initialUsername:
           </div>
           <p style={{ marginTop: 6, fontSize: 12, color: usernameHint.color }}>{usernameHint.text}</p>
         </FieldRow>
-        <FieldRow>
-          <label style={label}>Display name <span style={{ fontWeight: 400, color: "#6B6B6B" }}>(optional)</span></label>
-          <input
-            type="text"
-            value={displayName}
-            onChange={(e) => { setDisplayName(e.target.value.slice(0, 60)); setStatus(null); }}
-            placeholder="How you appear to others"
-            maxLength={60}
-            style={input}
-          />
-        </FieldRow>
         {status && <StatusMsg type={status.type}>{status.msg}</StatusMsg>}
         <div style={{ marginTop: 20 }}>
           <button type="button" onClick={handleSave} disabled={!canSave || saving} style={saveBtn(!canSave || saving)}>
-            {saving ? "Saving…" : "Save profile"}
+            {saving ? "Saving…" : "Save username"}
           </button>
         </div>
       </div>
@@ -380,6 +373,27 @@ function PasswordCard() {
   );
 }
 
+// ─── Timezone helpers ─────────────────────────────────────────────────────────
+
+function getTzOffset(tz: string): string {
+  try {
+    const parts = new Intl.DateTimeFormat("en", {
+      timeZone: tz,
+      timeZoneName: "shortOffset",
+    }).formatToParts(new Date());
+    const raw = parts.find((p) => p.type === "timeZoneName")?.value ?? "GMT";
+    return raw.replace("GMT", "UTC");
+  } catch {
+    return "UTC";
+  }
+}
+
+function getTzLabel(tz: string): string {
+  const offset = getTzOffset(tz);
+  const name = tz.replace(/_/g, " ").replace("/", " / ");
+  return `(${offset}) ${name}`;
+}
+
 // ─── Preferences card ─────────────────────────────────────────────────────────
 
 function PreferencesCard() {
@@ -429,10 +443,10 @@ function PreferencesCard() {
             style={{ ...input, appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%239A9A9A' stroke-width='1.5'%3E%3Cpath d='M4 6l4 4 4-4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center", backgroundSize: 16, paddingRight: 32, cursor: "pointer" }}
           >
             {timezones.map((tz) => (
-              <option key={tz} value={tz} style={{ background: "#1A1A1A" }}>{tz.replace(/_/g, " ")}</option>
+              <option key={tz} value={tz} style={{ background: "#1A1A1A" }}>{getTzLabel(tz)}</option>
             ))}
             {timezone && !timezones.includes(timezone) && (
-              <option value={timezone} style={{ background: "#1A1A1A" }}>{timezone.replace(/_/g, " ")}</option>
+              <option value={timezone} style={{ background: "#1A1A1A" }}>{getTzLabel(timezone)}</option>
             )}
           </select>
           <p style={{ marginTop: 6, fontSize: 12, color: "#6B6B6B" }}>Used for analytics time displays. Saved locally.</p>
@@ -534,7 +548,6 @@ interface AccountSettingsClientProps {
   email: string;
   plan: Plan;
   username: string;
-  displayName: string;
   linkCap: number;
   linksUsed: number;
 }
@@ -543,7 +556,6 @@ export function AccountSettingsClient({
   email,
   plan,
   username,
-  displayName,
   linkCap,
   linksUsed,
 }: AccountSettingsClientProps) {
@@ -561,7 +573,7 @@ export function AccountSettingsClient({
         </div>
 
         <PlanCard plan={plan} linksUsed={linksUsed} linkCap={linkCap} />
-        <ProfileCard initialUsername={username} initialDisplayName={displayName} />
+        <ProfileCard initialUsername={username} />
         <EmailCard email={email} />
         <PasswordCard />
         <PreferencesCard />

@@ -98,6 +98,10 @@ export const FEATURE_PLAN: Record<string, "free" | "pro"> = {
   badge_removal:   "pro",
 };
 
+export function planHasAnalytics(plan: string): boolean {
+  return plan === "pro";
+}
+
 export function getLinkCap(plan: string): number {
   switch (plan) {
     case "pro":

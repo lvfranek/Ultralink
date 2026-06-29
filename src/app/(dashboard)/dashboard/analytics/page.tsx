@@ -1,28 +1,85 @@
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { createClient } from "@/lib/supabase/server";
+import { planHasAnalytics } from "@/lib/config/pricing";
+import { getUserPages } from "@/app/actions/analytics";
+import { AnalyticsDashboard } from "./analytics-client";
+import type { Plan } from "@/lib/supabase/types";
 
 export const metadata: Metadata = {
-  title: "Ultralink Dashboard",
+  title: "Analytics — Ultralink",
   robots: { index: false, follow: false },
 };
 
-export default function AnalyticsPage() {
-  return <ComingSoon title="Analytics" description="Click tracking, referrer data, and geo insights are coming in Phase 3." />;
+export default async function AnalyticsPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", user.id)
+    .single();
+
+  const plan = (profile?.plan ?? "free") as Plan;
+
+  if (!planHasAnalytics(plan)) {
+    return <UpgradeGate />;
+  }
+
+  const pages = await getUserPages();
+
+  return <AnalyticsDashboard pages={pages} />;
 }
 
-function ComingSoon({ title, description }: { title: string; description: string }) {
+function UpgradeGate() {
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-2xl font-bold text-text mb-2">{title}</h1>
-      <div className="mt-12 flex flex-col items-center text-center">
-        <div className="w-16 h-16 rounded-[var(--radius-lg)] flex items-center justify-center mb-5 bg-surface-2 border border-border">
-          <svg viewBox="0 0 24 24" className="w-7 h-7 text-text-muted" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-            <path d="M3 20l4.5-7 4 4 4-8 4.5 7" strokeLinecap="round" strokeLinejoin="round" />
+    <div className="min-h-full flex items-center justify-center px-4" style={{ background: "#131313" }}>
+      <div
+        className="flex flex-col items-center text-center rounded-[20px] p-10 max-w-sm w-full"
+        style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.08)" }}
+      >
+        {/* Lock icon */}
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
+          style={{ background: "#2A2A2A", border: "1px solid rgba(255,255,255,.08)" }}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            style={{ color: "#9A9A9A" }}
+            aria-hidden="true"
+          >
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path
+              d="M7 11V7a5 5 0 0110 0v4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
-        <span className="inline-flex items-center gap-1.5 mb-3 px-2.5 py-1 rounded-full border border-border-strong bg-surface-2 text-xs font-medium tracking-widest uppercase text-text-muted">
-          Coming soon
-        </span>
-        <p className="text-sm text-text-muted max-w-xs">{description}</p>
+
+        <h2 className="text-lg font-bold mb-2" style={{ color: "#ffffff" }}>
+          Analytics is a Pro feature.
+        </h2>
+        <p className="text-sm leading-relaxed mb-8" style={{ color: "#9A9A9A" }}>
+          See views, clicks, countries, devices, and your top-performing links.
+          Pro starts at $8/mo.
+        </p>
+
+        <a
+          href="/#pricing"
+          className="inline-flex items-center gap-1.5 h-10 px-6 rounded-full text-sm font-semibold transition-opacity hover:opacity-85"
+          style={{ background: "#ffffff", color: "#000000" }}
+        >
+          Upgrade to Pro →
+        </a>
       </div>
     </div>
   );

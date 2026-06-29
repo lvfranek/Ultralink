@@ -24,9 +24,9 @@ export default async function DashboardLayout({
     <>
       {/* Lock html/body to #131313 so macOS scroll-bounce never reveals white */}
       <style>{`html, body { background: #131313 !important; }`}</style>
-      <div className="flex min-h-screen dark-theme" style={{ background: "#131313" }}>
+      <div className="flex h-screen overflow-hidden dark-theme" style={{ background: "#131313" }}>
         <Sidebar user={user} displayName={profile?.display_name} username={profile?.username} />
-        <main className="flex-1 lg:overflow-y-auto pt-14 lg:pt-0">
+        <main className="flex-1 overflow-y-auto pt-14 lg:pt-0">
           {children}
         </main>
       </div>
