@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveOwnerId } from "@/lib/team";
 import { getReferrerLabel } from "@/lib/config/referrers";
 
 export interface TimeseriesPoint {
@@ -78,18 +79,19 @@ export async function getAnalyticsData(
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Verify ownership
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+
+  // Verify page belongs to active owner
   const { data: pageCheck } = await supabase
     .from("pages")
     .select("owner_id")
     .eq("id", pageId)
     .single();
-  if (!pageCheck || pageCheck.owner_id !== user.id) return null;
+  if (!pageCheck || pageCheck.owner_id !== activeOwnerId) return null;
 
   const startDate = startOfDay(new Date(startStr));
   const endDate = endOfDay(new Date(endStr));
 
-  // Previous period mirrors the current range exactly
   const rangeMs = endDate.getTime() - startDate.getTime();
   const prevEndDate = new Date(startDate.getTime() - 1);
   const prevStartDate = new Date(prevEndDate.getTime() - rangeMs);
@@ -119,7 +121,6 @@ export async function getAnalyticsData(
   const prevEvents = prevEventsRes.data ?? [];
   const links = linksRes.data ?? [];
 
-  // ── Headline numbers ────────────────────────────────────────────────────────
   const views = events.filter((e) => e.kind === "view").length;
   const clicks = events.filter((e) => e.kind === "click").length;
   const ctr = views > 0 ? Math.round((clicks / views) * 1000) / 10 : 0;
@@ -132,7 +133,6 @@ export async function getAnalyticsData(
   const winbackShown = events.filter((e) => e.kind === "winback_shown").length;
   const winbackClicks = events.filter((e) => e.kind === "winback_click").length;
 
-  // ── Timeseries ──────────────────────────────────────────────────────────────
   const days =
     Math.ceil((endDate.getTime() - startDate.getTime()) / 86_400_000) + 1;
   const timeseries: TimeseriesPoint[] = Array.from({ length: days }, (_, i) => {
@@ -150,7 +150,6 @@ export async function getAnalyticsData(
     }
   }
 
-  // ── Countries ───────────────────────────────────────────────────────────────
   const countryCounts: Record<string, number> = {};
   for (const e of events.filter((e) => e.kind === "view")) {
     const code = e.country ?? "Unknown";
@@ -165,7 +164,6 @@ export async function getAnalyticsData(
       pct: views > 0 ? Math.round((count / views) * 100) : 0,
     }));
 
-  // ── Traffic sources ─────────────────────────────────────────────────────────
   const sourceCounts: Record<string, number> = {};
   for (const e of events.filter((e) => e.kind === "view")) {
     const key = e.referrer_host ?? "__direct__";
@@ -197,7 +195,6 @@ export async function getAnalyticsData(
       : []),
   ];
 
-  // ── Devices ─────────────────────────────────────────────────────────────────
   const devices: DeviceCounts = { mobile: 0, desktop: 0, tablet: 0, total: 0 };
   for (const e of events) {
     if (e.device === "mobile") devices.mobile++;
@@ -206,7 +203,6 @@ export async function getAnalyticsData(
   }
   devices.total = devices.mobile + devices.desktop + devices.tablet;
 
-  // ── Top links ───────────────────────────────────────────────────────────────
   const linkClickCounts: Record<string, number> = {};
   for (const e of events.filter((e) => e.kind === "click" && e.link_id)) {
     const id = e.link_id!;
@@ -251,10 +247,12 @@ export async function getUserPages() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+
   const { data } = await supabase
     .from("pages")
     .select("id, slug, title")
-    .eq("owner_id", user.id)
+    .eq("owner_id", activeOwnerId)
     .order("created_at", { ascending: true });
 
   return data ?? [];

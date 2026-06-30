@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { siteConfig } from "@/lib/config/site";
 import { PageBuilder } from "@/components/dashboard/page-builder/page-builder";
 import { getEffectivePlan } from "@/lib/supabase/types";
+import { getActiveOwnerId } from "@/lib/team";
 import type { Page, PageLink, PageSocial, SubscriptionStatus } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
@@ -27,8 +28,10 @@ export default async function EditLinkPage({
 
   if (!user) redirect("/login");
 
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+
   const [pageResult, linksResult, socialsResult, profileResult] = await Promise.all([
-    supabase.from("pages").select("*").eq("id", id).eq("owner_id", user.id).single(),
+    supabase.from("pages").select("*").eq("id", id).eq("owner_id", activeOwnerId).single(),
     supabase
       .from("page_links")
       .select("*")
@@ -42,7 +45,7 @@ export default async function EditLinkPage({
     supabase
       .from("profiles")
       .select("subscription_status, grace_period_ends_at")
-      .eq("id", user.id)
+      .eq("id", activeOwnerId)
       .single(),
   ]);
 

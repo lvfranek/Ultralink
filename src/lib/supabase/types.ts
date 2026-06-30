@@ -108,3 +108,20 @@ export interface Event {
   referrer_host: string | null;
   created_at: string;
 }
+
+export interface TeamMember {
+  id: string;
+  owner_id: string;
+  editor_id: string;
+  created_at: string;
+}
+
+export interface TeamInvite {
+  id: string;
+  owner_id: string;
+  email: string;
+  token: string;
+  created_at: string;
+  expires_at: string;
+  accepted_at: string | null;
+}

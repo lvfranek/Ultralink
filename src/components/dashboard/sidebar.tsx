@@ -5,13 +5,18 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
+import { setActiveOwner } from "@/app/actions/team";
 import { Link2, BarChart3, Wallet } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
+import type { TeamEntry } from "@/lib/team";
 
 interface SidebarProps {
   user: User;
   displayName?: string | null;
   username?: string | null;
+  activeOwnerId: string;
+  selfUsername: string;
+  teamMemberships: TeamEntry[];
 }
 
 function NavItem({
@@ -64,8 +69,49 @@ function NavItem({
   );
 }
 
-function AccountMenu({ user, displayName, username }: { user: User; displayName?: string | null; username?: string | null }) {
+function Avatar({ name, size = 32 }: { name: string; size?: number }) {
+  return (
+    <div
+      className="rounded-full flex items-center justify-center text-xs font-bold text-bg shrink-0 bg-text"
+      style={{ width: size, height: size }}
+    >
+      {name.charAt(0).toUpperCase()}
+    </div>
+  );
+}
+
+function RoleBadge({ role }: { role: "Owner" | "Editor" }) {
+  return (
+    <span
+      className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+      style={{
+        color: role === "Owner" ? "#C9A86A" : "#9A9A9A",
+        border: role === "Owner" ? "1px solid rgba(201,168,106,0.3)" : "1px solid rgba(255,255,255,.08)",
+        background: role === "Owner" ? "rgba(201,168,106,0.08)" : "rgba(255,255,255,0.04)",
+      }}
+    >
+      {role}
+    </span>
+  );
+}
+
+function AccountMenu({
+  user,
+  displayName,
+  username,
+  activeOwnerId,
+  selfUsername,
+  teamMemberships,
+}: {
+  user: User;
+  displayName?: string | null;
+  username?: string | null;
+  activeOwnerId: string;
+  selfUsername: string;
+  teamMemberships: TeamEntry[];
+}) {
   const [open, setOpen] = useState(false);
+  const [switching, setSwitching] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -75,8 +121,35 @@ function AccountMenu({ user, displayName, username }: { user: User; displayName?
     router.refresh();
   };
 
-  const name = displayName || username || user.email?.split("@")[0] || "Account";
+  const handleSwitchOwner = async (ownerId: string) => {
+    if (ownerId === activeOwnerId) { setOpen(false); return; }
+    setSwitching(ownerId);
+    await setActiveOwner(ownerId);
+    setSwitching(null);
+    setOpen(false);
+    router.refresh();
+  };
+
+  const selfName = displayName || username || user.email?.split("@")[0] || "Account";
   const email = user.email ?? "";
+
+  const isEditor = activeOwnerId !== user.id;
+  const activeTeam = teamMemberships.find((m) => m.ownerId === activeOwnerId);
+  const activeName = isEditor
+    ? (activeTeam?.ownerDisplayName || activeTeam?.ownerUsername || selfName)
+    : selfName;
+
+  const hasMemberships = teamMemberships.length > 0;
+
+  // Build full account list for switcher: own account first, then memberships
+  const accounts = [
+    { id: user.id, name: selfName, role: "Owner" as const },
+    ...teamMemberships.map((m) => ({
+      id: m.ownerId,
+      name: m.ownerDisplayName || m.ownerUsername,
+      role: "Editor" as const,
+    })),
+  ];
 
   return (
     <div className="relative">
@@ -86,13 +159,9 @@ function AccountMenu({ user, displayName, username }: { user: User; displayName?
         className="w-full flex items-center gap-3 p-2.5 rounded-[var(--radius)] hover:bg-surface-2 transition-colors cursor-pointer"
         aria-expanded={open}
       >
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-bg shrink-0 bg-text"
-        >
-          {name.charAt(0).toUpperCase()}
-        </div>
+        <Avatar name={activeName} />
         <div className="flex-1 text-left min-w-0">
-          <p className="text-sm font-medium text-text truncate">{name}</p>
+          <p className="text-sm font-medium text-text truncate">{activeName}</p>
           <p className="text-xs text-text-subtle truncate">{email}</p>
         </div>
         <svg
@@ -115,6 +184,50 @@ function AccountMenu({ user, displayName, username }: { user: User; displayName?
             aria-hidden="true"
           />
           <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 px-1 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+
+            {hasMemberships && (
+              <>
+                {/* Switching as header */}
+                <div className="px-3 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: "#6B6B6B" }}>
+                    Switching as
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Avatar name={activeName} size={20} />
+                    <span className="text-xs font-medium text-text truncate">{activeName}</span>
+                    <RoleBadge role={isEditor ? "Editor" : "Owner"} />
+                  </div>
+                </div>
+                <div className="border-t border-border mx-1 my-1" />
+
+                {/* Account list */}
+                {accounts.map((acct) => {
+                  const isActive = acct.id === activeOwnerId;
+                  const isLoading = switching === acct.id;
+                  return (
+                    <button
+                      key={acct.id}
+                      type="button"
+                      onClick={() => handleSwitchOwner(acct.id)}
+                      disabled={isLoading}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius-sm)] transition-colors cursor-pointer hover:bg-surface disabled:opacity-50"
+                      style={{ textAlign: "left" }}
+                    >
+                      <Avatar name={acct.name} size={24} />
+                      <span className="flex-1 text-xs font-medium text-text truncate">{acct.name}</span>
+                      <RoleBadge role={acct.role} />
+                      {isActive && (
+                        <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="#C9A86A" strokeWidth="2" aria-hidden="true">
+                          <path d="M3 8l3.5 3.5L13 4.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </button>
+                  );
+                })}
+                <div className="border-t border-border mx-1 my-1" />
+              </>
+            )}
+
             <button
               type="button"
               onClick={() => { setOpen(false); router.push("/dashboard/account"); }}
@@ -145,7 +258,14 @@ function AccountMenu({ user, displayName, username }: { user: User; displayName?
   );
 }
 
-export function Sidebar({ user, displayName, username }: SidebarProps) {
+export function Sidebar({
+  user,
+  displayName,
+  username,
+  activeOwnerId,
+  selfUsername,
+  teamMemberships,
+}: SidebarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -235,7 +355,14 @@ export function Sidebar({ user, displayName, username }: SidebarProps) {
       </div>
 
       <div className="p-3 mt-2">
-        <AccountMenu user={user} displayName={displayName} username={username} />
+        <AccountMenu
+          user={user}
+          displayName={displayName}
+          username={username}
+          activeOwnerId={activeOwnerId}
+          selfUsername={selfUsername}
+          teamMemberships={teamMemberships}
+        />
       </div>
     </div>
   );

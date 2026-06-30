@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/dashboard/sidebar";
+import { getActiveOwnerId, getTeamMemberships } from "@/lib/team";
 
 export default async function DashboardLayout({
   children,
@@ -14,18 +15,29 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name, username")
-    .eq("id", user.id)
-    .single();
+  const [profileResult, memberships] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("display_name, username")
+      .eq("id", user.id)
+      .single(),
+    getTeamMemberships(user.id, supabase),
+  ]);
+
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
 
   return (
     <>
-      {/* Lock html/body to #131313 so macOS scroll-bounce never reveals white */}
       <style>{`html, body { background: #131313 !important; }`}</style>
       <div className="flex h-screen overflow-hidden dark-theme" style={{ background: "#131313" }}>
-        <Sidebar user={user} displayName={profile?.display_name} username={profile?.username} />
+        <Sidebar
+          user={user}
+          displayName={profileResult.data?.display_name}
+          username={profileResult.data?.username}
+          activeOwnerId={activeOwnerId}
+          selfUsername={profileResult.data?.username ?? ""}
+          teamMemberships={memberships}
+        />
         <main className="flex-1 overflow-y-auto pt-14 lg:pt-0">
           {children}
         </main>

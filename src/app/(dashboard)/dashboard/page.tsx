@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { siteConfig } from "@/lib/config/site";
 import { getLinkCap } from "@/lib/config/pricing";
 import { isProActive } from "@/lib/supabase/types";
+import { getActiveOwnerId } from "@/lib/team";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import type { Page, SubscriptionStatus } from "@/lib/supabase/types";
 
@@ -24,12 +25,15 @@ export default async function DashboardPage({
 
   if (!user) redirect("/login");
 
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const isEditor = activeOwnerId !== user.id;
+
   const [pagesResult, profileResult] = await Promise.all([
-    supabase.from("pages").select("*").eq("owner_id", user.id).order("created_at", { ascending: false }),
+    supabase.from("pages").select("*").eq("owner_id", activeOwnerId).order("created_at", { ascending: false }),
     supabase
       .from("profiles")
       .select("subscription_status, grace_period_ends_at, plan_tier, stripe_customer_id")
-      .eq("id", user.id)
+      .eq("id", activeOwnerId)
       .single(),
   ]);
 
@@ -45,9 +49,10 @@ export default async function DashboardPage({
   const initialSlug = sp.username ?? "";
   const upgraded = sp.upgraded === "1";
 
-  // For lapsed Pro users, find the surviving page (oldest)
   const lapsed =
-    profile.subscription_status !== "none" && !isProActive(profile);
+    !isEditor &&
+    profile.subscription_status !== "none" &&
+    !isProActive(profile);
 
   let survivingPageId: string | null = null;
   if (lapsed) {
@@ -67,9 +72,9 @@ export default async function DashboardPage({
       initialSlug={initialSlug}
       linkCap={linkCap}
       upgraded={upgraded}
-      subscriptionStatus={profile.subscription_status as SubscriptionStatus}
-      gracePeriodEndsAt={profile.grace_period_ends_at}
-      stripeCustomerId={profile.stripe_customer_id}
+      subscriptionStatus={isEditor ? "active" : (profile.subscription_status as SubscriptionStatus)}
+      gracePeriodEndsAt={isEditor ? null : profile.grace_period_ends_at}
+      stripeCustomerId={isEditor ? null : profile.stripe_customer_id}
       survivingPageId={survivingPageId}
       lapsed={lapsed}
     />

@@ -5,14 +5,13 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { validateSlug } from "@/lib/slug";
 import { getLinkCap } from "@/lib/config/pricing";
+import { getActiveOwnerId } from "@/lib/team";
 
 export type ActionResult =
   | { error: string }
   | { ok: true }
   | { ok: true; pageId: string };
 
-// createPage returns the new page's id so the client can navigate.
-// Do NOT call redirect() here — it silently breaks when used inside useActionState.
 export async function createPage(
   _prev: ActionResult | null,
   formData: FormData
@@ -30,10 +29,12 @@ export async function createPage(
   if (slugError) return { error: slugError };
   if (!title) return { error: "Title is required." };
 
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("subscription_status, grace_period_ends_at, plan_tier")
-    .eq("id", user.id)
+    .eq("id", activeOwnerId)
     .single();
 
   const cap = getLinkCap(
@@ -43,7 +44,7 @@ export async function createPage(
   const { count } = await supabase
     .from("pages")
     .select("*", { count: "exact", head: true })
-    .eq("owner_id", user.id);
+    .eq("owner_id", activeOwnerId);
 
   if ((count ?? 0) >= cap) {
     return {
@@ -53,7 +54,7 @@ export async function createPage(
 
   const { data: page, error } = await supabase
     .from("pages")
-    .insert({ owner_id: user.id, slug, title })
+    .insert({ owner_id: activeOwnerId, slug, title })
     .select()
     .single();
 
@@ -97,7 +98,7 @@ export async function updatePage(
         );
       }
     } catch {
-      // ignore invalid JSON — default to empty
+      // ignore invalid JSON
     }
   }
 
@@ -138,11 +139,13 @@ export async function updatePage(
     return { error: "Invalid avatar style." };
   }
 
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+
   const { data: existing } = await supabase
     .from("pages")
     .select("id, slug")
     .eq("id", id)
-    .eq("owner_id", user.id)
+    .eq("owner_id", activeOwnerId)
     .single();
 
   if (!existing) return { error: "Page not found." };
@@ -173,7 +176,7 @@ export async function updatePage(
       ...(theme !== undefined ? { theme } : {}),
     })
     .eq("id", id)
-    .eq("owner_id", user.id);
+    .eq("owner_id", activeOwnerId);
 
   if (error) {
     if (error.code === "23505") return { error: "That username is already taken." };
@@ -185,7 +188,6 @@ export async function updatePage(
   return { ok: true };
 }
 
-// Returns { ok: true } so the client can navigate away after delete.
 export async function deletePage(id: string): Promise<ActionResult> {
   const supabase = await createClient();
   const {
@@ -193,11 +195,13 @@ export async function deletePage(id: string): Promise<ActionResult> {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+
   const { error } = await supabase
     .from("pages")
     .delete()
     .eq("id", id)
-    .eq("owner_id", user.id);
+    .eq("owner_id", activeOwnerId);
 
   if (error) return { error: error.message };
 
@@ -215,11 +219,13 @@ export async function togglePageActive(
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+
   const { error } = await supabase
     .from("pages")
     .update({ is_active: isActive, updated_at: new Date().toISOString() })
     .eq("id", id)
-    .eq("owner_id", user.id);
+    .eq("owner_id", activeOwnerId);
 
   if (error) return { error: error.message };
 

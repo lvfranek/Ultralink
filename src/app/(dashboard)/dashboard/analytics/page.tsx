@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { planHasAnalytics } from "@/lib/config/pricing";
+import { getActiveOwnerId } from "@/lib/team";
 import { getUserPages } from "@/app/actions/analytics";
 import { AnalyticsDashboard } from "./analytics-client";
 import { AnalyticsUpgradeCTA } from "./analytics-upgrade-cta";
@@ -19,10 +20,13 @@ export default async function AnalyticsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const isEditor = activeOwnerId !== user.id;
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("subscription_status, grace_period_ends_at")
-    .eq("id", user.id)
+    .eq("id", activeOwnerId)
     .single();
 
   const subProfile = profile ?? {
@@ -31,7 +35,7 @@ export default async function AnalyticsPage() {
   };
 
   if (!planHasAnalytics(subProfile)) {
-    return <UpgradeGate />;
+    return <UpgradeGate isEditor={isEditor} />;
   }
 
   const pages = await getUserPages();
@@ -39,7 +43,7 @@ export default async function AnalyticsPage() {
   return <AnalyticsDashboard pages={pages} />;
 }
 
-function UpgradeGate() {
+function UpgradeGate({ isEditor }: { isEditor: boolean }) {
   return (
     <div className="min-h-full flex items-center justify-center px-4" style={{ background: "#131313" }}>
       <div
@@ -68,11 +72,12 @@ function UpgradeGate() {
           Analytics is a Pro feature.
         </h2>
         <p className="text-sm leading-relaxed mb-8" style={{ color: "#9A9A9A" }}>
-          See views, clicks, countries, devices, and your top-performing links.
-          Pro starts at $8/mo.
+          {isEditor
+            ? "The account owner needs to upgrade to Pro to enable analytics."
+            : "See views, clicks, countries, devices, and your top-performing links. Pro starts at $8/mo."}
         </p>
 
-        <AnalyticsUpgradeCTA />
+        {!isEditor && <AnalyticsUpgradeCTA />}
       </div>
     </div>
   );
