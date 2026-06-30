@@ -1,12 +1,36 @@
-export type Plan = "free" | "pro" | "creator" | "agency";
+export type SubscriptionStatus = "none" | "active" | "trialing" | "past_due" | "canceled" | "grace";
+export type PlanInterval = "monthly" | "annual";
 export type AvatarStyle = "circle" | "hero";
 
 export interface Profile {
   id: string;
-  plan: Plan;
   username: string;
   display_name: string | null;
   created_at: string;
+  // Subscription (Phase 4)
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  plan_tier: number | null;
+  plan_interval: PlanInterval | null;
+  subscription_status: SubscriptionStatus;
+  grace_period_ends_at: string | null;
+  current_period_end: string | null;
+}
+
+export function getEffectivePlan(profile: Pick<Profile, "subscription_status">): "free" | "pro" {
+  const s = profile.subscription_status;
+  if (s === "active" || s === "trialing" || s === "grace") return "pro";
+  return "free";
+}
+
+export function isProActive(profile: Pick<Profile, "subscription_status" | "grace_period_ends_at">): boolean {
+  if (profile.subscription_status === "active" || profile.subscription_status === "trialing") return true;
+  if (
+    profile.subscription_status === "grace" &&
+    profile.grace_period_ends_at &&
+    new Date(profile.grace_period_ends_at) > new Date()
+  ) return true;
+  return false;
 }
 
 export interface Page {
@@ -37,7 +61,6 @@ export interface PageLink {
   icon: string | null;
   thumbnail_url: string | null;
   is_adult: boolean;
-  // per-link style columns (added in migration)
   fill_type: string;
   fill_value: string;
   text_color: string;

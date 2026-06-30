@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { planHasAnalytics } from "@/lib/config/pricing";
 import { getUserPages } from "@/app/actions/analytics";
 import { AnalyticsDashboard } from "./analytics-client";
-import type { Plan } from "@/lib/supabase/types";
+import { AnalyticsUpgradeCTA } from "./analytics-upgrade-cta";
+import type { SubscriptionStatus } from "@/lib/supabase/types";
 
 export const metadata: Metadata = {
   title: "Analytics — Ultralink",
@@ -20,13 +21,16 @@ export default async function AnalyticsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan")
+    .select("subscription_status, grace_period_ends_at")
     .eq("id", user.id)
     .single();
 
-  const plan = (profile?.plan ?? "free") as Plan;
+  const subProfile = profile ?? {
+    subscription_status: "none" as SubscriptionStatus,
+    grace_period_ends_at: null,
+  };
 
-  if (!planHasAnalytics(plan)) {
+  if (!planHasAnalytics(subProfile)) {
     return <UpgradeGate />;
   }
 
@@ -42,7 +46,6 @@ function UpgradeGate() {
         className="flex flex-col items-center text-center rounded-[20px] p-10 max-w-sm w-full"
         style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.08)" }}
       >
-        {/* Lock icon */}
         <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
           style={{ background: "#2A2A2A", border: "1px solid rgba(255,255,255,.08)" }}
@@ -57,11 +60,7 @@ function UpgradeGate() {
             aria-hidden="true"
           >
             <rect x="3" y="11" width="18" height="11" rx="2" />
-            <path
-              d="M7 11V7a5 5 0 0110 0v4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+            <path d="M7 11V7a5 5 0 0110 0v4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
 
@@ -73,13 +72,7 @@ function UpgradeGate() {
           Pro starts at $8/mo.
         </p>
 
-        <a
-          href="/#pricing"
-          className="inline-flex items-center gap-1.5 h-10 px-6 rounded-full text-sm font-semibold transition-opacity hover:opacity-85"
-          style={{ background: "#ffffff", color: "#000000" }}
-        >
-          Upgrade to Pro →
-        </a>
+        <AnalyticsUpgradeCTA />
       </div>
     </div>
   );

@@ -11,14 +11,14 @@ import { PresetsContent, TypographyContent, ColorsContent } from "./design-tab";
 import { LinksTab } from "./links-tab";
 import { LivePreview } from "./live-preview";
 import { SettingsCard } from "./panel-primitives";
-import type { Page, PageLink, PageSocial, Plan } from "@/lib/supabase/types";
+import type { Page, PageLink, PageSocial } from "@/lib/supabase/types";
 import { type Theme, type LinkStyle, type PresetKey, resolveTheme, PRESET_META, FONT_OPTIONS } from "@/lib/config/theme";
 
 interface PageBuilderProps {
   page: Page;
   initialLinks: PageLink[];
   initialSocials: PageSocial[];
-  plan: Plan;
+  effectivePlan: "free" | "pro";
   userId: string;
   siteUrl: string;
 }
@@ -28,7 +28,7 @@ type LocalPageState = Pick<
   "title" | "bio" | "avatar_url" | "avatar_style" | "active_badge" | "slug"
 >;
 
-export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, siteUrl }: PageBuilderProps) {
+export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan, userId, siteUrl }: PageBuilderProps) {
   const [links, setLinks] = useState<PageLink[]>(initialLinks);
   const [socials, setSocials] = useState<PageSocial[]>(initialSocials);
   const [activeTab, setActiveTab] = useState<"page" | "links">("page");
@@ -54,7 +54,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, plan, userId, 
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const canUseBadge = plan === "creator" || plan === "agency";
+  const canUseBadge = effectivePlan === "pro";
 
   const boundUpdatePage = updatePage.bind(null, page.id);
   const [state, formAction, pending] = useActionState(boundUpdatePage, null);

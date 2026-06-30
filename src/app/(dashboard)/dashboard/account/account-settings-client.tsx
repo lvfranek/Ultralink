@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { updateUsername, updateEmail, updatePassword } from "@/app/actions/account";
-import type { Plan } from "@/lib/supabase/types";
+import { createPortalSession } from "@/app/actions/billing";
+import type { SubscriptionStatus, PlanInterval } from "@/lib/supabase/types";
+import { getEffectivePlan } from "@/lib/supabase/types";
 
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
 type UsernameState = "idle" | "checking" | "available" | "taken" | "invalid" | "unchanged";
@@ -53,12 +55,6 @@ const input: React.CSSProperties = {
 const inputError: React.CSSProperties = {
   ...input,
   border: "1px solid rgba(220,38,38,0.5)",
-};
-
-const inputDisabled: React.CSSProperties = {
-  ...input,
-  opacity: 0.5,
-  cursor: "not-allowed",
 };
 
 const saveBtn = (disabled: boolean): React.CSSProperties => ({
@@ -120,30 +116,152 @@ function StatusMsg({ type, children }: { type: "error" | "success" | "info"; chi
 
 // ─── Plan & usage ─────────────────────────────────────────────────────────────
 
-function PlanCard({ plan, linksUsed, linkCap }: { plan: Plan; linksUsed: number; linkCap: number }) {
+interface PlanCardProps {
+  subscriptionStatus: SubscriptionStatus;
+  planTier: number | null;
+  planInterval: PlanInterval | null;
+  currentPeriodEnd: string | null;
+  gracePeriodEndsAt: string | null;
+  stripeCustomerId: string | null;
+  linksUsed: number;
+  linkCap: number;
+}
+
+function PlanCard({
+  subscriptionStatus,
+  planTier,
+  planInterval,
+  currentPeriodEnd,
+  gracePeriodEndsAt,
+  stripeCustomerId,
+  linksUsed,
+  linkCap,
+}: PlanCardProps) {
+  const [pending, startTransition] = useTransition();
+  const effectivePlan = getEffectivePlan({ subscription_status: subscriptionStatus });
   const atLimit = linksUsed >= linkCap;
+  const isPastDue = subscriptionStatus === "grace";
+  const isCanceled = subscriptionStatus === "canceled";
+
+  const handleManageBilling = () => {
+    startTransition(async () => {
+      const result = await createPortalSession();
+      if ("url" in result) window.location.href = result.url;
+    });
+  };
+
+  const formatDate = (iso: string | null) => {
+    if (!iso) return null;
+    return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+  };
+
+  const planLabel =
+    effectivePlan === "pro"
+      ? `Pro · ${planTier ?? 1} ${planTier === 1 ? "link" : "links"} · ${planInterval === "annual" ? "Annual" : "Monthly"}`
+      : "Free";
+
   return (
     <div style={card}>
       <div style={cardHeader}><SectionTitle>Plan &amp; usage</SectionTitle></div>
       <div style={cardBody}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
           <span style={{ fontSize: 14, color: "#9A9A9A" }}>Plan</span>
-          <span style={{ fontSize: 14, fontWeight: 600, color: "#ffffff", textTransform: "capitalize" }}>{plan}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#ffffff" }}>{planLabel}</span>
+            {isPastDue && (
+              <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 999, background: "rgba(220,38,38,0.12)", color: "#ef4444", border: "1px solid rgba(220,38,38,0.3)" }}>
+                Past due
+              </span>
+            )}
+            {isCanceled && (
+              <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 999, background: "rgba(255,255,255,0.06)", color: "#6B6B6B", border: "1px solid rgba(255,255,255,.10)" }}>
+                Canceled
+              </span>
+            )}
+          </div>
         </div>
+
+        {currentPeriodEnd && effectivePlan === "pro" && (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+            <span style={{ fontSize: 14, color: "#9A9A9A" }}>Next billing</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#ffffff" }}>{formatDate(currentPeriodEnd)}</span>
+          </div>
+        )}
+
+        {isPastDue && gracePeriodEndsAt && (
+          <div style={{ padding: "10px 14px", marginBottom: 8, marginTop: 8, borderRadius: 8, background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)", fontSize: 13, color: "#ef4444" }}>
+            Your payment failed. Update your card by {formatDate(gracePeriodEndsAt)} or your pages will go offline.
+          </div>
+        )}
+
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0" }}>
           <span style={{ fontSize: 14, color: "#9A9A9A" }}>Links used</span>
           <span style={{ fontSize: 14, fontWeight: 600, color: atLimit ? "#C47A3A" : "#ffffff" }}>
             {linksUsed} / {linkCap}
           </span>
         </div>
-        {atLimit && (
-          <div style={{ marginTop: 8, padding: "10px 14px", borderRadius: 8, background: "rgba(196,122,58,0.08)", border: "1px solid rgba(196,122,58,0.25)", fontSize: 13, color: "#C47A3A" }}>
+
+        {atLimit && effectivePlan === "free" && (
+          <div style={{ marginTop: 4, padding: "10px 14px", borderRadius: 8, background: "rgba(196,122,58,0.08)", border: "1px solid rgba(196,122,58,0.25)", fontSize: 13, color: "#C47A3A" }}>
             You&apos;ve reached your plan limit.{" "}
             <a href="/#pricing" style={{ color: "#C47A3A", textDecoration: "underline", textUnderlineOffset: 2 }}>
               Upgrade to add more
             </a>
           </div>
         )}
+
+        <div style={{ marginTop: 16, display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {stripeCustomerId && (
+            <button
+              type="button"
+              onClick={handleManageBilling}
+              disabled={pending}
+              style={saveBtn(pending)}
+            >
+              {pending ? "Loading…" : "Manage billing"}
+            </button>
+          )}
+          {effectivePlan === "free" && (
+            <a
+              href="/#pricing"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "9px 18px",
+                fontSize: 13,
+                fontWeight: 600,
+                borderRadius: 8,
+                border: "none",
+                background: "#ffffff",
+                color: "#000000",
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+            >
+              Upgrade
+            </a>
+          )}
+          {(isCanceled || isPastDue) && (
+            <a
+              href="/#pricing"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "9px 18px",
+                fontSize: 13,
+                fontWeight: 600,
+                borderRadius: 8,
+                border: "none",
+                background: "#ffffff",
+                color: "#000000",
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+            >
+              Resubscribe
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -546,23 +664,32 @@ function DangerZoneCard({ username }: { username: string }) {
 
 interface AccountSettingsClientProps {
   email: string;
-  plan: Plan;
   username: string;
   linkCap: number;
   linksUsed: number;
+  subscriptionStatus: SubscriptionStatus;
+  planTier: number | null;
+  planInterval: PlanInterval | null;
+  currentPeriodEnd: string | null;
+  gracePeriodEndsAt: string | null;
+  stripeCustomerId: string | null;
 }
 
 export function AccountSettingsClient({
   email,
-  plan,
   username,
   linkCap,
   linksUsed,
+  subscriptionStatus,
+  planTier,
+  planInterval,
+  currentPeriodEnd,
+  gracePeriodEndsAt,
+  stripeCustomerId,
 }: AccountSettingsClientProps) {
   return (
     <div style={{ minHeight: "100%", background: "#131313" }}>
       <div style={{ maxWidth: 640, margin: "0 auto", padding: "40px 20px 80px" }}>
-        {/* Page header */}
         <div style={{ marginBottom: 32 }}>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: "#ffffff", margin: "0 0 4px" }}>
             Account settings
@@ -572,7 +699,16 @@ export function AccountSettingsClient({
           </p>
         </div>
 
-        <PlanCard plan={plan} linksUsed={linksUsed} linkCap={linkCap} />
+        <PlanCard
+          subscriptionStatus={subscriptionStatus}
+          planTier={planTier}
+          planInterval={planInterval}
+          currentPeriodEnd={currentPeriodEnd}
+          gracePeriodEndsAt={gracePeriodEndsAt}
+          stripeCustomerId={stripeCustomerId}
+          linksUsed={linksUsed}
+          linkCap={linkCap}
+        />
         <ProfileCard initialUsername={username} />
         <EmailCard email={email} />
         <PasswordCard />

@@ -1,4 +1,10 @@
+import type { Profile } from "@/lib/supabase/types";
+import { isProActive } from "@/lib/supabase/types";
+
 export type BillingInterval = "monthly" | "annual";
+
+export const TIERS = [1, 3, 10, 25, 50, 100, 200, 400] as const;
+export type Tier = (typeof TIERS)[number];
 
 export interface PlanFeature {
   text: string;
@@ -86,27 +92,24 @@ export const PRO_PLAN: ProPlan = {
 
 export const PLANS = [FREE_PLAN, PRO_PLAN] as const;
 
-// Feature → minimum plan (Phase 4 will enforce; this is the source of truth)
 export const FEATURE_PLAN: Record<string, "free" | "pro"> = {
-  age_gate:        "free",
-  active_badge:    "pro",
+  age_gate:         "free",
+  active_badge:     "pro",
   country_blocking: "pro",
-  analytics:       "pro",
-  custom_domains:  "pro",
-  team_access:     "pro",
-  win_back:        "pro",
-  badge_removal:   "pro",
+  analytics:        "pro",
+  custom_domains:   "pro",
+  team_access:      "pro",
+  win_back:         "pro",
+  badge_removal:    "pro",
 };
 
-export function planHasAnalytics(plan: string): boolean {
-  return plan === "pro";
+type SubProfile = Pick<Profile, "subscription_status" | "grace_period_ends_at" | "plan_tier">;
+
+export function getLinkCap(profile: SubProfile): number {
+  if (isProActive(profile)) return profile.plan_tier ?? 1;
+  return 1;
 }
 
-export function getLinkCap(plan: string): number {
-  switch (plan) {
-    case "pro":
-      return PRO_PLAN.tiers[0].links; // smallest tier (1); Phase 4 will use real tier
-    default:
-      return FREE_PLAN.links;
-  }
+export function planHasAnalytics(profile: Pick<Profile, "subscription_status" | "grace_period_ends_at">): boolean {
+  return isProActive(profile);
 }

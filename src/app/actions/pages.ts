@@ -32,11 +32,13 @@ export async function createPage(
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan")
+    .select("subscription_status, grace_period_ends_at, plan_tier")
     .eq("id", user.id)
     .single();
 
-  const cap = getLinkCap(profile?.plan ?? "free");
+  const cap = getLinkCap(
+    profile ?? { subscription_status: "none", grace_period_ends_at: null, plan_tier: null }
+  );
 
   const { count } = await supabase
     .from("pages")

@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { siteConfig } from "@/lib/config/site";
 import { getLinkCap } from "@/lib/config/pricing";
+import { isProActive } from "@/lib/supabase/types";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import type { Page, Plan } from "@/lib/supabase/types";
+import type { Page, SubscriptionStatus } from "@/lib/supabase/types";
 
 export const metadata: Metadata = {
   title: "Ultralink Dashboard",
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ username?: string }>;
+  searchParams: Promise<{ username?: string; upgraded?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -25,19 +26,52 @@ export default async function DashboardPage({
 
   const [pagesResult, profileResult] = await Promise.all([
     supabase.from("pages").select("*").eq("owner_id", user.id).order("created_at", { ascending: false }),
-    supabase.from("profiles").select("plan").eq("id", user.id).single(),
+    supabase
+      .from("profiles")
+      .select("subscription_status, grace_period_ends_at, plan_tier, stripe_customer_id")
+      .eq("id", user.id)
+      .single(),
   ]);
 
-  const plan = (profileResult.data?.plan ?? "free") as Plan;
+  const profile = profileResult.data ?? {
+    subscription_status: "none" as SubscriptionStatus,
+    grace_period_ends_at: null,
+    plan_tier: null,
+    stripe_customer_id: null,
+  };
+
+  const linkCap = getLinkCap(profile);
   const sp = await searchParams;
   const initialSlug = sp.username ?? "";
+  const upgraded = sp.upgraded === "1";
+
+  // For lapsed Pro users, find the surviving page (oldest)
+  const lapsed =
+    profile.subscription_status !== "none" && !isProActive(profile);
+
+  let survivingPageId: string | null = null;
+  if (lapsed) {
+    const pages = (pagesResult.data ?? []) as Page[];
+    if (pages.length > 0) {
+      const oldest = [...pages].sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      )[0];
+      survivingPageId = oldest.id;
+    }
+  }
 
   return (
     <DashboardShell
       pages={(pagesResult.data ?? []) as Page[]}
       siteUrl={siteConfig.url}
       initialSlug={initialSlug}
-      linkCap={getLinkCap(plan)}
+      linkCap={linkCap}
+      upgraded={upgraded}
+      subscriptionStatus={profile.subscription_status as SubscriptionStatus}
+      gracePeriodEndsAt={profile.grace_period_ends_at}
+      stripeCustomerId={profile.stripe_customer_id}
+      survivingPageId={survivingPageId}
+      lapsed={lapsed}
     />
   );
 }

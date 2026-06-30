@@ -9,11 +9,20 @@ interface LinksListProps {
   pages: Page[];
   siteUrl: string;
   linkCap?: number;
+  survivingPageId?: string | null;
 }
 
 type SortKey = "manual" | "name-az" | "newest" | "oldest";
 
-function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
+function PageRow({
+  page,
+  siteUrl,
+  isHidden,
+}: {
+  page: Page;
+  siteUrl: string;
+  isHidden: boolean;
+}) {
   const [copied, setCopied] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -40,21 +49,32 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
       className="flex items-center gap-3 p-4 group cursor-default"
       style={{
         background: hovered ? "#1F1F1F" : "#1A1A1A",
-        border: "1px solid rgba(255,255,255,.08)",
+        border: isHidden ? "1px solid rgba(255,255,255,.05)" : "1px solid rgba(255,255,255,.08)",
         borderRadius: 14,
         marginBottom: 8,
         transition: "background 120ms",
+        opacity: isHidden ? 0.6 : 1,
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div className="flex-1 min-w-0">
-        <p
-          className="text-sm font-medium truncate"
-          style={{ color: "#ffffff" }}
-        >
-          {page.title || <span className="italic" style={{ color: "#9A9A9A" }}>Untitled</span>}
-        </p>
+        <div className="flex items-center gap-2">
+          <p
+            className="text-sm font-medium truncate"
+            style={{ color: "#ffffff" }}
+          >
+            {page.title || <span className="italic" style={{ color: "#9A9A9A" }}>Untitled</span>}
+          </p>
+          {isHidden && (
+            <span
+              className="shrink-0 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(255,255,255,.06)", color: "#6B6B6B", border: "1px solid rgba(255,255,255,.08)" }}
+            >
+              Hidden
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-1.5 mt-1">
           <a
             href={pageUrl}
@@ -84,6 +104,14 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
             )}
           </button>
         </div>
+        {isHidden && (
+          <p className="text-xs mt-1" style={{ color: "#6B6B6B" }}>
+            Publicly hidden.{" "}
+            <a href="/#pricing" style={{ color: "#9A9A9A", textDecoration: "underline", textUnderlineOffset: 2 }}>
+              Upgrade to restore
+            </a>
+          </p>
+        )}
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
@@ -141,7 +169,12 @@ function PageRow({ page, siteUrl }: { page: Page; siteUrl: string }) {
   );
 }
 
-export function LinksList({ pages, siteUrl, linkCap: _linkCap = 1 }: LinksListProps) {
+export function LinksList({
+  pages,
+  siteUrl,
+  linkCap: _linkCap = 1,
+  survivingPageId = null,
+}: LinksListProps) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortKey>("manual");
 
@@ -196,7 +229,7 @@ export function LinksList({ pages, siteUrl, linkCap: _linkCap = 1 }: LinksListPr
           />
         </div>
 
-        {/* Sort dropdown — tight arrow */}
+        {/* Sort dropdown */}
         <div className="relative flex-shrink-0">
           <select
             value={sort}
@@ -218,7 +251,6 @@ export function LinksList({ pages, siteUrl, linkCap: _linkCap = 1 }: LinksListPr
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
           </select>
-          {/* Tight chevron */}
           <svg
             viewBox="0 0 10 6"
             className="absolute pointer-events-none"
@@ -241,7 +273,12 @@ export function LinksList({ pages, siteUrl, linkCap: _linkCap = 1 }: LinksListPr
       ) : (
         <div>
           {filtered.map((page) => (
-            <PageRow key={page.id} page={page} siteUrl={siteUrl} />
+            <PageRow
+              key={page.id}
+              page={page}
+              siteUrl={siteUrl}
+              isHidden={survivingPageId !== null && page.id !== survivingPageId}
+            />
           ))}
         </div>
       )}

@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { siteConfig } from "@/lib/config/site";
 import { PageBuilder } from "@/components/dashboard/page-builder/page-builder";
-import type { Page, PageLink, PageSocial, Plan } from "@/lib/supabase/types";
+import { getEffectivePlan } from "@/lib/supabase/types";
+import type { Page, PageLink, PageSocial, SubscriptionStatus } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +39,11 @@ export default async function EditLinkPage({
       .select("*")
       .eq("page_id", id)
       .order("position", { ascending: true }),
-    supabase.from("profiles").select("plan").eq("id", user.id).single(),
+    supabase
+      .from("profiles")
+      .select("subscription_status, grace_period_ends_at")
+      .eq("id", user.id)
+      .single(),
   ]);
 
   if (!pageResult.data) notFound();
@@ -46,7 +51,11 @@ export default async function EditLinkPage({
   const page = pageResult.data as Page;
   const links = (linksResult.data ?? []) as PageLink[];
   const socials = (socialsResult.data ?? []) as PageSocial[];
-  const plan = (profileResult.data?.plan ?? "free") as Plan;
+  const subProfile = profileResult.data ?? {
+    subscription_status: "none" as SubscriptionStatus,
+    grace_period_ends_at: null,
+  };
+  const effectivePlan = getEffectivePlan(subProfile);
 
   return (
     <div className="flex flex-col h-screen lg:h-dvh">
@@ -54,7 +63,7 @@ export default async function EditLinkPage({
         page={page}
         initialLinks={links}
         initialSocials={socials}
-        plan={plan}
+        effectivePlan={effectivePlan}
         userId={user.id}
         siteUrl={siteConfig.url}
       />

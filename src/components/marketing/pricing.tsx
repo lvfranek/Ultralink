@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import {
   FREE_PLAN,
   PRO_PLAN,
   type BillingInterval,
   type ProTier,
+  type Tier,
 } from "@/lib/config/pricing";
+import { startCheckout } from "@/app/actions/billing";
 
 const GRADIENT = 'linear-gradient(110deg,#FBC2A4 0%,#F7A8C4 33%,#C9A7F2 66%,#A7C7F7 100%)';
 
@@ -31,10 +32,35 @@ function XIcon() {
 export function Pricing() {
   const [interval, setInterval] = useState<BillingInterval>("monthly");
   const [proTierIndex, setProTierIndex] = useState(0);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   const selectedTier: ProTier = PRO_PLAN.tiers[proTierIndex];
   const proPrice =
     interval === "monthly" ? selectedTier.monthlyPrice : selectedTier.annualMonthlyPrice;
+
+  const handleGetPro = async () => {
+    setCheckoutLoading(true);
+    setCheckoutError(null);
+    try {
+      const result = await startCheckout({
+        tier: selectedTier.links as Tier,
+        interval,
+      });
+      if ("loginUrl" in result) {
+        window.location.href = result.loginUrl;
+        return;
+      }
+      if ("url" in result) {
+        window.location.href = result.url;
+        return;
+      }
+      setCheckoutError(result.error ?? "Something went wrong.");
+    } catch {
+      setCheckoutError("Something went wrong. Please try again.");
+    }
+    setCheckoutLoading(false);
+  };
 
   return (
     <section
@@ -42,7 +68,6 @@ export function Pricing() {
       aria-labelledby="pricing-heading"
       style={{ maxWidth: 1140, margin: '0 auto', padding: '72px 24px' }}
     >
-      {/* Floating header on dark — same pattern as Features, FAQ */}
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
         <h2
           id="pricing-heading"
@@ -105,7 +130,7 @@ export function Pricing() {
         </div>
       </div>
 
-      {/* Two-card grid — paddingTop gives room for the Recommended badge */}
+      {/* Two-card grid */}
       <div
         style={{
           display: 'grid',
@@ -158,7 +183,7 @@ export function Pricing() {
             ))}
           </ul>
 
-          <Link
+          <a
             href="/login"
             style={{
               display: 'inline-flex',
@@ -181,10 +206,10 @@ export function Pricing() {
             onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)'; }}
           >
             Get started free
-          </Link>
+          </a>
         </div>
 
-        {/* Pro — white card, gradient border, Recommended badge on the top border edge */}
+        {/* Pro — gradient border */}
         <div style={{ position: 'relative', isolation: 'isolate', display: 'flex', flexDirection: 'column', height: '100%' }}>
           {/* Pastel glow */}
           <div
@@ -200,7 +225,7 @@ export function Pricing() {
               pointerEvents: 'none',
             }}
           />
-          {/* Gradient border frame — position relative so badge anchors here */}
+          {/* Gradient border frame */}
           <div
             style={{
               position: 'relative',
@@ -213,7 +238,7 @@ export function Pricing() {
               flexDirection: 'column',
             }}
           >
-            {/* Badge sitting centered on the top border edge */}
+            {/* Badge */}
             <div
               style={{
                 position: 'absolute',
@@ -320,8 +345,14 @@ export function Pricing() {
                 ))}
               </ul>
 
-              <Link
-                href="/login?plan=pro"
+              {checkoutError && (
+                <p style={{ fontSize: 12, color: '#dc2626', marginBottom: 8 }}>{checkoutError}</p>
+              )}
+
+              <button
+                type="button"
+                onClick={handleGetPro}
+                disabled={checkoutLoading}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -335,16 +366,17 @@ export function Pricing() {
                   border: 'none',
                   color: '#ffffff',
                   textDecoration: 'none',
-                  background: '#0A0A0A',
+                  background: checkoutLoading ? 'rgba(10,10,10,0.4)' : '#0A0A0A',
                   boxSizing: 'border-box',
-                  cursor: 'pointer',
+                  cursor: checkoutLoading ? 'not-allowed' : 'pointer',
                   transition: 'opacity 0.15s, transform 0.15s',
+                  fontFamily: 'inherit',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8'; e.currentTarget.style.transform = 'scale(0.97)'; }}
+                onMouseEnter={(e) => { if (!checkoutLoading) { e.currentTarget.style.opacity = '0.8'; e.currentTarget.style.transform = 'scale(0.97)'; } }}
                 onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)'; }}
               >
-                Get Pro
-              </Link>
+                {checkoutLoading ? "Redirecting…" : "Get Pro"}
+              </button>
             </div>
           </div>
         </div>

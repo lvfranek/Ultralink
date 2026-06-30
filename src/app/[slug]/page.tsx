@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { captureEvent } from "@/lib/analytics";
 import { ProfilePageView } from "@/components/public/profile-page-view";
 import { AgeGate } from "@/components/public/age-gate";
+import { isProActive } from "@/lib/supabase/types";
 import type { Page, PageLink, PageSocial } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
@@ -66,6 +67,33 @@ export default async function BioPage({ params }: Props) {
     .single();
 
   if (!page) notFound();
+
+  // Subscription enforcement: check owner's subscription status
+  const { data: ownerProfile } = await supabase
+    .from("profiles")
+    .select("id, subscription_status, grace_period_ends_at")
+    .eq("id", page.owner_id)
+    .single();
+
+  if (ownerProfile) {
+    const wasEverPro = ownerProfile.subscription_status !== "none";
+    const stillActive = isProActive(ownerProfile);
+
+    if (wasEverPro && !stillActive) {
+      // Lapsed Pro — only oldest page stays live
+      const { data: oldestPage } = await supabase
+        .from("pages")
+        .select("id")
+        .eq("owner_id", page.owner_id)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .single();
+
+      if (!oldestPage || oldestPage.id !== page.id) {
+        notFound();
+      }
+    }
+  }
 
   // Fire-and-forget view capture — only reaches here if page exists
   after(async () => {
