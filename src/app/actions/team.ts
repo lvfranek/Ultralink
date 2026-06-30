@@ -65,21 +65,34 @@ export async function inviteEditor(
     return { error: "Inviting team members requires an active Pro subscription." };
   }
 
+  const service = createServiceClient();
+
+  // Handle existing invite: auto-clean expired ones, surface pending ones clearly
+  const { data: existing } = await service
+    .from("team_invites")
+    .select("id, accepted_at, expires_at")
+    .eq("owner_id", user.id)
+    .ilike("email", normalizedEmail)
+    .maybeSingle();
+
+  if (existing) {
+    const isExpired = !existing.accepted_at && new Date(existing.expires_at) <= new Date();
+    if (isExpired) {
+      await service.from("team_invites").delete().eq("id", existing.id);
+    } else {
+      return { error: "An invite was already sent to this email. Resend or revoke it from the pending list above." };
+    }
+  }
+
   const token = crypto.randomBytes(24).toString("base64url");
 
-  const service = createServiceClient();
   const { error: insertError } = await service.from("team_invites").insert({
     owner_id: user.id,
     email: normalizedEmail,
     token,
   });
 
-  if (insertError) {
-    if (insertError.code === "23505") {
-      return { error: "An invite has already been sent to that email address." };
-    }
-    return { error: insertError.message };
-  }
+  if (insertError) return { error: insertError.message };
 
   await resend.emails.send({
     from: "Ultralink <hello@ultralink.bio>",
@@ -172,6 +185,17 @@ export async function removeEditor(
     .eq("editor_id", editorId);
 
   if (error) return { error: error.message };
+
+  // Clean up the accepted invite so the owner can re-invite the same email
+  const service = createServiceClient();
+  const { data: editorAuth } = await service.auth.admin.getUserById(editorId);
+  if (editorAuth.user?.email) {
+    await service
+      .from("team_invites")
+      .delete()
+      .eq("owner_id", user.id)
+      .ilike("email", editorAuth.user.email);
+  }
 
   revalidatePath("/dashboard/account");
   return {};

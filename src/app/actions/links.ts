@@ -3,25 +3,32 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveOwnerId } from "@/lib/team";
 import type { PageLink } from "@/lib/supabase/types";
 
 export type LinkActionResult = { error: string } | { ok: true; link?: PageLink };
 
+function normalizeUrl(url: string): string {
+  const trimmed = url.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 function isValidUrl(url: string): boolean {
   try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
+    new URL(url);
+    return true;
   } catch {
     return false;
   }
 }
 
-async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createClient>>, pageId: string, userId: string): Promise<boolean> {
+async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createClient>>, pageId: string, activeOwnerId: string): Promise<boolean> {
   const { count } = await supabase
     .from("pages")
     .select("*", { count: "exact", head: true })
     .eq("id", pageId)
-    .eq("owner_id", userId);
+    .eq("owner_id", activeOwnerId);
   return (count ?? 0) > 0;
 }
 
@@ -36,10 +43,13 @@ export async function addLink(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  if (!isValidUrl(data.url)) return { error: "URL must start with http:// or https://" };
   if (!data.label.trim()) return { error: "Label is required." };
 
-  const owns = await verifyPageOwnership(supabase, pageId, user.id);
+  const normalizedUrl = normalizeUrl(data.url);
+  if (!isValidUrl(normalizedUrl)) return { error: "Please enter a valid URL." };
+
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const owns = await verifyPageOwnership(supabase, pageId, activeOwnerId);
   if (!owns) return { error: "Page not found." };
 
   const { count } = await supabase
@@ -54,7 +64,7 @@ export async function addLink(
     .insert({
       page_id: pageId,
       label: data.label.trim(),
-      url: data.url.trim(),
+      url: normalizedUrl,
       icon: data.icon ?? null,
       thumbnail_url: data.thumbnail_url ?? null,
       is_adult: data.is_adult ?? false,
@@ -86,8 +96,10 @@ export async function updateLink(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  if (data.url !== undefined && !isValidUrl(data.url)) {
-    return { error: "URL must start with http:// or https://" };
+  let normalizedUrl: string | undefined;
+  if (data.url !== undefined) {
+    normalizedUrl = normalizeUrl(data.url);
+    if (!isValidUrl(normalizedUrl)) return { error: "Please enter a valid URL." };
   }
 
   const { data: existing } = await supabase
@@ -98,14 +110,15 @@ export async function updateLink(
 
   if (!existing) return { error: "Link not found." };
 
-  const owns = await verifyPageOwnership(supabase, existing.page_id, user.id);
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const owns = await verifyPageOwnership(supabase, existing.page_id, activeOwnerId);
   if (!owns) return { error: "Not authorized." };
 
   const { error } = await supabase
     .from("page_links")
     .update({
       ...(data.label !== undefined ? { label: data.label.trim() } : {}),
-      ...(data.url !== undefined ? { url: data.url.trim() } : {}),
+      ...(normalizedUrl !== undefined ? { url: normalizedUrl } : {}),
       ...(data.icon !== undefined ? { icon: data.icon } : {}),
       ...(data.thumbnail_url !== undefined ? { thumbnail_url: data.thumbnail_url } : {}),
       ...(data.is_adult !== undefined ? { is_adult: data.is_adult } : {}),
@@ -137,7 +150,8 @@ export async function deleteLink(id: string): Promise<LinkActionResult> {
 
   if (!existing) return { error: "Link not found." };
 
-  const owns = await verifyPageOwnership(supabase, existing.page_id, user.id);
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const owns = await verifyPageOwnership(supabase, existing.page_id, activeOwnerId);
   if (!owns) return { error: "Not authorized." };
 
   const { error } = await supabase.from("page_links").delete().eq("id", id);
@@ -155,7 +169,8 @@ export async function reorderLinks(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const owns = await verifyPageOwnership(supabase, pageId, user.id);
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const owns = await verifyPageOwnership(supabase, pageId, activeOwnerId);
   if (!owns) return { error: "Page not found." };
 
   const updates = orderedIds.map((id, position) =>
@@ -179,7 +194,8 @@ export async function applyPresetToLinks(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const owns = await verifyPageOwnership(supabase, pageId, user.id);
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const owns = await verifyPageOwnership(supabase, pageId, activeOwnerId);
   if (!owns) return { error: "Page not found." };
 
   const { error } = await supabase

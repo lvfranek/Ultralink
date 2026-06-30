@@ -36,7 +36,7 @@ export function inviteEmail({
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:40px auto;">
     <tr>
       <td style="padding:40px 32px;background:#141417;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
-        <p style="font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#C9A86A;margin:0 0 24px;">
+        <p style="font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#9A9A9A;margin:0 0 24px;">
           ultralink
         </p>
         <h1 style="font-size:28px;font-weight:700;margin:0 0 16px;color:#F5F3EF;line-height:1.2;">
@@ -46,7 +46,7 @@ export function inviteEmail({
           <strong style="color:#F5F3EF;">${ownerUsername}</strong> has invited you to collaborate on their Ultralink pages as an Editor.
         </p>
         <a href="${acceptUrl}"
-           style="display:inline-block;padding:14px 28px;background:#C9A86A;color:#0A0A0B;font-weight:600;font-size:15px;text-decoration:none;border-radius:8px;">
+           style="display:inline-block;padding:14px 28px;background:#FFFFFF;color:#0A0A0A;font-weight:600;font-size:15px;text-decoration:none;border-radius:8px;">
           Accept invite →
         </a>
         <p style="font-size:13px;color:#6B6B75;margin:40px 0 0;line-height:1.6;">
@@ -73,7 +73,7 @@ export function welcomeEmail({ name }: { name: string }): string {
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:40px auto;">
     <tr>
       <td style="padding:40px 32px;background:#141417;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
-        <p style="font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#C9A86A;margin:0 0 24px;">
+        <p style="font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#9A9A9A;margin:0 0 24px;">
           ultralink
         </p>
         <h1 style="font-size:28px;font-weight:700;margin:0 0 16px;color:#F5F3EF;line-height:1.2;">
@@ -83,7 +83,7 @@ export function welcomeEmail({ name }: { name: string }): string {
           Your link page is ready. Set it up in minutes and share it everywhere.
         </p>
         <a href="https://ultralink.bio/dashboard"
-           style="display:inline-block;padding:14px 28px;background:#C9A86A;color:#0A0A0B;font-weight:600;font-size:15px;text-decoration:none;border-radius:8px;">
+           style="display:inline-block;padding:14px 28px;background:#FFFFFF;color:#0A0A0A;font-weight:600;font-size:15px;text-decoration:none;border-radius:8px;">
           Go to Dashboard →
         </a>
         <p style="font-size:13px;color:#6B6B75;margin:40px 0 0;line-height:1.6;">

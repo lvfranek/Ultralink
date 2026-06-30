@@ -155,7 +155,7 @@ function PlanCard({
 
   const formatDate = (iso: string | null) => {
     if (!iso) return null;
-    return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+    return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   };
 
   if (isEditor) {
@@ -331,7 +331,7 @@ function TeamCard({
   };
 
   const formatDate = (iso: string) =>
-    new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 
   if (!isPro) {
     return (

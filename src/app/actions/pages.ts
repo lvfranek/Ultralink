@@ -110,10 +110,8 @@ export async function updatePage(
       if (parsed && typeof parsed === "object") {
         const enabled = !!parsed.enabled;
         const headline = String(parsed.headline ?? "").slice(0, 80);
-        const url = String(parsed.url ?? "");
-        if (enabled && url && !/^https?:\/\//i.test(url)) {
-          return { error: "Win-Back URL must start with http:// or https://" };
-        }
+        const rawUrl = String(parsed.url ?? "");
+        const url = rawUrl && !/^https?:\/\//i.test(rawUrl) ? `https://${rawUrl}` : rawUrl;
         win_back = { enabled, headline, url };
       }
     } catch {

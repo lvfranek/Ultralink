@@ -3,18 +3,19 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveOwnerId } from "@/lib/team";
 import type { PageSocial } from "@/lib/supabase/types";
 
 const MAX_SOCIALS = 20;
 
 export type SocialActionResult = { error: string } | { ok: true; social?: PageSocial };
 
-async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createClient>>, pageId: string, userId: string): Promise<boolean> {
+async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createClient>>, pageId: string, activeOwnerId: string): Promise<boolean> {
   const { count } = await supabase
     .from("pages")
     .select("*", { count: "exact", head: true })
     .eq("id", pageId)
-    .eq("owner_id", userId);
+    .eq("owner_id", activeOwnerId);
   return (count ?? 0) > 0;
 }
 
@@ -29,7 +30,8 @@ export async function addSocial(
   if (!data.url.trim()) return { error: "URL is required." };
   if (!data.platform) return { error: "Platform is required." };
 
-  const owns = await verifyPageOwnership(supabase, pageId, user.id);
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const owns = await verifyPageOwnership(supabase, pageId, activeOwnerId);
   if (!owns) return { error: "Page not found." };
 
   const { count } = await supabase
@@ -74,7 +76,8 @@ export async function updateSocial(
 
   if (!existing) return { error: "Social link not found." };
 
-  const owns = await verifyPageOwnership(supabase, existing.page_id, user.id);
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const owns = await verifyPageOwnership(supabase, existing.page_id, activeOwnerId);
   if (!owns) return { error: "Not authorized." };
 
   const { error } = await supabase
@@ -104,7 +107,8 @@ export async function deleteSocial(id: string): Promise<SocialActionResult> {
 
   if (!existing) return { error: "Social link not found." };
 
-  const owns = await verifyPageOwnership(supabase, existing.page_id, user.id);
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const owns = await verifyPageOwnership(supabase, existing.page_id, activeOwnerId);
   if (!owns) return { error: "Not authorized." };
 
   const { error } = await supabase.from("page_socials").delete().eq("id", id);
@@ -122,7 +126,8 @@ export async function reorderSocials(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const owns = await verifyPageOwnership(supabase, pageId, user.id);
+  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
+  const owns = await verifyPageOwnership(supabase, pageId, activeOwnerId);
   if (!owns) return { error: "Page not found." };
 
   const updates = orderedIds.map((id, position) =>
