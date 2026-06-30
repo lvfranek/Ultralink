@@ -51,6 +51,8 @@ export interface AnalyticsData {
   sources: SourceRow[];
   devices: DeviceCounts;
   topLinks: LinkRow[];
+  winbackShown: number;
+  winbackClicks: number;
 }
 
 function startOfDay(d: Date): Date {
@@ -126,6 +128,9 @@ export async function getAnalyticsData(
   const prevClicks = prevEvents.filter((e) => e.kind === "click").length;
   const prevCtr =
     prevViews > 0 ? Math.round((prevClicks / prevViews) * 1000) / 10 : 0;
+
+  const winbackShown = events.filter((e) => e.kind === "winback_shown").length;
+  const winbackClicks = events.filter((e) => e.kind === "winback_click").length;
 
   // ── Timeseries ──────────────────────────────────────────────────────────────
   const days =
@@ -234,6 +239,8 @@ export async function getAnalyticsData(
     sources,
     devices,
     topLinks,
+    winbackShown,
+    winbackClicks,
   };
 }
 

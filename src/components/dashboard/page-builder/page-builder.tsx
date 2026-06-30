@@ -12,7 +12,8 @@ import { LinksTab } from "./links-tab";
 import { LivePreview } from "./live-preview";
 import { SettingsCard } from "./panel-primitives";
 import { CountryBlockingControl } from "./country-blocking-control";
-import type { Page, PageLink, PageSocial } from "@/lib/supabase/types";
+import { WinBackControl } from "./win-back-control";
+import type { Page, PageLink, PageSocial, WinBack } from "@/lib/supabase/types";
 import { type Theme, type LinkStyle, type PresetKey, resolveTheme, PRESET_META, FONT_OPTIONS } from "@/lib/config/theme";
 
 interface PageBuilderProps {
@@ -48,6 +49,10 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
   const [blockedCountries, setBlockedCountries] = useState<string[]>(
     Array.isArray(page.blocked_countries) ? page.blocked_countries : []
   );
+  const [winBack, setWinBack] = useState<WinBack>(() => {
+    const wb = (page as Page & { win_back?: WinBack }).win_back;
+    return wb ?? { enabled: false, headline: "", url: "" };
+  });
 
   const [isDirty, setIsDirty] = useState(false);
   const [hasLinksDirty, setHasLinksDirty] = useState(false);
@@ -239,6 +244,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
               <input type="hidden" name="active_badge" value={String(local.active_badge ?? false)} />
               <input type="hidden" name="theme" value={JSON.stringify(theme)} />
               <input type="hidden" name="blocked_countries" value={JSON.stringify(blockedCountries)} />
+              <input type="hidden" name="win_back" value={JSON.stringify(winBack)} />
               <button
                 type="submit"
                 disabled={!canSave || pending}
@@ -259,7 +265,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
 
             {/* Middle: live preview — always visible on md+, mobile only in preview mode */}
             <div className={`${mobileView === "preview" ? "flex" : "hidden md:flex"} flex-1 relative overflow-hidden`}>
-              <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} />
+              <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} winBack={winBack} />
             </div>
 
             {/* Right: settings panel — always visible on md+, mobile only in edit mode */}
@@ -375,8 +381,13 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                   <TypographyContent theme={theme} onChange={handleThemeChange} />
                 </SettingsCard>
 
-                {/* 4. Advanced — Active badge + geo-blocking + stubs */}
-                <SettingsCard title="Advanced" summary={blockedCountries.length > 0 ? `${blockedCountries.length} countr${blockedCountries.length === 1 ? "y" : "ies"} blocked` : undefined}>
+                {/* 4. Advanced — Active badge + geo-blocking + win-back */}
+                <SettingsCard title="Advanced" summary={(() => {
+                  const parts: string[] = [];
+                  if (blockedCountries.length > 0) parts.push(`${blockedCountries.length} countr${blockedCountries.length === 1 ? "y" : "ies"} blocked`);
+                  if (winBack.enabled) parts.push("Win-Back on");
+                  return parts.join(" · ") || undefined;
+                })()}>
                   {/* Active now badge */}
                   <div className="flex items-center justify-between py-1 mb-3">
                     <div>
@@ -423,21 +434,20 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                       onChange={(v) => { setBlockedCountries(v); setIsDirty(true); }}
                       isPro={effectivePlan === "pro"}
                     />
-                    {[
-                      { label: "Custom Domain", description: "Point your own domain (e.g. links.yourbrand.com) to this page." },
-                      { label: "Win-Back",       description: "Show a prompt to visitors who start to leave, offering a second destination." },
-                    ].map((item) => (
-                      <div
-                        key={item.label}
-                        className="flex items-center justify-between py-2.5 opacity-50"
-                        style={{ borderBottom: "1px solid rgba(255,255,255,.06)" }}
-                      >
-                        <span className="text-sm text-text">{item.label}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 bg-surface-2 text-text-subtle border border-border-strong rounded font-semibold uppercase tracking-wider">
-                          Phase 5
-                        </span>
-                      </div>
-                    ))}
+                    <div
+                      className="flex items-center justify-between py-2.5 opacity-50"
+                      style={{ borderBottom: "1px solid rgba(255,255,255,.06)" }}
+                    >
+                      <span className="text-sm text-text">Custom Domain</span>
+                      <span className="text-[10px] px-1.5 py-0.5 bg-surface-2 text-text-subtle border border-border-strong rounded font-semibold uppercase tracking-wider">
+                        Phase 5
+                      </span>
+                    </div>
+                    <WinBackControl
+                      value={winBack}
+                      onChange={(v) => { setWinBack(v); setIsDirty(true); }}
+                      isPro={effectivePlan === "pro"}
+                    />
                   </div>
                 </SettingsCard>
 

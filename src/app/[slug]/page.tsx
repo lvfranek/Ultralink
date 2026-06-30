@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { captureEvent } from "@/lib/analytics";
 import { ProfilePageView } from "@/components/public/profile-page-view";
 import { AgeGate } from "@/components/public/age-gate";
+import { WinBackOverlay } from "@/components/public/win-back-overlay";
 import { BlockedPage } from "./blocked";
 import { isProActive } from "@/lib/supabase/types";
 import type { Page, PageLink, PageSocial } from "@/lib/supabase/types";
@@ -130,10 +131,24 @@ export default async function BioPage({ params, searchParams }: Props) {
 
   const socials = (typedPage.page_socials ?? []).sort((a, b) => a.position - b.position);
 
+  const winBack = typedPage.win_back ?? { enabled: false, headline: "", url: "" };
+
   return (
     <>
       {/* Age gate overlay (client component, uses sessionStorage) */}
       {typedPage.age_gate_enabled && <AgeGate slug={slug} />}
+
+      {/* Win-Back exit-intent overlay (client component, triggers on mouseleave/visibilitychange) */}
+      {winBack.enabled && winBack.url && (
+        <WinBackOverlay
+          pageId={typedPage.id}
+          winBack={winBack}
+          rawTheme={typedPage.theme as Record<string, unknown>}
+          avatarUrl={typedPage.avatar_url}
+          title={typedPage.title}
+          firstLink={activeLinks[0] ?? null}
+        />
+      )}
 
       {/* Public page — footer is rendered inside ProfilePageView on the themed background */}
       <ProfilePageView

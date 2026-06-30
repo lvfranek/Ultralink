@@ -410,6 +410,14 @@ export function AnalyticsDashboard({ pages }: Props) {
                   prev={"rawPrev" in tile ? (tile.rawPrev ?? 0) : tile.prev!}
                 />
               )}
+              {tile.label === "Clicks" && !loading && (data?.winbackShown ?? 0) > 0 && (
+                <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: "#6B6B6B" }}>
+                  Win-Back: {fmt(data!.winbackShown)} shown · {fmt(data!.winbackClicks)} recovered (
+                  {data!.winbackShown > 0
+                    ? Math.round((data!.winbackClicks / data!.winbackShown) * 100)
+                    : 0}%)
+                </p>
+              )}
             </Card>
           ))}
         </div>

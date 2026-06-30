@@ -101,6 +101,25 @@ export async function updatePage(
     }
   }
 
+  const winBackStr = formData.get("win_back") as string | null;
+  let win_back: { enabled: boolean; headline: string; url: string } = { enabled: false, headline: "", url: "" };
+  if (winBackStr) {
+    try {
+      const parsed = JSON.parse(winBackStr);
+      if (parsed && typeof parsed === "object") {
+        const enabled = !!parsed.enabled;
+        const headline = String(parsed.headline ?? "").slice(0, 80);
+        const url = String(parsed.url ?? "");
+        if (enabled && url && !/^https?:\/\//i.test(url)) {
+          return { error: "Win-Back URL must start with http:// or https://" };
+        }
+        win_back = { enabled, headline, url };
+      }
+    } catch {
+      // ignore invalid JSON
+    }
+  }
+
   const themeStr = formData.get("theme") as string | null;
   let theme: Record<string, unknown> | undefined;
   if (themeStr) {
@@ -147,6 +166,7 @@ export async function updatePage(
       age_gate_enabled,
       active_badge,
       blocked_countries,
+      win_back,
       updated_at: new Date().toISOString(),
       ...(avatar_url !== undefined ? { avatar_url } : {}),
       ...(avatar_style !== undefined ? { avatar_style } : {}),

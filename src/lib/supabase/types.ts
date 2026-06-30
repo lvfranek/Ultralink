@@ -2,6 +2,12 @@ export type SubscriptionStatus = "none" | "active" | "trialing" | "past_due" | "
 export type PlanInterval = "monthly" | "annual";
 export type AvatarStyle = "circle" | "hero";
 
+export type WinBack = {
+  enabled: boolean;
+  headline: string;
+  url: string;
+};
+
 export interface Profile {
   id: string;
   username: string;
@@ -46,6 +52,7 @@ export interface Page {
   theme: Record<string, unknown>;
   age_gate_enabled: boolean;
   blocked_countries: string[];
+  win_back: WinBack;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -89,7 +96,7 @@ export interface PageWithData extends Page {
 }
 
 export type DeviceType = "mobile" | "tablet" | "desktop" | "bot" | "unknown";
-export type EventKind = "view" | "click";
+export type EventKind = "view" | "click" | "winback_shown" | "winback_click";
 
 export interface Event {
   id: number;

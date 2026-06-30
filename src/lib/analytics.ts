@@ -1,5 +1,5 @@
 import { createServiceClient } from "./supabase/service";
-import type { DeviceType } from "./supabase/types";
+import type { DeviceType, EventKind } from "./supabase/types";
 
 const BOT_RE =
   /bot|crawler|spider|preview|facebookexternalhit|twitterbot|googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|ia_archiver|whatsapp|telegrambot|discordbot|linkedinbot|slackbot|vkshare|embedly|outbrain|pinterest\/|bufferbot|rogerbot/i;
@@ -34,7 +34,7 @@ function parseReferrer(referrer: string | null): string | null {
 export interface CaptureOptions {
   page_id: string;
   link_id?: string;
-  kind: "view" | "click";
+  kind: EventKind;
   country: string | null;
   ua: string | null;
   referrer: string | null;
