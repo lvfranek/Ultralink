@@ -86,6 +86,21 @@ export async function updatePage(
   const active_badge = formData.get("active_badge") === "true";
   const age_gate_enabled = formData.get("age_gate_enabled") === "true";
 
+  const blockedCountriesStr = formData.get("blocked_countries") as string | null;
+  let blocked_countries: string[] = [];
+  if (blockedCountriesStr) {
+    try {
+      const parsed = JSON.parse(blockedCountriesStr);
+      if (Array.isArray(parsed)) {
+        blocked_countries = parsed.filter(
+          (c: unknown) => typeof c === "string" && /^[A-Z]{2}$/.test(c)
+        );
+      }
+    } catch {
+      // ignore invalid JSON — default to empty
+    }
+  }
+
   const themeStr = formData.get("theme") as string | null;
   let theme: Record<string, unknown> | undefined;
   if (themeStr) {
@@ -131,6 +146,7 @@ export async function updatePage(
       is_active,
       age_gate_enabled,
       active_badge,
+      blocked_countries,
       updated_at: new Date().toISOString(),
       ...(avatar_url !== undefined ? { avatar_url } : {}),
       ...(avatar_style !== undefined ? { avatar_style } : {}),

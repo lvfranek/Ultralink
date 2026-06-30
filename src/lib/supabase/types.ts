@@ -45,6 +45,7 @@ export interface Page {
   template: string;
   theme: Record<string, unknown>;
   age_gate_enabled: boolean;
+  blocked_countries: string[];
   is_active: boolean;
   created_at: string;
   updated_at: string;

@@ -11,6 +11,7 @@ import { PresetsContent, TypographyContent, ColorsContent } from "./design-tab";
 import { LinksTab } from "./links-tab";
 import { LivePreview } from "./live-preview";
 import { SettingsCard } from "./panel-primitives";
+import { CountryBlockingControl } from "./country-blocking-control";
 import type { Page, PageLink, PageSocial } from "@/lib/supabase/types";
 import { type Theme, type LinkStyle, type PresetKey, resolveTheme, PRESET_META, FONT_OPTIONS } from "@/lib/config/theme";
 
@@ -44,6 +45,9 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
   });
 
   const [theme, setTheme] = useState<Theme>(() => resolveTheme(page.theme as Record<string, unknown>));
+  const [blockedCountries, setBlockedCountries] = useState<string[]>(
+    Array.isArray(page.blocked_countries) ? page.blocked_countries : []
+  );
 
   const [isDirty, setIsDirty] = useState(false);
   const [hasLinksDirty, setHasLinksDirty] = useState(false);
@@ -234,6 +238,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
               <input type="hidden" name="avatar_style" value={local.avatar_style ?? "circle"} />
               <input type="hidden" name="active_badge" value={String(local.active_badge ?? false)} />
               <input type="hidden" name="theme" value={JSON.stringify(theme)} />
+              <input type="hidden" name="blocked_countries" value={JSON.stringify(blockedCountries)} />
               <button
                 type="submit"
                 disabled={!canSave || pending}
@@ -370,8 +375,8 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                   <TypographyContent theme={theme} onChange={handleThemeChange} />
                 </SettingsCard>
 
-                {/* 4. Advanced — Active badge + Phase-5 stubs */}
-                <SettingsCard title="Advanced" summary="Coming soon">
+                {/* 4. Advanced — Active badge + geo-blocking + stubs */}
+                <SettingsCard title="Advanced" summary={blockedCountries.length > 0 ? `${blockedCountries.length} countr${blockedCountries.length === 1 ? "y" : "ies"} blocked` : undefined}>
                   {/* Active now badge */}
                   <div className="flex items-center justify-between py-1 mb-3">
                     <div>
@@ -411,11 +416,15 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                       </a>
                     )}
                   </div>
-                  {/* Phase-5 stubs */}
-                  <div className="space-y-1" style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                  {/* Geo-blocking + remaining stubs */}
+                  <div style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                    <CountryBlockingControl
+                      value={blockedCountries}
+                      onChange={(v) => { setBlockedCountries(v); setIsDirty(true); }}
+                      isPro={effectivePlan === "pro"}
+                    />
                     {[
                       { label: "Custom Domain", description: "Point your own domain (e.g. links.yourbrand.com) to this page." },
-                      { label: "Geo-Blocking",  description: "Restrict access to specific countries or regions." },
                       { label: "Win-Back",       description: "Show a prompt to visitors who start to leave, offering a second destination." },
                     ].map((item) => (
                       <div

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { captureEvent } from "@/lib/analytics";
 import { ProfilePageView } from "@/components/public/profile-page-view";
 import { AgeGate } from "@/components/public/age-gate";
+import { BlockedPage } from "./blocked";
 import { isProActive } from "@/lib/supabase/types";
 import type { Page, PageLink, PageSocial } from "@/lib/supabase/types";
 
@@ -13,6 +14,7 @@ export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -48,8 +50,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function BioPage({ params }: Props) {
+export default async function BioPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const sp = searchParams ? await searchParams : {};
 
   // Read request headers BEFORE after() — required by Next.js for Server Components
   const reqHeaders = await headers();
@@ -93,6 +96,19 @@ export default async function BioPage({ params }: Props) {
         notFound();
       }
     }
+  }
+
+  // Geo-blocking: enforce before any analytics are captured
+  // In development, ?fake_country=XX overrides the header for local testing.
+  // REMOVE the dev bypass before deploying to production.
+  const effectiveCountry =
+    process.env.NODE_ENV === "development"
+      ? (sp.fake_country as string | undefined) ?? country
+      : country;
+
+  const blockedCountries = (page.blocked_countries ?? []) as string[];
+  if (effectiveCountry && blockedCountries.includes(effectiveCountry)) {
+    return <BlockedPage />;
   }
 
   // Fire-and-forget view capture — only reaches here if page exists
