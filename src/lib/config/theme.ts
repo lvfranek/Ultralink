@@ -2,7 +2,7 @@
 
 export type Theme = {
   preset: 'glacier' | 'sunset' | 'mint' | 'lilac' | 'custom';
-  pageBg: { type: 'color' | 'gradient' | 'image'; value: string; overlay: number };
+  pageBg: { type: 'color' | 'gradient' | 'image'; value: string; overlay: number; blur?: number };
   fonts: { title: string; body: string };
   colors: {
     name: string;
@@ -204,6 +204,7 @@ export function resolveTheme(raw: Record<string, unknown> | null | undefined): T
       type: (pageBgRaw.type as Theme['pageBg']['type']) ?? DEFAULT_THEME.pageBg.type,
       value: (pageBgRaw.value as string) ?? DEFAULT_THEME.pageBg.value,
       overlay: typeof pageBgRaw.overlay === 'number' ? pageBgRaw.overlay : DEFAULT_THEME.pageBg.overlay,
+      blur: typeof pageBgRaw.blur === 'number' ? pageBgRaw.blur : 0,
     },
     fonts: {
       title: (fontsRaw.title as string) ?? DEFAULT_THEME.fonts.title,

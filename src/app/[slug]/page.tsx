@@ -79,6 +79,8 @@ export default async function BioPage({ params, searchParams }: Props) {
     .eq("id", page.owner_id)
     .single();
 
+  const ownerIsPro = ownerProfile ? isProActive(ownerProfile) : false;
+
   if (ownerProfile) {
     const wasEverPro = ownerProfile.subscription_status !== "none";
     const stillActive = isProActive(ownerProfile);
@@ -156,6 +158,7 @@ export default async function BioPage({ params, searchParams }: Props) {
         links={activeLinks}
         socials={socials}
         theme={typedPage.theme as Record<string, unknown>}
+        isPro={ownerIsPro}
       />
     </>
   );

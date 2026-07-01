@@ -2,8 +2,10 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { Page } from "@/lib/supabase/types";
 import { deletePage } from "@/app/actions/pages";
+import { DuplicateLinkModal } from "./duplicate-link-modal";
 
 interface LinksListProps {
   pages: Page[];
@@ -26,7 +28,9 @@ function PageRow({
   const [copied, setCopied] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showDuplicate, setShowDuplicate] = useState(false);
   const [deleting, startDelete] = useTransition();
+  const router = useRouter();
 
   const pageUrl = `${siteUrl}/${page.slug}`;
 
@@ -129,6 +133,22 @@ function PageRow({
           </svg>
         </Link>
 
+        {/* Duplicate */}
+        <button
+          type="button"
+          onClick={() => setShowDuplicate(true)}
+          className="p-1.5 rounded-lg transition-colors cursor-pointer"
+          style={{ color: "#9A9A9A" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,.08)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
+          aria-label="Duplicate"
+        >
+          <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            <rect x="6" y="6" width="8" height="8" rx="1.5" />
+            <path d="M10 6V4a1.5 1.5 0 00-1.5-1.5H4A1.5 1.5 0 002.5 4v4.5A1.5 1.5 0 004 10h2" strokeLinecap="round" />
+          </svg>
+        </button>
+
         {/* Delete */}
         {!showConfirm ? (
           <button
@@ -165,6 +185,15 @@ function PageRow({
           </div>
         )}
       </div>
+
+      {showDuplicate && (
+        <DuplicateLinkModal
+          sourcePageId={page.id}
+          sourceSlug={page.slug}
+          onClose={() => setShowDuplicate(false)}
+          onDuplicated={(newPageId) => router.push(`/dashboard/links/${newPageId}`)}
+        />
+      )}
     </div>
   );
 }

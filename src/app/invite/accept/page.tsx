@@ -4,7 +4,7 @@ import { createServiceClient } from "@/lib/supabase/service";
 import { AcceptInviteClient } from "./accept-client";
 
 export const metadata: Metadata = {
-  title: "Accept invite — Ultralink",
+  title: "Ultralink Invite",
   robots: { index: false, follow: false },
 };
 

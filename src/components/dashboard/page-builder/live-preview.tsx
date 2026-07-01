@@ -10,9 +10,10 @@ interface LivePreviewProps {
   socials: PageSocial[];
   theme: Theme;
   winBack?: WinBack;
+  isPro?: boolean;
 }
 
-export function LivePreview({ page, links, socials, theme, winBack }: LivePreviewProps) {
+export function LivePreview({ page, links, socials, theme, winBack, isPro }: LivePreviewProps) {
   const pageBgIsImage = theme.pageBg.type === "image" && !!theme.pageBg.value;
 
   return (
@@ -75,6 +76,7 @@ export function LivePreview({ page, links, socials, theme, winBack }: LivePrevie
             socials={socials}
             theme={theme}
             isPreview
+            isPro={isPro}
           />
         </div>
 

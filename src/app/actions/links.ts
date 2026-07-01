@@ -37,16 +37,22 @@ export async function addLink(
   data: {
     label: string; url: string; icon?: string; thumbnail_url?: string; is_adult?: boolean;
     fill_type?: string; fill_value?: string; text_color?: string; corner?: string; animation?: string;
+    item_type?: "button" | "heading";
   }
 ): Promise<LinkActionResult> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  if (!data.label.trim()) return { error: "Label is required." };
+  const isHeading = data.item_type === "heading";
 
-  const normalizedUrl = normalizeUrl(data.url);
-  if (!isValidUrl(normalizedUrl)) return { error: "Please enter a valid URL." };
+  if (!isHeading && !data.label.trim()) return { error: "Label is required." };
+
+  let normalizedUrl = "";
+  if (!isHeading) {
+    normalizedUrl = normalizeUrl(data.url);
+    if (!isValidUrl(normalizedUrl)) return { error: "Please enter a valid URL." };
+  }
 
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
   const owns = await verifyPageOwnership(supabase, pageId, activeOwnerId);
@@ -73,6 +79,7 @@ export async function addLink(
       text_color: data.text_color ?? '#FFFFFF',
       corner: data.corner ?? 'pill',
       animation: data.animation ?? 'none',
+      item_type: data.item_type ?? 'button',
       position: nextPos,
     })
     .select()

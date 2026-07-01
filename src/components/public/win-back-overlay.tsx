@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import type { WinBack, PageLink } from "@/lib/supabase/types";
 import { resolveTheme, fontVar, cornerRadius, resolveLinkStyle, DEFAULT_LINK_STYLE } from "@/lib/config/theme";
 import type { Theme } from "@/lib/config/theme";
+import { isAdultConfirmed, showAdultGate } from "./adult-gate";
 
 interface WinBackOverlayProps {
   pageId: string;
@@ -222,8 +223,21 @@ export function WinBackOverlay({
             color: ls.textColor,
             borderRadius: btnRadius,
           }}
-          onClick={() => {
-            beacon(pageId, "click");
+          onClick={(e) => {
+            if (!winBack.age_gate) {
+              beacon(pageId, "click");
+              return;
+            }
+            e.preventDefault();
+            if (isAdultConfirmed()) {
+              beacon(pageId, "click");
+              window.open(winBack.url, "_blank", "noopener,noreferrer");
+              return;
+            }
+            showAdultGate(() => {
+              beacon(pageId, "click");
+              window.open(winBack.url, "_blank", "noopener,noreferrer");
+            });
           }}
         >
           Yes, show me →

@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
+import { emailInUse } from "@/app/actions/account";
 
 type Mode = "signin" | "signup";
 type UsernameState = "idle" | "checking" | "available" | "taken" | "invalid";
@@ -56,13 +57,16 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState(prefilledUsername);
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailInUseError, setEmailInUseError] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
+  const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
   const [usernameTouched, setUsernameTouched] = useState(false);
 
   const [usernameState, setUsernameState] = useState<UsernameState>("idle");
@@ -107,6 +111,10 @@ export function LoginForm() {
     ? "Password must be at least 8 characters."
     : null;
 
+  const confirmPasswordError = confirmPasswordTouched && confirmPassword !== password
+    ? "Passwords don't match."
+    : null;
+
   const usernameError = usernameTouched && (usernameState === "invalid" || (usernameState === "idle" && username.length === 0))
     ? "3–20 characters, lowercase letters, numbers, underscores."
     : usernameTouched && usernameState === "taken"
@@ -114,18 +122,27 @@ export function LoginForm() {
     : null;
 
   const isFormValid = isValidEmail(email) && password.length >= 8 &&
-    (mode === "signin" || (USERNAME_RE.test(username) && usernameState === "available"));
+    (mode === "signin" || (
+      USERNAME_RE.test(username) &&
+      usernameState === "available" &&
+      confirmPassword === password
+    ));
 
   const clearMessages = () => {
     setError(null);
+    setEmailInUseError(false);
     setSuccessMessage(null);
   };
 
-  const handleModeSwitch = (m: Mode) => {
+  const handleModeSwitch = (m: Mode, prefillEmail?: string) => {
     setMode(m);
     setEmailTouched(false);
     setPasswordTouched(false);
+    setConfirmPasswordTouched(false);
     setUsernameTouched(false);
+    setPassword("");
+    setConfirmPassword("");
+    if (prefillEmail) setEmail(prefillEmail);
     clearMessages();
   };
 
@@ -133,7 +150,10 @@ export function LoginForm() {
     e.preventDefault();
     setEmailTouched(true);
     setPasswordTouched(true);
-    if (mode === "signup") setUsernameTouched(true);
+    if (mode === "signup") {
+      setConfirmPasswordTouched(true);
+      setUsernameTouched(true);
+    }
     if (!isFormValid) return;
 
     clearMessages();
@@ -141,6 +161,13 @@ export function LoginForm() {
 
     try {
       if (mode === "signup") {
+        const inUse = await emailInUse(email);
+        if (inUse) {
+          setEmailInUseError(true);
+          setLoading(false);
+          return;
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -153,6 +180,14 @@ export function LoginForm() {
           },
         });
         if (error) {
+          if (
+            error.message.toLowerCase().includes("already registered") ||
+            error.message.toLowerCase().includes("already exists")
+          ) {
+            setEmailInUseError(true);
+            setLoading(false);
+            return;
+          }
           if (error.message.includes("unique") || error.message.includes("duplicate")) {
             throw new Error("That username was just taken. Please choose another.");
           }
@@ -369,10 +404,31 @@ export function LoginForm() {
                   autoComplete="email"
                   required
                   disabled={loading}
-                  style={emailError ? inputErrorStyle : inputStyle}
+                  style={emailError || emailInUseError ? inputErrorStyle : inputStyle}
                 />
                 {emailError && (
                   <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>{emailError}</p>
+                )}
+                {emailInUseError && (
+                  <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>
+                    An account with this email already exists.{" "}
+                    <button
+                      type="button"
+                      onClick={() => handleModeSwitch("signin", email)}
+                      style={{
+                        color: '#dc2626',
+                        textDecoration: 'underline',
+                        textUnderlineOffset: 2,
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        font: 'inherit',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Sign in instead →
+                    </button>
+                  </p>
                 )}
               </div>
 
@@ -449,6 +505,30 @@ export function LoginForm() {
                   <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>{passwordError}</p>
                 )}
               </div>
+
+              {/* Confirm password — signup only */}
+              {mode === "signup" && (
+                <div>
+                  <label htmlFor="confirm-password" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6B6B6B', marginBottom: 6 }}>
+                    Confirm password
+                  </label>
+                  <input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => { setConfirmPassword(e.target.value); clearMessages(); }}
+                    onBlur={() => setConfirmPasswordTouched(true)}
+                    placeholder="Re-enter your password"
+                    autoComplete="new-password"
+                    required
+                    disabled={loading}
+                    style={confirmPasswordError ? inputErrorStyle : inputStyle}
+                  />
+                  {confirmPasswordError && (
+                    <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>{confirmPasswordError}</p>
+                  )}
+                </div>
+              )}
 
               {error && (
                 <div

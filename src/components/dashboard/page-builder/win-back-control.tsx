@@ -144,6 +144,18 @@ export function WinBackControl({ value, onChange, isPro }: WinBackControlProps) 
               className="w-full bg-surface-2 border border-border-strong text-text rounded-[var(--radius)] px-3 py-2 text-xs placeholder:text-text-subtle focus:outline-none focus:ring-1 focus:ring-white/20 disabled:opacity-40"
             />
           </div>
+
+          {/* 18+ gate toggle */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-text">Show 18+ confirmation before opening</p>
+              <p className="text-xs text-text-subtle mt-0.5">Visitor must confirm age before the Win-Back link opens</p>
+            </div>
+            <Toggle
+              checked={!!value.age_gate}
+              onToggle={() => onChange({ ...value, age_gate: !value.age_gate })}
+            />
+          </div>
         </div>
       )}
     </div>

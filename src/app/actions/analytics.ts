@@ -113,13 +113,13 @@ export async function getAnalyticsData(
       .lte("created_at", prevEndDate.toISOString()),
     supabase
       .from("page_links")
-      .select("id, label, url")
+      .select("id, label, url, item_type")
       .eq("page_id", pageId),
   ]);
 
   const events = eventsRes.data ?? [];
   const prevEvents = prevEventsRes.data ?? [];
-  const links = linksRes.data ?? [];
+  const links = (linksRes.data ?? []).filter((l) => (l.item_type ?? "button") === "button");
 
   const views = events.filter((e) => e.kind === "view").length;
   const clicks = events.filter((e) => e.kind === "click").length;

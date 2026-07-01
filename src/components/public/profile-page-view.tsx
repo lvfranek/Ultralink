@@ -13,6 +13,7 @@ import {
   gradientEndColor,
 } from "@/lib/config/theme";
 import { SocialIcon } from "./social-icon";
+import { isAdultConfirmed, showAdultGate } from "./adult-gate";
 
 interface ProfilePageViewProps {
   page: Pick<Page, "slug" | "title" | "bio" | "avatar_url" | "avatar_style" | "active_badge">;
@@ -20,97 +21,47 @@ interface ProfilePageViewProps {
   socials: PageSocial[];
   theme?: Theme | Record<string, unknown> | null;
   isPreview?: boolean;
+  /** Free plans show the "Build your own" CTA card above the footer; Pro pages show no promotion. */
+  isPro?: boolean;
 }
 
-// ─── 18+ interstitial ─────────────────────────────────────────────────────────
-
-const SESSION_KEY = "ultralink_adult_confirmed";
-
-let _resolveGate: ((proceed: boolean) => void) | null = null;
-
-function showGate(destination: string) {
-  const existing = document.getElementById("__ul_gate");
-  if (existing) return;
-
-  const overlay = document.createElement("div");
-  overlay.id = "__ul_gate";
-  Object.assign(overlay.style, {
-    position: "fixed", inset: "0", zIndex: "9999",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    background: "rgba(0,0,0,0.85)", padding: "1rem",
-  });
-
-  const box = document.createElement("div");
-  Object.assign(box.style, {
-    background: "#18181b", border: "1px solid #3f3f46",
-    borderRadius: "1rem", padding: "2rem", maxWidth: "340px",
-    width: "100%", textAlign: "center",
-  });
-
-  const badge = document.createElement("div");
-  badge.textContent = "18+";
-  Object.assign(badge.style, {
-    display: "inline-block", fontSize: "1.5rem", fontWeight: "700",
-    color: "#e4e4e7", marginBottom: "1rem",
-  });
-
-  const msg = document.createElement("p");
-  msg.textContent = "This link may contain adult content. Are you 18 or older?";
-  Object.assign(msg.style, {
-    color: "#a1a1aa", fontSize: "0.875rem", lineHeight: "1.5", marginBottom: "1.5rem",
-  });
-
-  const btnYes = document.createElement("button");
-  btnYes.textContent = "Yes, continue";
-  Object.assign(btnYes.style, {
-    display: "block", width: "100%", padding: "0.75rem",
-    background: "#C9A86A", color: "#0A0A0B", fontWeight: "600",
-    fontSize: "0.875rem", borderRadius: "0.5rem", border: "none",
-    cursor: "pointer", marginBottom: "0.5rem",
-  });
-
-  const btnNo = document.createElement("button");
-  btnNo.textContent = "No, go back";
-  Object.assign(btnNo.style, {
-    display: "block", width: "100%", padding: "0.75rem",
-    background: "transparent", color: "#71717a", fontWeight: "500",
-    fontSize: "0.875rem", borderRadius: "0.5rem",
-    border: "1px solid #3f3f46", cursor: "pointer",
-  });
-
-  btnYes.addEventListener("click", () => {
-    sessionStorage.setItem(SESSION_KEY, "1");
-    document.body.removeChild(overlay);
-    window.open(destination, "_blank", "noopener,noreferrer");
-  });
-
-  btnNo.addEventListener("click", () => {
-    document.body.removeChild(overlay);
-  });
-
-  box.appendChild(badge);
-  box.appendChild(msg);
-  box.appendChild(btnYes);
-  box.appendChild(btnNo);
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
+// Approximates whether a hex color reads as "light" (used to detect dark vs. light themes,
+// since we only ever compute a per-theme text color, never a first-class "is this dark" flag).
+function isLightColor(hex: string): boolean {
+  const m = hex.replace("#", "");
+  if (m.length !== 6 && m.length !== 3) return true;
+  const full = m.length === 3 ? m.split("").map((c) => c + c).join("") : m;
+  const r = parseInt(full.substring(0, 2), 16) / 255;
+  const g = parseInt(full.substring(2, 4), 16) / 255;
+  const b = parseInt(full.substring(4, 6), 16) / 255;
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.5;
 }
 
 // ─── Background layer helper ──────────────────────────────────────────────────
 
-function BgLayer({ pageBgIsImage, value, overlay, className = "absolute inset-0" }: {
+function BgLayer({ pageBgIsImage, value, overlay, blur = 0, className = "absolute inset-0" }: {
   pageBgIsImage: boolean;
   value: string;
   overlay: number;
+  blur?: number;
   className?: string;
 }) {
   if (pageBgIsImage) {
     return (
       <>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={value} alt="" aria-hidden className={`${className} w-full h-full object-cover`} />
+        <img
+          src={value}
+          alt=""
+          aria-hidden
+          className={`${className} w-full h-full object-cover`}
+          style={blur > 0 ? { filter: `blur(${blur}px)`, transform: "scale(1.05)" } : undefined}
+        />
         {overlay > 0 && (
-          <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${overlay})` }} />
+          <div
+            className="absolute inset-0"
+            style={{ background: "#000000", opacity: overlay, mixBlendMode: "multiply" }}
+          />
         )}
       </>
     );
@@ -120,7 +71,7 @@ function BgLayer({ pageBgIsImage, value, overlay, className = "absolute inset-0"
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
-export function ProfilePageView({ page, links, socials, theme: rawTheme, isPreview }: ProfilePageViewProps) {
+export function ProfilePageView({ page, links, socials, theme: rawTheme, isPreview, isPro }: ProfilePageViewProps) {
   const theme: Theme = rawTheme && typeof rawTheme === "object" && "preset" in rawTheme
     ? (rawTheme as Theme)
     : resolveTheme(rawTheme as Record<string, unknown>);
@@ -132,12 +83,20 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
 
   const pageBgIsImage = t.pageBg.type === "image" && !!t.pageBg.value;
   const overlay = t.pageBg.overlay ?? 0;
+  const bgBlur = t.pageBg.blur ?? 0;
 
   const heroFadeColor: string = (() => {
     if (t.pageBg.type === "color") return t.pageBg.value;
     if (t.pageBg.type === "gradient") return gradientEndColor(t.pageBg.value);
     return "#000000";
   })();
+
+  const isDarkTheme = isLightColor(t.colors.name);
+  const ctaBaseColor = t.pageBg.type === "color"
+    ? t.pageBg.value
+    : t.pageBg.type === "gradient"
+    ? gradientEndColor(t.pageBg.value)
+    : (isDarkTheme ? "#0A0A0A" : "#FFFFFF");
 
   // Keep html/body background in sync so iOS overscroll matches the page theme
   useEffect(() => {
@@ -204,14 +163,6 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
         </div>
       )}
 
-      {/* Active badge */}
-      {page.active_badge && (
-        <div className="flex items-center gap-1.5 mb-3 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs font-medium text-emerald-400">Active now</span>
-        </div>
-      )}
-
       {/* Name */}
       {page.title && (
         <h1
@@ -226,6 +177,14 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
       <p className="text-center text-sm mb-3" style={{ color: handleColor }}>
         @{page.slug}
       </p>
+
+      {/* Active badge */}
+      {page.active_badge && (
+        <div className="flex items-center gap-1.5 mb-3 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-xs font-medium text-emerald-400">Active now</span>
+        </div>
+      )}
 
       {/* Bio */}
       {page.bio && (
@@ -263,14 +222,18 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
             className="w-full space-y-3"
             aria-label={`${page.title || page.slug}'s links`}
           >
-            {links.map((link, index) => (
-              <LinkButton
-                key={link.id}
-                link={link}
-                index={index}
-                isPreview={isPreview ?? false}
-              />
-            ))}
+            {links.map((link, index) =>
+              link.item_type === "heading" ? (
+                <HeadingItem key={link.id} label={link.label} color={nameColor} bodyFont={bodyFont} />
+              ) : (
+                <LinkButton
+                  key={link.id}
+                  link={link}
+                  index={index}
+                  isPreview={isPreview ?? false}
+                />
+              )
+            )}
           </nav>
         ) : (
           !isPreview && (
@@ -280,6 +243,29 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
           )
         )}
       </div>
+
+      {/* Free-plan CTA — Pro pages show no Ultralink promotion at all */}
+      {!isPro && (
+        <a
+          href="https://ultralink.bio"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex flex-col items-center gap-0.5 text-center mt-4 px-4 py-2.5 rounded-2xl transition-all duration-150 hover:-translate-y-0.5 hover:brightness-110"
+          style={{
+            background: isDarkTheme
+              ? `color-mix(in srgb, ${ctaBaseColor} 100%, white 6%)`
+              : `color-mix(in srgb, ${ctaBaseColor} 100%, black 4%)`,
+            border: `1px solid ${isDarkTheme ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+          }}
+        >
+          <span className="text-sm font-medium" style={{ color: nameColor, fontFamily: bodyFont }}>
+            Build your own link hub — free.
+          </span>
+          <span className="text-xs" style={{ color: handleColor, opacity: 0.7, fontFamily: bodyFont }}>
+            Get yours at ultralink.bio →
+          </span>
+        </a>
+      )}
     </div>
     </>
   );
@@ -303,7 +289,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
        * `md:hidden` would suppress the background on any desktop viewport.
        */}
       <div className={`${isPreview ? "" : "md:hidden "}absolute inset-0 overflow-hidden`} aria-hidden>
-        <BgLayer pageBgIsImage={pageBgIsImage} value={t.pageBg.value} overlay={overlay} />
+        <BgLayer pageBgIsImage={pageBgIsImage} value={t.pageBg.value} overlay={overlay} blur={bgBlur} />
       </div>
 
       {/* ── Desktop: fixed blurred-avatar backdrop (hidden on <768px) ── */}
@@ -326,7 +312,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
             />
           ) : (
             /* No avatar — fall back to the theme background unmodified */
-            <BgLayer pageBgIsImage={pageBgIsImage} value={t.pageBg.value} overlay={overlay} />
+            <BgLayer pageBgIsImage={pageBgIsImage} value={t.pageBg.value} overlay={overlay} blur={bgBlur} />
           )}
         </div>
       )}
@@ -339,13 +325,13 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
           className={[
             "w-full relative overflow-hidden",
             // Desktop card shape (public page only)
-            !isPreview && "md:max-w-[480px] md:rounded-[32px] md:shadow-[0_8px_64px_rgba(0,0,0,0.5)]",
+            !isPreview && "md:max-w-[480px] md:rounded-[32px] md:shadow-[0_10px_40px_rgba(0,0,0,.35),0_4px_12px_rgba(0,0,0,.25)]",
           ].filter(Boolean).join(" ")}
         >
           {/* Desktop card background — suppressed in preview (mobile bg covers everything) */}
           {!isPreview && (
             <div className="hidden md:block absolute inset-0" aria-hidden>
-              <BgLayer pageBgIsImage={pageBgIsImage} value={t.pageBg.value} overlay={overlay} />
+              <BgLayer pageBgIsImage={pageBgIsImage} value={t.pageBg.value} overlay={overlay} blur={bgBlur} />
             </div>
           )}
 
@@ -353,18 +339,9 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
         </div>
       </div>
 
-      {/* ── Footer ── */}
+      {/* ── Footer — legal row only; Ultralink promotion lives in the CTA card above (Free plans only) ── */}
       {!isPreview && (
         <div className="relative flex flex-col items-center gap-4 mt-12 pb-8 px-4">
-          <a
-            href="https://ultralink.bio"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs hover:opacity-70 transition-opacity"
-            style={{ color: handleColor, opacity: 0.45 }}
-          >
-            Powered by <span className="font-medium">ultralink</span>
-          </a>
           <div className="flex items-center gap-4" style={{ opacity: 0.3 }}>
             <a href="/privacy" className="text-xs hover:opacity-70 transition-opacity" style={{ color: handleColor }}>
               Privacy
@@ -390,6 +367,18 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
 
 // ─── Individual link button ───────────────────────────────────────────────────
 
+function HeadingItem({ label, color, bodyFont }: { label: string; color: string; bodyFont: string }) {
+  if (!label.trim()) return null;
+  return (
+    <p
+      className="w-full text-center text-xs font-semibold uppercase tracking-widest pt-2"
+      style={{ color, opacity: 0.75, fontFamily: bodyFont }}
+    >
+      {label}
+    </p>
+  );
+}
+
 function LinkButton({ link, index, isPreview }: { link: PageLink; index: number; isPreview: boolean }) {
   const ls = resolveLinkStyle(link);
   const btnRadius = cornerRadius(ls.corner);
@@ -399,11 +388,9 @@ function LinkButton({ link, index, isPreview }: { link: PageLink; index: number;
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     if (!link.is_adult || isPreview) return;
-    if (typeof window === "undefined") return;
-    const confirmed = sessionStorage.getItem(SESSION_KEY) === "1";
-    if (confirmed) return;
+    if (isAdultConfirmed()) return;
     e.preventDefault();
-    showGate(redirectHref);
+    showAdultGate(() => window.open(redirectHref, "_blank", "noopener,noreferrer"));
   }
 
   return (

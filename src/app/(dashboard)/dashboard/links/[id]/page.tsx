@@ -10,7 +10,7 @@ import type { Page, PageLink, PageSocial, SubscriptionStatus } from "@/lib/supab
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Ultralink Dashboard",
+  title: "Ultralink Links",
   robots: { index: false, follow: false },
 };
 

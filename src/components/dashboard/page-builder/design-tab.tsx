@@ -16,10 +16,11 @@ import {
   cornerRadius,
 } from "@/lib/config/theme";
 import { FieldRow } from "./panel-primitives";
+import type { PageLink } from "@/lib/supabase/types";
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
-function patchTheme(theme: Theme, partial: Partial<Theme>): Theme {
+export function patchTheme(theme: Theme, partial: Partial<Theme>): Theme {
   return { ...theme, ...partial, preset: "custom" as const };
 }
 
@@ -124,11 +125,12 @@ export function ColorPickerField({
         style={{ zIndex: 9998 }}
         onClick={() => setOpen(false)}
       />
-      {/* Picker popover */}
+      {/* Picker popover — hardcoded dark bg; the page-builder editor stays dark
+          even though --color-surface resolves to the light dashboard-chrome token */}
       <div
         style={{
           ...popoverStyle,
-          background: "var(--color-surface, #1A1A1A)",
+          background: "#1A1A1A",
           border: "1px solid rgba(255,255,255,.12)",
           borderRadius: "var(--radius, 0.75rem)",
           padding: "0.75rem",
@@ -145,9 +147,9 @@ export function ColorPickerField({
           }}
           className="mt-2 w-full font-mono text-xs rounded px-2 py-1.5 focus:outline-none uppercase"
           style={{
-            background: "rgba(255,255,255,.06)",
-            border: "1px solid rgba(255,255,255,.12)",
-            color: "#ffffff",
+            background: "#1A1A1A",
+            border: "1px solid rgba(255,255,255,.1)",
+            color: "#FFFFFF",
           }}
           maxLength={7}
           spellCheck={false}
@@ -292,19 +294,49 @@ function PresetThumb({ presetKey, active }: { presetKey: PresetKey; active: bool
 interface ThemeProps {
   theme: Theme;
   userId: string;
+  links: PageLink[];
   onChange: (theme: Theme) => void;
   onPresetApply: (key: PresetKey, linkStyle: LinkStyle) => void;
 }
 
-export function PresetsContent({ theme, userId, onChange, onPresetApply }: ThemeProps) {
+/** Has the user diverged from the currently active preset's own defaults? */
+function hasCustomWork(theme: Theme, links: PageLink[]): boolean {
+  if (theme.preset === "custom") return true;
+  const activeStyle = PRESETS[theme.preset].linkStyle;
+  return links.some(
+    (l) =>
+      l.fill_type !== activeStyle.fillType ||
+      l.fill_value !== activeStyle.fillValue ||
+      l.text_color !== activeStyle.textColor ||
+      l.corner !== activeStyle.corner ||
+      l.animation !== activeStyle.animation
+  );
+}
+
+export function PresetsContent({ theme, userId, links, onChange, onPresetApply }: ThemeProps) {
   const [bgUploading, setBgUploading] = useState(false);
   const [bgUploadError, setBgUploadError] = useState<string | null>(null);
   const bgFileRef = useRef<HTMLInputElement>(null);
+  const [pendingPreset, setPendingPreset] = useState<PresetKey | null>(null);
 
   function applyPreset(key: PresetKey) {
     const preset = PRESETS[key];
     onChange(preset.theme);
     onPresetApply(key, preset.linkStyle);
+  }
+
+  function handlePresetClick(key: PresetKey) {
+    if (theme.preset === key) return;
+    if (hasCustomWork(theme, links)) {
+      setPendingPreset(key);
+    } else {
+      applyPreset(key);
+    }
+  }
+
+  function confirmPendingPreset() {
+    if (pendingPreset) applyPreset(pendingPreset);
+    setPendingPreset(null);
   }
 
   function setPageBgType(type: Theme["pageBg"]["type"]) {
@@ -346,7 +378,7 @@ export function PresetsContent({ theme, userId, onChange, onPresetApply }: Theme
           <button
             key={key}
             type="button"
-            onClick={() => applyPreset(key)}
+            onClick={() => handlePresetClick(key)}
             className="flex flex-col gap-1 cursor-pointer group text-left"
           >
             <PresetThumb presetKey={key} active={theme.preset === key} />
@@ -413,7 +445,7 @@ export function PresetsContent({ theme, userId, onChange, onPresetApply }: Theme
               {bgUploadError && <p className="text-xs text-red-400">{bgUploadError}</p>}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-xs text-text-muted">Overlay</p>
+                  <p className="text-xs text-text-muted">Visibility</p>
                   <span className="text-xs text-text-subtle">{Math.round(theme.pageBg.overlay * 100)}%</span>
                 </div>
                 <input
@@ -426,10 +458,65 @@ export function PresetsContent({ theme, userId, onChange, onPresetApply }: Theme
                   className="w-full accent-gold h-1.5 cursor-pointer"
                 />
               </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs text-text-muted">Blur</p>
+                  <span className="text-xs text-text-subtle">{theme.pageBg.blur ?? 0}px</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={40}
+                  step={1}
+                  value={theme.pageBg.blur ?? 0}
+                  onChange={(e) => onChange(patchTheme(theme, { pageBg: { ...theme.pageBg, blur: parseInt(e.target.value, 10) } }))}
+                  className="w-full accent-gold h-1.5 cursor-pointer"
+                />
+              </div>
             </div>
           )}
         </div>
       </div>
+
+      {pendingPreset && (
+        <div
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+          onClick={(e) => { if (e.target === e.currentTarget) setPendingPreset(null); }}
+        >
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="w-full max-w-sm rounded-2xl p-6"
+              style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.12)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-base font-semibold mb-2" style={{ color: "#ffffff" }}>
+                Apply {PRESET_META[pendingPreset].label} theme?
+              </h2>
+              <p className="text-sm mb-5" style={{ color: "#9A9A9A" }}>
+                This will replace your current colors, fonts, and button styling. Custom changes will be lost.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPendingPreset(null)}
+                  className="flex-1 py-2 text-xs font-medium border rounded-full transition-colors cursor-pointer"
+                  style={{ color: "#9A9A9A", borderColor: "rgba(255,255,255,.12)" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmPendingPreset}
+                  className="flex-1 py-2 text-xs font-semibold rounded-full transition-all cursor-pointer"
+                  style={{ background: "#ffffff", color: "#000000" }}
+                >
+                  Apply {PRESET_META[pendingPreset].label}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -504,14 +591,6 @@ export function ColorsContent({ theme, onChange }: ColorsProps) {
           label="Handle color"
           value={theme.colors.handle}
           onChange={(v) => onChange(patchTheme(theme, { colors: { ...theme.colors, handle: v } }))}
-          inline
-        />
-      </FieldRow>
-      <FieldRow label="Icons">
-        <ColorPickerField
-          label="Icons color"
-          value={theme.colors.icons}
-          onChange={(v) => onChange(patchTheme(theme, { colors: { ...theme.colors, icons: v } }))}
           inline
         />
       </FieldRow>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useTransition, useEffect, useCallback } from "react";
+import { useState, useRef, useTransition, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import {
   DndContext,
   closestCenter,
@@ -27,7 +27,7 @@ import type { PageLink, PageSocial } from "@/lib/supabase/types";
 import type { LinkStyle } from "@/lib/config/theme";
 import { resolveLinkStyle, BUTTON_CORNERS, ANIMATIONS, cornerRadius } from "@/lib/config/theme";
 import { ColorPickerField, GradientBuilder, SegmentedControl } from "./design-tab";
-import { SettingsCard } from "./panel-primitives";
+import { SettingsCard, FieldRow } from "./panel-primitives";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -56,11 +56,17 @@ interface LinkItemProps {
   onDirtyChange: (id: string, dirty: boolean) => void;
 }
 
-function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirtyChange }: LinkItemProps) {
+export interface LinkItemHandle {
+  flush: () => Promise<{ ok: true } | { ok: false; error: string }>;
+}
+
+const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirtyChange }, ref) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: link.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
 
-  const [expanded, setExpanded] = useState(false);
+  const isHeading = link.item_type === "heading";
+  const [expanded, setExpanded] = useState(isHeading && !link.label);
+  const labelInputRef = useRef<HTMLInputElement>(null);
   const [label, setLabel] = useState(link.label);
   const [url, setUrl] = useState(link.url);
   const [isAdult, setIsAdult] = useState(link.is_adult);
@@ -98,6 +104,12 @@ function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirty
     return () => onDirtyChange(link.id, false);
   }, [dirty, link.id, onDirtyChange]);
 
+  // New empty headings open expanded with focus straight in the label field.
+  useEffect(() => {
+    if (isHeading && expanded && !link.label) labelInputRef.current?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Update live preview immediately whenever style changes
   function updateStyle(patch: Partial<LinkStyle>) {
     const next = { ...linkStyle, ...patch };
@@ -111,7 +123,7 @@ function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirty
     });
   }
 
-  async function save() {
+  async function save(): Promise<{ ok: true } | { ok: false; error: string }> {
     setSaving(true);
     setError(null);
     const result = await updateLink(link.id, {
@@ -129,29 +141,32 @@ function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirty
     setSaving(false);
     if ("error" in result) {
       setError(result.error);
-    } else {
-      savedStyleRef.current = linkStyle;
-      onUpdate({
-        ...link,
-        label, url, is_adult: isAdult, icon: selectedIcon, thumbnail_url: thumbnailUrl,
-        fill_type: linkStyle.fillType, fill_value: linkStyle.fillValue, text_color: linkStyle.textColor,
-        corner: linkStyle.corner, animation: linkStyle.animation,
-      });
-      setExpanded(false);
+      return { ok: false, error: result.error };
     }
+    savedStyleRef.current = linkStyle;
+    onUpdate({
+      ...link,
+      label, url, is_adult: isAdult, icon: selectedIcon, thumbnail_url: thumbnailUrl,
+      fill_type: linkStyle.fillType, fill_value: linkStyle.fillValue, text_color: linkStyle.textColor,
+      corner: linkStyle.corner, animation: linkStyle.animation,
+    });
+    return { ok: true };
   }
 
+  // `save` intentionally isn't memoized — it closes over this render's field state,
+  // so the handle must be rebuilt every render to always flush the latest edits.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useImperativeHandle(ref, () => ({
+    flush: async () => {
+      if (!dirty) return { ok: true };
+      return save();
+    },
+  }), [dirty, save]);
+
   function handleToggleExpanded() {
-    if (saving) return;
-    if (!expanded) {
-      setExpanded(true);
-    } else {
-      if (dirty) {
-        save();
-      } else {
-        setExpanded(false);
-      }
-    }
+    // Collapsing/expanding never persists — edits are only ever written on the
+    // page-level Save button via the imperative `flush` handle above.
+    setExpanded((v) => !v);
   }
 
   async function handleThumbUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -207,7 +222,7 @@ function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirty
       className="rounded-[12px] overflow-hidden"
     >
       {/* Row header */}
-      <div className="flex items-center gap-2 px-3 py-3">
+      <div className={`flex items-center gap-2 px-3 ${isHeading ? "py-2" : "py-3"}`}>
         <button
           type="button"
           {...attributes}
@@ -220,34 +235,44 @@ function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirty
           </svg>
         </button>
 
-        {/* Colour swatch preview */}
-        <span
-          className="w-5 h-5 rounded-sm flex-shrink-0 border border-black/10"
-          style={{ background: btnBg, borderRadius: btnRadius === '9999px' ? '9999px' : '4px' }}
-        />
+        {isHeading ? (
+          <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-[11px] font-bold text-text-subtle border border-border-strong rounded">
+            H
+          </span>
+        ) : (
+          <>
+            {/* Colour swatch preview */}
+            <span
+              className="w-5 h-5 rounded-sm flex-shrink-0 border border-black/10"
+              style={{ background: btnBg, borderRadius: btnRadius === '9999px' ? '9999px' : '4px' }}
+            />
 
-        {thumbnailUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumbnailUrl} alt="" className="w-8 h-8 rounded object-cover flex-shrink-0" />
-        )}
+            {thumbnailUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={thumbnailUrl} alt="" className="w-8 h-8 rounded object-cover flex-shrink-0" />
+            )}
 
-        {selectedIcon && !thumbnailUrl && (
-          selectedIcon.startsWith("http") ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={selectedIcon} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
-          ) : (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 flex-shrink-0 text-text-muted">
-              <path strokeLinecap="round" strokeLinejoin="round" d={ICON_OPTIONS.find(i => i.id === selectedIcon)?.path} />
-            </svg>
-          )
+            {selectedIcon && !thumbnailUrl && (
+              selectedIcon.startsWith("http") ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={selectedIcon} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 flex-shrink-0 text-text-muted">
+                  <path strokeLinecap="round" strokeLinejoin="round" d={ICON_OPTIONS.find(i => i.id === selectedIcon)?.path} />
+                </svg>
+              )
+            )}
+          </>
         )}
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-text truncate">{link.label || "Untitled"}</p>
-          <p className="text-xs text-text-subtle truncate">{link.url}</p>
+          <p className="text-sm font-medium text-text truncate">
+            {link.label || (isHeading ? "Untitled heading" : "Untitled")}
+          </p>
+          {!isHeading && <p className="text-xs text-text-subtle truncate">{link.url}</p>}
         </div>
 
-        {link.is_adult && (
+        {!isHeading && link.is_adult && (
           <span className="text-[10px] font-bold text-text-subtle border border-border-strong rounded px-1 flex-shrink-0">18+</span>
         )}
 
@@ -269,7 +294,35 @@ function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirty
       </div>
 
       {/* Expanded editor */}
-      {expanded && (
+      {expanded && isHeading && (
+        <div className="border-t border-border px-3 py-4 space-y-5">
+          <div>
+            <label className="block text-xs font-medium text-text-muted mb-1">Heading text</label>
+            <input
+              ref={labelInputRef}
+              type="text"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="Section heading"
+              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+            />
+          </div>
+
+          {error && <p className="text-xs text-red-400">{error}</p>}
+
+          <div className="flex items-center justify-end pt-1">
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isPending}
+              className="px-3 py-2 text-xs text-red-400 border border-red-800/40 rounded-[var(--radius-sm)] hover:bg-red-950/30 transition-colors disabled:opacity-40 cursor-pointer"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      )}
+      {expanded && !isHeading && (
         <div className="border-t border-border px-3 py-4 space-y-5">
           {/* Label + URL */}
           <div className="grid grid-cols-1 gap-3">
@@ -460,7 +513,7 @@ function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirty
       )}
     </div>
   );
-}
+});
 
 // ─── Social item ──────────────────────────────────────────────────────────────
 
@@ -606,9 +659,16 @@ interface LinksTabProps {
   socials: PageSocial[];
   onSocialsChange: (socials: PageSocial[]) => void;
   onDirtyChange?: (hasDirty: boolean) => void;
+  iconsColor: string;
+  onIconsColorChange: (color: string) => void;
 }
 
-export function LinksTab({ pageId, userId, links, onLinksChange, socials, onSocialsChange, onDirtyChange }: LinksTabProps) {
+export interface LinksTabHandle {
+  /** Persists every unsaved per-link edit. Called by the page-level Save button. */
+  flushDirtyLinks: () => Promise<{ ok: true } | { ok: false; error: string }>;
+}
+
+export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function LinksTab({ pageId, userId, links, onLinksChange, socials, onSocialsChange, onDirtyChange, iconsColor, onIconsColorChange }, ref) {
   const [adding, setAdding] = useState(false);
   const [newLabel, setNewLabel] = useState("");
   const [newUrl, setNewUrl] = useState("");
@@ -622,6 +682,19 @@ export function LinksTab({ pageId, userId, links, onLinksChange, socials, onSoci
   const [isAddingSocial, startAddingSocial] = useTransition();
 
   const [dirtyLinkIds, setDirtyLinkIds] = useState<Set<string>>(new Set());
+  const linkItemRefs = useRef<Map<string, LinkItemHandle>>(new Map());
+
+  useImperativeHandle(ref, () => ({
+    flushDirtyLinks: async () => {
+      for (const link of links) {
+        const handle = linkItemRefs.current.get(link.id);
+        if (!handle) continue;
+        const result = await handle.flush();
+        if (!result.ok) return result;
+      }
+      return { ok: true };
+    },
+  }), [links]);
 
   const linksSensors = useSensors(
     useSensor(PointerSensor),
@@ -683,6 +756,18 @@ export function LinksTab({ pageId, userId, links, onLinksChange, socials, onSoci
     });
   }
 
+  function handleAddHeading() {
+    setAddError(null);
+    startAdding(async () => {
+      const result = await addLink(pageId, { label: "", url: "", item_type: "heading" });
+      if ("error" in result) {
+        setAddError(result.error);
+      } else if (result.link) {
+        onLinksChange([...links, result.link]);
+      }
+    });
+  }
+
   function handleAddSocialSubmit() {
     setAddSocialError(null);
     startAddingSocial(async () => {
@@ -711,12 +796,16 @@ export function LinksTab({ pageId, userId, links, onLinksChange, socials, onSoci
           </div>
         )}
 
-        <DndContext sensors={linksSensors} collisionDetection={closestCenter} onDragEnd={handleLinksDragEnd}>
+        <DndContext id="links-dnd" sensors={linksSensors} collisionDetection={closestCenter} onDragEnd={handleLinksDragEnd}>
           <SortableContext items={links.map((l) => l.id)} strategy={verticalListSortingStrategy}>
             <div className="space-y-2 mb-2">
               {links.map((link) => (
                 <LinkItem
                   key={link.id}
+                  ref={(handle) => {
+                    if (handle) linkItemRefs.current.set(link.id, handle);
+                    else linkItemRefs.current.delete(link.id);
+                  }}
                   link={link}
                   pageId={pageId}
                   userId={userId}
@@ -768,13 +857,23 @@ export function LinksTab({ pageId, userId, links, onLinksChange, socials, onSoci
             </div>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => setAdding(true)}
-            className="w-full py-2.5 border border-dashed border-gold/30 text-gold text-sm font-medium rounded-[var(--radius)] hover:border-gold/60 hover:bg-gold-dim transition-all cursor-pointer"
-          >
-            + Add button
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setAdding(true)}
+              className="flex-1 py-2.5 border border-dashed border-gold/30 text-gold text-sm font-medium rounded-[var(--radius)] hover:border-gold/60 hover:bg-gold-dim transition-all cursor-pointer"
+            >
+              + Add button
+            </button>
+            <button
+              type="button"
+              onClick={handleAddHeading}
+              disabled={isAdding}
+              className="flex-1 py-2.5 border border-dashed border-border-strong/60 text-text-muted text-sm font-medium rounded-[var(--radius)] hover:border-border-strong hover:bg-surface transition-all cursor-pointer disabled:opacity-50"
+            >
+              + Add heading
+            </button>
+          </div>
         )}
       </SettingsCard>
 
@@ -783,6 +882,17 @@ export function LinksTab({ pageId, userId, links, onLinksChange, socials, onSoci
         title="Social icons"
         summary={socials.length > 0 ? `${socials.length} icon${socials.length !== 1 ? "s" : ""}` : "None yet"}
       >
+        <div className="mb-3 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+          <FieldRow label="Color">
+            <ColorPickerField
+              label="Social icons color"
+              value={iconsColor}
+              onChange={onIconsColorChange}
+              inline
+            />
+          </FieldRow>
+        </div>
+
         {socials.length === 0 && !addingSocial && (
           <div className="text-center py-6 text-text-muted">
             <p className="text-sm mb-1">No social icons yet</p>
@@ -790,7 +900,7 @@ export function LinksTab({ pageId, userId, links, onLinksChange, socials, onSoci
           </div>
         )}
 
-        <DndContext sensors={socialsSensors} collisionDetection={closestCenter} onDragEnd={handleSocialsDragEnd}>
+        <DndContext id="socials-dnd" sensors={socialsSensors} collisionDetection={closestCenter} onDragEnd={handleSocialsDragEnd}>
           <SortableContext items={socials.map((s) => s.id)} strategy={verticalListSortingStrategy}>
             <div className="space-y-2 mb-2">
               {socials.map((social) => (
@@ -863,4 +973,4 @@ export function LinksTab({ pageId, userId, links, onLinksChange, socials, onSoci
 
     </div>
   );
-}
+});

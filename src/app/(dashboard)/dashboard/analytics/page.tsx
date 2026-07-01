@@ -9,7 +9,7 @@ import { AnalyticsUpgradeCTA } from "./analytics-upgrade-cta";
 import type { SubscriptionStatus } from "@/lib/supabase/types";
 
 export const metadata: Metadata = {
-  title: "Analytics — Ultralink",
+  title: "Ultralink Analytics",
   robots: { index: false, follow: false },
 };
 

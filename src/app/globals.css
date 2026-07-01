@@ -116,24 +116,48 @@ body {
 /* Theme animations — permanent loops on link buttons; respects reduced-motion */
 @keyframes theme-bounce {
   0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-4px); }
+  50%       { transform: translateY(-10px); }
 }
 @keyframes theme-shake {
-  0%, 100% { transform: rotate(0deg); }
-  25%       { transform: rotate(-1deg); }
-  75%       { transform: rotate(1deg); }
+  0%, 100% { transform: rotate(-2.5deg); }
+  50%       { transform: rotate(2.5deg); }
 }
 @keyframes theme-pulse {
   0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.025); }
+  50%       { transform: scale(1.06); }
 }
 
-.theme-anim-bounce { animation: theme-bounce 1.8s ease-in-out infinite; }
-.theme-anim-shake  { animation: theme-shake  2.4s ease-in-out infinite; }
-.theme-anim-pulse  { animation: theme-pulse  2.0s ease-in-out infinite; }
+.theme-anim-bounce { animation: theme-bounce 1.4s ease-in-out infinite; }
+.theme-anim-shake  { animation: theme-shake  1.6s ease-in-out infinite; }
+.theme-anim-pulse  { animation: theme-pulse  1.4s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .theme-anim-bounce,
   .theme-anim-shake,
   .theme-anim-pulse { animation: none; }
+}
+
+/* Analytics custom date-range popover — dark theme for react-day-picker */
+.ul-daypicker .rdp-root {
+  --rdp-accent-color: #ffffff;
+  --rdp-accent-background-color: rgba(255,255,255,.14);
+  --rdp-today-color: #ffffff;
+  --rdp-range_start-color: #000000;
+  --rdp-range_end-color: #000000;
+  --rdp-range_start-date-background-color: #ffffff;
+  --rdp-range_end-date-background-color: #ffffff;
+  --rdp-disabled-opacity: 0.35;
+  --rdp-outside-opacity: 0.4;
+  color: #ffffff;
+}
+.ul-daypicker .rdp-day_button:hover:not([disabled]) {
+  background-color: #2A2A2A;
+  border-radius: 100%;
+}
+.ul-daypicker .rdp-weekday {
+  color: #6B6B6B;
+}
+.ul-daypicker .rdp-caption_label,
+.ul-daypicker .rdp-nav button {
+  color: #ffffff;
 }

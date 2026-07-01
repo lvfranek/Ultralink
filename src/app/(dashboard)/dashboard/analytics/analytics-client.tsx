@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useCallback, Suspense } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -16,6 +17,7 @@ import {
 } from "recharts";
 import { getAnalyticsData, type AnalyticsData } from "@/app/actions/analytics";
 import { getCountryName, flagEmoji } from "@/lib/countries";
+import { CustomRangePopover, RANGE_OPTIONS, type RangeKey } from "./date-range-picker";
 
 interface Page {
   id: string;
@@ -29,34 +31,68 @@ interface Props {
 
 // ─── Date range helpers ───────────────────────────────────────────────────────
 
+function pad(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+function toStr(d: Date): string {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
+  return toStr(new Date());
 }
 
 function daysAgoStr(n: number): string {
   const d = new Date();
   d.setDate(d.getDate() - n);
-  return d.toISOString().slice(0, 10);
+  return toStr(d);
+}
+
+function startOfMonthStr(monthsAgo = 0): string {
+  const d = new Date();
+  d.setDate(1);
+  d.setMonth(d.getMonth() - monthsAgo);
+  return toStr(d);
+}
+
+function endOfMonthStr(monthsAgo = 0): string {
+  const d = new Date();
+  d.setMonth(d.getMonth() - monthsAgo + 1, 0);
+  return toStr(d);
 }
 
 function getDateRange(
-  range: "7d" | "30d" | "custom",
+  range: RangeKey,
   customStart: string,
   customEnd: string,
 ): { start: string; end: string } | null {
-  if (range === "custom") {
-    if (!customStart || !customEnd) return null;
-    return { start: customStart, end: customEnd };
+  switch (range) {
+    case "7d":
+      return { start: daysAgoStr(6), end: todayStr() };
+    case "30d":
+      return { start: daysAgoStr(29), end: todayStr() };
+    case "90d":
+      return { start: daysAgoStr(89), end: todayStr() };
+    case "thisMonth":
+      return { start: startOfMonthStr(0), end: todayStr() };
+    case "lastMonth":
+      return { start: startOfMonthStr(1), end: endOfMonthStr(1) };
+    case "custom":
+      if (!customStart || !customEnd) return null;
+      return { start: customStart, end: customEnd };
   }
-  return {
-    start: daysAgoStr(range === "7d" ? 6 : 29),
-    end: todayStr(),
-  };
 }
 
 function calcDelta(current: number, prev: number): number | null {
   if (prev === 0) return null;
   return Math.round(((current - prev) / prev) * 100);
+}
+
+function fmtDelta(delta: number): string {
+  const sign = delta >= 0 ? "+" : "-";
+  const abs = Math.abs(delta);
+  return abs > 999 ? `${sign}>999%` : `${sign}${abs}%`;
 }
 
 function fmt(n: number): string {
@@ -68,6 +104,35 @@ function fmt(n: number): string {
 function shortDate(iso: string): string {
   const [, m, d] = iso.split("-");
   return `${+m}/${+d}`;
+}
+
+/** Mirrors the server's previous-period calculation so we can label it client-side. */
+function prevPeriod(startStr: string, endStr: string): { prevStart: Date; prevEnd: Date } {
+  const startDate = new Date(`${startStr}T00:00:00`);
+  const endDate = new Date(`${endStr}T23:59:59.999`);
+  const rangeMs = endDate.getTime() - startDate.getTime();
+  const prevEnd = new Date(startDate.getTime() - 1);
+  const prevStart = new Date(prevEnd.getTime() - rangeMs);
+  return { prevStart, prevEnd };
+}
+
+function formatDateRangeLabel(from: Date, to: Date): string {
+  const sameYear = from.getFullYear() === to.getFullYear();
+  const sameMonth = sameYear && from.getMonth() === to.getMonth();
+  const monthFmt = new Intl.DateTimeFormat("en-US", { month: "short" });
+  if (sameMonth) {
+    return `${monthFmt.format(from)} ${from.getDate()} – ${to.getDate()}, ${to.getFullYear()}`;
+  }
+  const fullFmt = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return `${fullFmt.format(from)} – ${fullFmt.format(to)}`;
+}
+
+function prevPeriodLabel(range: RangeKey, startStr: string, endStr: string): string {
+  if (range === "7d") return "vs previous 7 days";
+  if (range === "30d") return "vs previous 30 days";
+  if (range === "90d") return "vs previous 90 days";
+  const { prevStart, prevEnd } = prevPeriod(startStr, endStr);
+  return `vs ${formatDateRangeLabel(prevStart, prevEnd)}`;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -91,14 +156,19 @@ function CardTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Delta({ current, prev }: { current: number; prev: number }) {
+function Delta({ current, prev, periodLabel }: { current: number; prev: number; periodLabel: string }) {
   const delta = calcDelta(current, prev);
-  if (delta === null) return <span className="text-xs" style={{ color: "#6B6B6B" }}>—</span>;
+  if (delta === null) {
+    return <span className="text-xs font-medium" style={{ color: "#6B6B6B" }}>New</span>;
+  }
   const positive = delta >= 0;
   return (
-    <span className="text-xs font-medium" style={{ color: positive ? "#4ade80" : "#f87171" }}>
-      {positive ? "+" : ""}{delta}%
-    </span>
+    <div>
+      <span className="text-xs font-medium" style={{ color: positive ? "#4ade80" : "#f87171" }}>
+        {fmtDelta(delta)}
+      </span>
+      <p className="text-[10px] mt-0.5" style={{ color: "#6B6B6B" }}>{periodLabel}</p>
+    </div>
   );
 }
 
@@ -106,31 +176,37 @@ function SegmentedPill<T extends string>({
   options,
   value,
   onChange,
+  customSlot,
 }: {
   options: { label: string; value: T }[];
   value: T;
   onChange: (v: T) => void;
+  customSlot?: React.ReactNode;
 }) {
   return (
     <div
-      className="flex items-center p-[3px] rounded-full gap-0.5"
+      className="flex items-center p-[3px] rounded-full gap-0.5 flex-wrap"
       style={{ background: "#2A2A2A", border: "1px solid rgba(255,255,255,.08)" }}
     >
-      {options.map((opt) => (
-        <button
-          key={opt.value}
-          type="button"
-          onClick={() => onChange(opt.value)}
-          className="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer"
-          style={
-            value === opt.value
-              ? { background: "#ffffff", color: "#000000" }
-              : { color: "#9A9A9A" }
-          }
-        >
-          {opt.label}
-        </button>
-      ))}
+      {options.map((opt) =>
+        opt.value === "custom" && customSlot ? (
+          <div key={opt.value}>{customSlot}</div>
+        ) : (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            className="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer"
+            style={
+              value === opt.value
+                ? { background: "#ffffff", color: "#000000" }
+                : { color: "#9A9A9A" }
+            }
+          >
+            {opt.label}
+          </button>
+        )
+      )}
     </div>
   );
 }
@@ -263,27 +339,84 @@ function SourcesDonut({ sources }: { sources: AnalyticsData["sources"] }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function AnalyticsDashboard({ pages }: Props) {
+function AnalyticsDashboardInner({ pages }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [selectedPageId, setSelectedPageId] = useState(pages[0]?.id ?? "");
-  const [range, setRange] = useState<"7d" | "30d" | "custom">("7d");
+  const [range, setRange] = useState<RangeKey>("7d");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [hydrated, setHydrated] = useState(false);
 
-  // Persist selected page
+  // Hydrate from URL, then localStorage (per-page), then default.
   useEffect(() => {
-    const stored = localStorage.getItem("ul_analytics_page");
-    if (stored && pages.some((p) => p.id === stored)) setSelectedPageId(stored);
-  }, [pages]);
+    const urlPage = searchParams.get("page");
+    const urlRange = searchParams.get("range") as RangeKey | null;
+    const urlFrom = searchParams.get("from");
+    const urlTo = searchParams.get("to");
 
+    let pageId = pages[0]?.id ?? "";
+    if (urlPage && pages.some((p) => p.id === urlPage)) {
+      pageId = urlPage;
+    } else {
+      const stored = localStorage.getItem("ul_analytics_page");
+      if (stored && pages.some((p) => p.id === stored)) pageId = stored;
+    }
+    setSelectedPageId(pageId);
+
+    if (urlRange && RANGE_OPTIONS.some((o) => o.value === urlRange)) {
+      setRange(urlRange);
+      if (urlRange === "custom" && urlFrom && urlTo) {
+        setCustomStart(urlFrom);
+        setCustomEnd(urlTo);
+      }
+    } else {
+      const storedRange = localStorage.getItem(`ul_analytics_range_${pageId}`);
+      if (storedRange) {
+        try {
+          const parsed = JSON.parse(storedRange);
+          if (parsed.range) setRange(parsed.range);
+          if (parsed.customStart) setCustomStart(parsed.customStart);
+          if (parsed.customEnd) setCustomEnd(parsed.customEnd);
+        } catch {
+          // ignore invalid stored value
+        }
+      }
+    }
+    setHydrated(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist selected page + range, and sync URL.
   useEffect(() => {
-    if (selectedPageId) localStorage.setItem("ul_analytics_page", selectedPageId);
-  }, [selectedPageId]);
+    if (!hydrated || !selectedPageId) return;
+    localStorage.setItem("ul_analytics_page", selectedPageId);
+    localStorage.setItem(
+      `ul_analytics_range_${selectedPageId}`,
+      JSON.stringify({ range, customStart, customEnd })
+    );
+
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    params.set("page", selectedPageId);
+    params.set("range", range);
+    if (range === "custom" && customStart && customEnd) {
+      params.set("from", customStart);
+      params.set("to", customEnd);
+    } else {
+      params.delete("from");
+      params.delete("to");
+    }
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated, selectedPageId, range, customStart, customEnd]);
 
   // Fetch on change
   useEffect(() => {
-    if (!selectedPageId) return;
+    if (!hydrated || !selectedPageId) return;
     const dates = getDateRange(range, customStart, customEnd);
     if (!dates) return;
 
@@ -291,9 +424,16 @@ export function AnalyticsDashboard({ pages }: Props) {
       const result = await getAnalyticsData(selectedPageId, dates.start, dates.end);
       setData(result);
     });
-  }, [selectedPageId, range, customStart, customEnd]);
+  }, [hydrated, selectedPageId, range, customStart, customEnd]);
 
-  const loading = isPending;
+  const handleCustomApply = useCallback((r: { from?: Date; to?: Date }) => {
+    if (!r.from || !r.to) return;
+    setCustomStart(toStr(r.from));
+    setCustomEnd(toStr(r.to));
+    setRange("custom");
+  }, []);
+
+  const loading = isPending || !hydrated;
 
   if (!pages.length) {
     return (
@@ -305,6 +445,13 @@ export function AnalyticsDashboard({ pages }: Props) {
     );
   }
 
+  const dates = getDateRange(range, customStart, customEnd);
+  const periodLabel = dates ? prevPeriodLabel(range, dates.start, dates.end) : "";
+  const customSummary =
+    range === "custom" && customStart && customEnd
+      ? formatDateRangeLabel(new Date(`${customStart}T00:00:00`), new Date(`${customEnd}T00:00:00`))
+      : null;
+
   return (
     <div className="min-h-full" style={{ background: "#131313" }}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
@@ -314,71 +461,51 @@ export function AnalyticsDashboard({ pages }: Props) {
           <h1 className="text-2xl font-bold flex-1" style={{ color: "#ffffff" }}>
             Analytics
           </h1>
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Page selector */}
-            {pages.length > 1 && (
-              <select
-                value={selectedPageId}
-                onChange={(e) => setSelectedPageId(e.target.value)}
-                className="h-8 px-3 text-xs rounded-full cursor-pointer"
-                style={{
-                  background: "#2A2A2A",
-                  border: "1px solid rgba(255,255,255,.08)",
-                  color: "#ffffff",
-                  outline: "none",
-                }}
-              >
-                {pages.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.title || p.slug}
-                  </option>
-                ))}
-              </select>
-            )}
+          <div className="flex flex-col items-end gap-1.5">
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Page selector */}
+              {pages.length > 1 && (
+                <select
+                  value={selectedPageId}
+                  onChange={(e) => setSelectedPageId(e.target.value)}
+                  className="h-8 px-3 text-xs rounded-full cursor-pointer"
+                  style={{
+                    background: "#2A2A2A",
+                    border: "1px solid rgba(255,255,255,.08)",
+                    color: "#ffffff",
+                    outline: "none",
+                  }}
+                >
+                  {pages.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.title || p.slug}
+                    </option>
+                  ))}
+                </select>
+              )}
 
-            {/* Range selector */}
-            <SegmentedPill
-              options={[
-                { label: "7 days", value: "7d" },
-                { label: "30 days", value: "30d" },
-                { label: "Custom", value: "custom" },
-              ]}
-              value={range}
-              onChange={setRange}
-            />
+              {/* Range selector */}
+              <SegmentedPill
+                options={RANGE_OPTIONS}
+                value={range}
+                onChange={setRange}
+                customSlot={
+                  <CustomRangePopover
+                    value={
+                      customStart && customEnd
+                        ? { from: new Date(`${customStart}T00:00:00`), to: new Date(`${customEnd}T00:00:00`) }
+                        : undefined
+                    }
+                    onApply={handleCustomApply}
+                  />
+                }
+              />
+            </div>
+            {range === "custom" && customSummary && (
+              <p className="text-xs" style={{ color: "#6B6B6B" }}>{customSummary}</p>
+            )}
           </div>
         </div>
-
-        {/* Custom date pickers */}
-        {range === "custom" && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <input
-              type="date"
-              value={customStart}
-              onChange={(e) => setCustomStart(e.target.value)}
-              className="h-8 px-3 text-xs rounded-lg"
-              style={{
-                background: "#2A2A2A",
-                border: "1px solid rgba(255,255,255,.08)",
-                color: "#ffffff",
-                outline: "none",
-              }}
-            />
-            <span className="text-xs" style={{ color: "#6B6B6B" }}>to</span>
-            <input
-              type="date"
-              value={customEnd}
-              onChange={(e) => setCustomEnd(e.target.value)}
-              className="h-8 px-3 text-xs rounded-lg"
-              style={{
-                background: "#2A2A2A",
-                border: "1px solid rgba(255,255,255,.08)",
-                color: "#ffffff",
-                outline: "none",
-              }}
-            />
-          </div>
-        )}
 
         {/* ── Headline tiles ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -408,6 +535,7 @@ export function AnalyticsDashboard({ pages }: Props) {
                 <Delta
                   current={"rawCurrent" in tile ? (tile.rawCurrent ?? 0) : (tile.value as number)}
                   prev={"rawPrev" in tile ? (tile.rawPrev ?? 0) : tile.prev!}
+                  periodLabel={periodLabel}
                 />
               )}
               {tile.label === "Clicks" && !loading && (data?.winbackShown ?? 0) > 0 && (
@@ -577,5 +705,13 @@ export function AnalyticsDashboard({ pages }: Props) {
 
       </div>
     </div>
+  );
+}
+
+export function AnalyticsDashboard({ pages }: Props) {
+  return (
+    <Suspense fallback={<div className="min-h-full" style={{ background: "#131313" }} />}>
+      <AnalyticsDashboardInner pages={pages} />
+    </Suspense>
   );
 }

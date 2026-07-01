@@ -9,7 +9,7 @@ import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import type { Page, SubscriptionStatus } from "@/lib/supabase/types";
 
 export const metadata: Metadata = {
-  title: "Ultralink Dashboard",
+  title: "Ultralink Links",
   robots: { index: false, follow: false },
 };
 

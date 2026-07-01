@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, startTransition } from "react";
 import { useActionState } from "react";
 import { updatePage } from "@/app/actions/pages";
 import { sanitizeSlug, validateSlug } from "@/lib/slug";
 import { checkSlugAvailable } from "@/app/actions/pages";
 import { applyPresetToLinks } from "@/app/actions/links";
 import { ProfileTab } from "./profile-tab";
-import { PresetsContent, TypographyContent, ColorsContent } from "./design-tab";
-import { LinksTab } from "./links-tab";
+import { PresetsContent, TypographyContent, ColorsContent, patchTheme } from "./design-tab";
+import { LinksTab, type LinksTabHandle } from "./links-tab";
 import { LivePreview } from "./live-preview";
 import { SettingsCard } from "./panel-primitives";
 import { CountryBlockingControl } from "./country-blocking-control";
@@ -62,11 +62,39 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
+  const linksTabRef = useRef<LinksTabHandle>(null);
+  const [linkFlushError, setLinkFlushError] = useState<string | null>(null);
+  const [flushingLinks, setFlushingLinks] = useState(false);
 
   const canUseBadge = effectivePlan === "pro";
 
   const boundUpdatePage = updatePage.bind(null, page.id);
   const [state, formAction, pending] = useActionState(boundUpdatePage, null);
+
+  // Atomically saves everything: first flushes any unsaved per-link edits
+  // (label/URL/style/icon/etc — these never auto-save on their own), then
+  // submits the page-level fields. This is the ONLY path that persists changes.
+  const handleSave = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Capture the form synchronously — `e.currentTarget` is cleared once this
+    // handler yields, so it must not be read after the `await` below.
+    const form = e.currentTarget;
+    setLinkFlushError(null);
+    setFlushingLinks(true);
+    const result = await linksTabRef.current?.flushDirtyLinks();
+    setFlushingLinks(false);
+    if (result && !result.ok) {
+      setLinkFlushError(result.error);
+      return;
+    }
+    const formData = new FormData(form);
+    // useActionState's dispatch must run inside a transition when invoked
+    // manually (rather than via the form's `action` prop), or React warns
+    // and `pending` won't track it correctly.
+    startTransition(() => {
+      formAction(formData);
+    });
+  }, [formAction]);
 
   useEffect(() => {
     if (state && "ok" in state) {
@@ -109,6 +137,11 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
 
   const handleThemeChange = useCallback((newTheme: Theme) => {
     setTheme(newTheme);
+    setIsDirty(true);
+  }, []);
+
+  const handleIconsColorChange = useCallback((color: string) => {
+    setTheme((prev) => patchTheme(prev, { colors: { ...prev.colors, icons: color } }));
     setIsDirty(true);
   }, []);
 
@@ -164,10 +197,10 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
         >
 
           {/* Error banner */}
-          {((state && "error" in state) || slugError) && (
+          {((state && "error" in state) || slugError || linkFlushError) && (
             <div className="flex-shrink-0 px-4 py-2 border-b border-red-800/30 bg-red-950/10">
               <p className="text-xs text-red-400">
-                {(state && "error" in state && state.error) || slugError}
+                {(state && "error" in state && state.error) || slugError || linkFlushError}
               </p>
             </div>
           )}
@@ -234,7 +267,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
               {mobileView === "preview" ? "← Edit" : "Preview"}
             </button>
 
-            <form action={formAction} className="flex-shrink-0">
+            <form onSubmit={handleSave} className="flex-shrink-0">
               <input type="hidden" name="slug" value={local.slug} />
               <input type="hidden" name="title" value={local.title ?? ""} />
               <input type="hidden" name="bio" value={local.bio ?? ""} />
@@ -247,7 +280,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
               <input type="hidden" name="win_back" value={JSON.stringify(winBack)} />
               <button
                 type="submit"
-                disabled={!canSave || pending}
+                disabled={!canSave || pending || flushingLinks}
                 className="px-4 py-1.5 text-xs font-semibold rounded-full transition-all disabled:opacity-40 cursor-pointer"
                 style={{ background: "#ffffff", color: "#000000" }}
                 onMouseEnter={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#F0F0F0"; }}
@@ -255,7 +288,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                 onMouseDown={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.transform = "scale(0.98)"; }}
                 onMouseUp={(e) => { e.currentTarget.style.transform = ""; }}
               >
-                {pending ? "Saving…" : saveSuccess ? "Saved!" : "Save"}
+                {(pending || flushingLinks) ? "Saving…" : saveSuccess ? "Saved!" : "Save"}
               </button>
             </form>
           </div>
@@ -265,7 +298,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
 
             {/* Middle: live preview — always visible on md+, mobile only in preview mode */}
             <div className={`${mobileView === "preview" ? "flex" : "hidden md:flex"} flex-1 relative overflow-hidden`}>
-              <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} winBack={winBack} />
+              <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} winBack={winBack} isPro={effectivePlan === "pro"} />
             </div>
 
             {/* Right: settings panel — always visible on md+, mobile only in edit mode */}
@@ -313,9 +346,8 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
               {/* Scrollable settings */}
               <div className="flex-1 overflow-y-auto">
 
-                {/* PAGE tab */}
-                {activeTab === "page" && (
-                  <div className="px-3 pt-1 pb-8 space-y-2.5">
+                {/* PAGE tab — stays mounted when hidden so link-tab edits below aren't lost on switch */}
+                <div className={activeTab === "page" ? "px-3 pt-1 pb-8 space-y-2.5" : "hidden"}>
 
                 {/* 1. Identity — open by default */}
                 <SettingsCard title="Identity" defaultOpen>
@@ -367,6 +399,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                   <PresetsContent
                     theme={theme}
                     userId={userId}
+                    links={links}
                     onChange={handleThemeChange}
                     onPresetApply={handlePresetApply}
                   />
@@ -452,22 +485,22 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                 </SettingsCard>
 
               </div>
-            )}
 
-            {/* LINKS tab */}
-            {activeTab === "links" && (
-              <div className="px-3 pt-3 pb-8">
-                <LinksTab
-                  pageId={page.id}
-                  userId={userId}
-                  links={links}
-                  onLinksChange={setLinks}
-                  socials={socials}
-                  onSocialsChange={setSocials}
-                  onDirtyChange={setHasLinksDirty}
-                />
-              </div>
-            )}
+                {/* LINKS tab — stays mounted when hidden so edits survive a tab switch until Save is clicked */}
+                <div className={activeTab === "links" ? "px-3 pt-3 pb-8" : "hidden"}>
+                  <LinksTab
+                    ref={linksTabRef}
+                    pageId={page.id}
+                    userId={userId}
+                    links={links}
+                    onLinksChange={setLinks}
+                    socials={socials}
+                    onSocialsChange={setSocials}
+                    onDirtyChange={setHasLinksDirty}
+                    iconsColor={theme.colors.icons}
+                    onIconsColorChange={handleIconsColorChange}
+                  />
+                </div>
 
               </div>
             </div>

@@ -6,6 +6,7 @@ export type WinBack = {
   enabled: boolean;
   headline: string;
   url: string;
+  age_gate?: boolean;
 };
 
 export interface Profile {
@@ -74,6 +75,7 @@ export interface PageLink {
   text_color: string;
   corner: string;
   animation: string;
+  item_type: "button" | "heading";
   created_at: string;
 }
 
