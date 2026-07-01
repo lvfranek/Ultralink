@@ -939,7 +939,7 @@ export function AccountSettingsClient({
           linkCap={linkCap}
           isEditor={isEditor}
         />
-        <ProfileCard initialUsername={username} />
+        <PreferencesCard />
 
         {!isEditor && (
           <TeamCard
@@ -951,9 +951,9 @@ export function AccountSettingsClient({
           />
         )}
 
+        <ProfileCard initialUsername={username} />
         <EmailCard email={email} />
         <PasswordCard />
-        <PreferencesCard />
         <DangerZoneCard username={username} />
       </div>
 

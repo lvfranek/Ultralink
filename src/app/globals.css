@@ -38,6 +38,7 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scrollbar-color: #444444 #131313;
 }
 
 body {
@@ -59,19 +60,19 @@ body {
   color: inherit;
 }
 
-/* Scrollbar */
+/* Scrollbar — blends with the always-dark page background (html/body above) */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--surface);
+  background: #131313;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
+  background: #444444;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-subtle);
+  background: #666666;
 }
 
 /* Dark theme token override — applied to dashboard and legal pages */

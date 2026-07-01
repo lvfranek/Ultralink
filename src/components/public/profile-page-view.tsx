@@ -91,12 +91,19 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
     return "#000000";
   })();
 
-  const isDarkTheme = isLightColor(t.colors.name);
-  const ctaBaseColor = t.pageBg.type === "color"
-    ? t.pageBg.value
+  // Contrast for the bottom panel is judged against the actual page background,
+  // not the name/handle text colors — those are independent user picks and can't
+  // be trusted to indicate whether the surrounding surface is light or dark.
+  // Image backgrounds vary in brightness per-pixel, so we assume dark there and
+  // rely on the panel's own translucent scrim + blur for legibility.
+  const panelOnLight = t.pageBg.type === "color"
+    ? isLightColor(t.pageBg.value)
     : t.pageBg.type === "gradient"
-    ? gradientEndColor(t.pageBg.value)
-    : (isDarkTheme ? "#0A0A0A" : "#FFFFFF");
+    ? isLightColor(gradientEndColor(t.pageBg.value))
+    : false;
+  const panelBg = panelOnLight ? "rgba(0,0,0,.06)" : "rgba(255,255,255,.10)";
+  const panelBorder = panelOnLight ? "rgba(0,0,0,.10)" : "rgba(255,255,255,.14)";
+  const panelText = panelOnLight ? "#000000" : "#FFFFFF";
 
   // Keep html/body background in sync so iOS overscroll matches the page theme
   useEffect(() => {
@@ -224,7 +231,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
           >
             {links.map((link, index) =>
               link.item_type === "heading" ? (
-                <HeadingItem key={link.id} label={link.label} color={nameColor} bodyFont={bodyFont} />
+                <HeadingItem key={link.id} label={link.label} color={link.text_color || nameColor} bodyFont={bodyFont} />
               ) : (
                 <LinkButton
                   key={link.id}
@@ -244,30 +251,24 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
         )}
       </div>
 
-      {/* Free-plan CTA — Pro pages show no Ultralink promotion at all */}
-      {!isPro && (
-        <a
-          href="https://ultralink.bio"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full flex flex-col items-center gap-0.5 text-center mt-4 px-4 py-2.5 rounded-2xl transition-all duration-150 hover:-translate-y-0.5 hover:brightness-110"
-          style={{
-            background: isDarkTheme
-              ? `color-mix(in srgb, ${ctaBaseColor} 100%, white 6%)`
-              : `color-mix(in srgb, ${ctaBaseColor} 100%, black 4%)`,
-            border: `1px solid ${isDarkTheme ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
-          }}
-        >
-          <span className="text-sm font-medium" style={{ color: nameColor, fontFamily: bodyFont }}>
-            Build your own link hub — free.
-          </span>
-          <span className="text-xs" style={{ color: handleColor, opacity: 0.7, fontFamily: bodyFont }}>
-            Get yours at ultralink.bio →
-          </span>
-        </a>
-      )}
     </div>
     </>
+  );
+
+  const ctaCard = !isPro && (
+    <a
+      href="https://ultralink.bio"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex flex-col items-center gap-0.5 text-center hover:opacity-80 transition-opacity"
+    >
+      <span className="text-sm font-medium" style={{ color: panelText, fontFamily: bodyFont }}>
+        Build your own link hub — free.
+      </span>
+      <span className="text-xs" style={{ color: panelText, opacity: 0.65, fontFamily: bodyFont }}>
+        Get yours at ultralink.bio →
+      </span>
+    </a>
   );
 
   // ── Layout ─────────────────────────────────────────────────────────────────
@@ -339,25 +340,37 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
         </div>
       </div>
 
-      {/* ── Footer — legal row only; Ultralink promotion lives in the CTA card above (Free plans only) ── */}
+      {/* ── Bottom panel: Free-plan CTA + legal row, bundled in one readable container ── */}
       {!isPreview && (
-        <div className="relative flex flex-col items-center gap-4 mt-12 pb-8 px-4">
-          <div className="flex items-center gap-4" style={{ opacity: 0.3 }}>
-            <a href="/privacy" className="text-xs hover:opacity-70 transition-opacity" style={{ color: handleColor }}>
-              Privacy
-            </a>
-            <span className="text-xs" style={{ color: handleColor }}>·</span>
-            <a href="/terms" className="text-xs hover:opacity-70 transition-opacity" style={{ color: handleColor }}>
-              Terms
-            </a>
-            <span className="text-xs" style={{ color: handleColor }}>·</span>
-            <a
-              href={`mailto:report@ultralink.bio?subject=Report: ${encodeURIComponent(page.slug)}`}
-              className="text-xs hover:opacity-70 transition-opacity"
-              style={{ color: handleColor }}
-            >
-              Report
-            </a>
+        <div className="relative z-[1] w-full flex justify-center px-4 pb-8 mt-4">
+          <div
+            className="w-full max-w-[480px] flex flex-col items-center gap-3 rounded-2xl px-4 py-4"
+            style={{
+              background: panelBg,
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              border: `1px solid ${panelBorder}`,
+            }}
+          >
+            {ctaCard}
+
+            <div className="flex items-center gap-4" style={{ opacity: 0.65 }}>
+              <a href="/privacy" className="text-xs hover:opacity-70 transition-opacity" style={{ color: panelText }}>
+                Privacy
+              </a>
+              <span className="text-xs" style={{ color: panelText }}>·</span>
+              <a href="/terms" className="text-xs hover:opacity-70 transition-opacity" style={{ color: panelText }}>
+                Terms
+              </a>
+              <span className="text-xs" style={{ color: panelText }}>·</span>
+              <a
+                href={`mailto:report@ultralink.bio?subject=Report: ${encodeURIComponent(page.slug)}`}
+                className="text-xs hover:opacity-70 transition-opacity"
+                style={{ color: panelText }}
+              >
+                Report
+              </a>
+            </div>
           </div>
         </div>
       )}

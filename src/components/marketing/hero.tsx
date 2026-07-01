@@ -1,27 +1,57 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { checkSlugAvailable } from "@/app/actions/pages";
 
 const GRADIENT = 'linear-gradient(110deg,#FBC2A4 0%,#F7A8C4 33%,#C9A7F2 66%,#A7C7F7 100%)';
+
+type SlugState = "idle" | "checking" | "available" | "taken" | "invalid";
 
 export function Hero() {
   const router = useRouter();
   const [username, setUsername] = useState("");
+  const [slugState, setSlugState] = useState<SlugState>("idle");
+  const [shake, setShake] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const slug = username
-    .toLowerCase()
-    .replace(/[^a-z0-9_-]/g, "")
-    .slice(0, 32);
+  const runCheck = useCallback(async (value: string) => {
+    const result = await checkSlugAvailable(value);
+    if (result.available) {
+      setSlugState("available");
+    } else {
+      setSlugState(result.error === "That username is already taken." ? "taken" : "invalid");
+    }
+  }, []);
+
+  const handleUsernameChange = (value: string) => {
+    const s = value
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, "")
+      .slice(0, 30);
+    setUsername(s);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (s.length < 2) {
+      setSlugState(s.length === 0 ? "idle" : "invalid");
+      return;
+    }
+    setSlugState("checking");
+    debounceRef.current = setTimeout(() => runCheck(s), 400);
+  };
 
   const handleClaim = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!slug) {
+    if (!username) {
       inputRef.current?.focus();
       return;
     }
-    router.push(`/login?username=${encodeURIComponent(slug)}`);
+    if (slugState !== "available") {
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
+      return;
+    }
+    router.push(`/login?username=${encodeURIComponent(username)}`);
   };
 
   return (
@@ -117,6 +147,7 @@ export function Hero() {
                   background: '#fff',
                   borderRadius: 16.5,
                   padding: '8px 8px 8px 18px',
+                  animation: shake ? 'shake 0.4s' : undefined,
                 }}
               >
                 <span
@@ -130,29 +161,47 @@ export function Hero() {
                 >
                   ultralink.bio/
                 </span>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="yourname"
-                  maxLength={32}
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  aria-label="Your username"
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    border: 'none',
-                    outline: 'none',
-                    background: 'transparent',
-                    fontSize: 16,
-                    color: '#0A0A0A',
-                    padding: '8px 4px',
-                    fontFamily: 'inherit',
-                  }}
-                />
+                <div style={{ position: 'relative', flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={username}
+                    onChange={(e) => handleUsernameChange(e.target.value)}
+                    placeholder="yourname"
+                    maxLength={32}
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    aria-label="Your username"
+                    style={{
+                      width: '100%',
+                      minWidth: 0,
+                      border: 'none',
+                      outline: 'none',
+                      background: 'transparent',
+                      fontSize: 16,
+                      color: '#0A0A0A',
+                      padding: '8px 22px 8px 4px',
+                      fontFamily: 'inherit',
+                    }}
+                  />
+                  {slugState === "checking" && (
+                    <span
+                      style={{ position: 'absolute', right: 4, width: 14, height: 14, border: '2px solid #9a9a9a', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.75s linear infinite' }}
+                      aria-hidden="true"
+                    />
+                  )}
+                  {slugState === "available" && (
+                    <svg style={{ position: 'absolute', right: 4, width: 16, height: 16, color: '#059669' }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <path d="M3 8l3.5 3.5L13 4.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                  {(slugState === "taken" || slugState === "invalid") && (
+                    <svg style={{ position: 'absolute', right: 4, width: 16, height: 16, color: '#dc2626' }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
+                    </svg>
+                  )}
+                </div>
                 <button
                   type="submit"
                   style={{
@@ -179,9 +228,23 @@ export function Hero() {
           </div>
 
           {/* Micro-copy */}
-          <p style={{ color: '#9a9a9a', fontSize: 13, marginTop: 14 }}>
-            Free forever, no credit card required.
+          <p style={{ color: slugState === "taken" ? '#dc2626' : '#9a9a9a', fontSize: 13, marginTop: 14 }}>
+            {slugState === "taken"
+              ? "That username is already taken."
+              : slugState === "invalid" && username.length > 0
+              ? "2–30 chars, a–z 0–9 -"
+              : "Free forever, no credit card required."}
           </p>
+
+          <style>{`
+            @keyframes shake {
+              10%, 90% { transform: translateX(-1px); }
+              20%, 80% { transform: translateX(2px); }
+              30%, 50%, 70% { transform: translateX(-4px); }
+              40%, 60% { transform: translateX(4px); }
+            }
+            @keyframes spin { to { transform: rotate(360deg); } }
+          `}</style>
 
           {/* Trust indicators */}
           <div

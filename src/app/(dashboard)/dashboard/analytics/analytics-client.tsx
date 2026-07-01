@@ -18,6 +18,7 @@ import {
 import { getAnalyticsData, type AnalyticsData } from "@/app/actions/analytics";
 import { getCountryName, flagEmoji } from "@/lib/countries";
 import { CustomRangePopover, RANGE_OPTIONS, type RangeKey } from "./date-range-picker";
+import { UpgradeModal } from "@/components/dashboard/upgrade-modal";
 
 interface Page {
   id: string;
@@ -27,6 +28,8 @@ interface Page {
 
 interface Props {
   pages: Page[];
+  /** When set, renders this static dataset instead of fetching real analytics (Free-plan example view). */
+  exampleData?: AnalyticsData;
 }
 
 // ─── Date range helpers ───────────────────────────────────────────────────────
@@ -339,7 +342,8 @@ function SourcesDonut({ sources }: { sources: AnalyticsData["sources"] }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-function AnalyticsDashboardInner({ pages }: Props) {
+function AnalyticsDashboardInner({ pages, exampleData }: Props) {
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -414,8 +418,12 @@ function AnalyticsDashboardInner({ pages }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, selectedPageId, range, customStart, customEnd]);
 
-  // Fetch on change
+  // Fetch on change — skipped entirely in example mode, where the same static dataset is reused.
   useEffect(() => {
+    if (exampleData) {
+      setData(exampleData);
+      return;
+    }
     if (!hydrated || !selectedPageId) return;
     const dates = getDateRange(range, customStart, customEnd);
     if (!dates) return;
@@ -424,7 +432,7 @@ function AnalyticsDashboardInner({ pages }: Props) {
       const result = await getAnalyticsData(selectedPageId, dates.start, dates.end);
       setData(result);
     });
-  }, [hydrated, selectedPageId, range, customStart, customEnd]);
+  }, [exampleData, hydrated, selectedPageId, range, customStart, customEnd]);
 
   const handleCustomApply = useCallback((r: { from?: Date; to?: Date }) => {
     if (!r.from || !r.to) return;
@@ -454,6 +462,41 @@ function AnalyticsDashboardInner({ pages }: Props) {
 
   return (
     <div className="min-h-full" style={{ background: "#131313" }}>
+      {exampleData && (
+        <div
+          className="sticky top-0 z-10 flex flex-wrap items-center gap-3 px-4 sm:px-6 py-3"
+          style={{
+            background: "linear-gradient(90deg, rgba(124,58,237,.35), rgba(59,130,246,.35))",
+            borderBottom: "1px solid rgba(255,255,255,.10)",
+            backdropFilter: "blur(8px)",
+          }}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="w-4 h-4 shrink-0"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="1.75"
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18M10.584 10.587a2 2 0 002.829 2.83M9.363 5.365A9.466 9.466 0 0112 5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.61 6.61C4.507 8.005 2.9 10.07 1.935 12.5 3.226 16.836 7.244 20 12 20a9.46 9.46 0 004.635-1.225" />
+          </svg>
+          <p className="text-xs sm:text-sm font-medium flex-1 min-w-0" style={{ color: "#ffffff" }}>
+            This is example data. Upgrade to Pro to see your real analytics.
+          </p>
+          <button
+            type="button"
+            onClick={() => setUpgradeOpen(true)}
+            className="shrink-0 inline-flex items-center gap-1.5 h-8 px-4 rounded-full text-xs font-semibold transition-opacity hover:opacity-85"
+            style={{ background: "#ffffff", color: "#000000" }}
+          >
+            Upgrade to Pro →
+          </button>
+        </div>
+      )}
+
+      <UpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
 
         {/* ── Header ── */}
@@ -526,10 +569,18 @@ function AnalyticsDashboardInner({ pages }: Props) {
                 {tile.label}
               </p>
               <p
-                className="text-2xl font-bold mb-1"
+                className="text-2xl font-bold mb-1 flex items-center gap-2"
                 style={{ color: loading ? "#3A3A3A" : "#ffffff" }}
               >
                 {typeof tile.value === "number" ? fmt(tile.value) : tile.value}
+                {exampleData && !loading && (
+                  <span
+                    className="text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded"
+                    style={{ background: "rgba(168,85,247,.15)", color: "#c4b5fd" }}
+                  >
+                    Example
+                  </span>
+                )}
               </p>
               {!tile.noCompare && !loading && (
                 <Delta
@@ -708,10 +759,10 @@ function AnalyticsDashboardInner({ pages }: Props) {
   );
 }
 
-export function AnalyticsDashboard({ pages }: Props) {
+export function AnalyticsDashboard({ pages, exampleData }: Props) {
   return (
     <Suspense fallback={<div className="min-h-full" style={{ background: "#131313" }} />}>
-      <AnalyticsDashboardInner pages={pages} />
+      <AnalyticsDashboardInner pages={pages} exampleData={exampleData} />
     </Suspense>
   );
 }

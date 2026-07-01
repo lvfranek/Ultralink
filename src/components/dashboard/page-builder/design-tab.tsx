@@ -446,15 +446,15 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-xs text-text-muted">Visibility</p>
-                  <span className="text-xs text-text-subtle">{Math.round(theme.pageBg.overlay * 100)}%</span>
+                  <span className="text-xs text-text-subtle">{Math.round((1 - theme.pageBg.overlay) * 100)}%</span>
                 </div>
                 <input
                   type="range"
                   min={0}
-                  max={0.7}
+                  max={1}
                   step={0.05}
-                  value={theme.pageBg.overlay}
-                  onChange={(e) => onChange(patchTheme(theme, { pageBg: { ...theme.pageBg, overlay: parseFloat(e.target.value) } }))}
+                  value={1 - theme.pageBg.overlay}
+                  onChange={(e) => onChange(patchTheme(theme, { pageBg: { ...theme.pageBg, overlay: 1 - parseFloat(e.target.value) } }))}
                   className="w-full accent-gold h-1.5 cursor-pointer"
                 />
               </div>

@@ -22,6 +22,7 @@ export interface Profile {
   subscription_status: SubscriptionStatus;
   grace_period_ends_at: string | null;
   current_period_end: string | null;
+  has_seen_welcome: boolean;
 }
 
 export function getEffectivePlan(profile: Pick<Profile, "subscription_status">): "free" | "pro" {

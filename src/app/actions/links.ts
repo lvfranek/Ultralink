@@ -103,19 +103,21 @@ export async function updateLink(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  let normalizedUrl: string | undefined;
-  if (data.url !== undefined) {
-    normalizedUrl = normalizeUrl(data.url);
-    if (!isValidUrl(normalizedUrl)) return { error: "Please enter a valid URL." };
-  }
-
   const { data: existing } = await supabase
     .from("page_links")
-    .select("page_id")
+    .select("page_id, item_type")
     .eq("id", id)
     .single();
 
   if (!existing) return { error: "Link not found." };
+
+  const isHeading = existing.item_type === "heading";
+
+  let normalizedUrl: string | undefined;
+  if (!isHeading && data.url !== undefined) {
+    normalizedUrl = normalizeUrl(data.url);
+    if (!isValidUrl(normalizedUrl)) return { error: "Please enter a valid URL." };
+  }
 
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
   const owns = await verifyPageOwnership(supabase, existing.page_id, activeOwnerId);

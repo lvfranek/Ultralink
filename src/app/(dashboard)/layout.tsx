@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Sidebar } from "@/components/dashboard/sidebar";
+import { DashboardChrome } from "@/components/dashboard/dashboard-chrome";
 import { getActiveOwnerId, getTeamMemberships } from "@/lib/team";
 
 export default async function DashboardLayout({
@@ -18,7 +18,7 @@ export default async function DashboardLayout({
   const [profileResult, memberships] = await Promise.all([
     supabase
       .from("profiles")
-      .select("display_name, username")
+      .select("display_name, username, has_seen_welcome")
       .eq("id", user.id)
       .single(),
     getTeamMemberships(user.id, supabase),
@@ -30,17 +30,17 @@ export default async function DashboardLayout({
     <>
       <style>{`html, body { background: #131313 !important; }`}</style>
       <div className="flex h-screen overflow-hidden dark-theme" style={{ background: "#131313" }}>
-        <Sidebar
+        <DashboardChrome
           user={user}
           displayName={profileResult.data?.display_name}
           username={profileResult.data?.username}
           activeOwnerId={activeOwnerId}
           selfUsername={profileResult.data?.username ?? ""}
           teamMemberships={memberships}
-        />
-        <main className="flex-1 overflow-y-auto pt-14 lg:pt-0">
+          hasSeenWelcome={profileResult.data?.has_seen_welcome ?? true}
+        >
           {children}
-        </main>
+        </DashboardChrome>
       </div>
     </>
   );

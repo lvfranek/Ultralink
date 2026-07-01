@@ -3,11 +3,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
 import { emailInUse } from "@/app/actions/account";
+import { AuthShell, inputStyle, inputErrorStyle } from "../auth-shell";
 
-type Mode = "signin" | "signup";
+type Mode = "signin" | "signup" | "reset";
 type UsernameState = "idle" | "checking" | "available" | "taken" | "invalid";
 
 function GoogleIcon() {
@@ -27,24 +27,6 @@ function isValidEmail(email: string) {
 
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
 
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  background: 'rgba(0,0,0,0.04)',
-  border: '1px solid rgba(0,0,0,.12)',
-  color: '#0A0A0A',
-  borderRadius: 8,
-  padding: '12px 14px',
-  fontSize: 14,
-  fontFamily: 'inherit',
-  outline: 'none',
-  boxSizing: 'border-box',
-};
-
-const inputErrorStyle: React.CSSProperties = {
-  ...inputStyle,
-  border: '1px solid rgba(220,38,38,0.5)',
-};
-
 export function LoginForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -63,6 +45,8 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [emailInUseError, setEmailInUseError] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
@@ -144,6 +128,24 @@ export function LoginForm() {
     setConfirmPassword("");
     if (prefillEmail) setEmail(prefillEmail);
     clearMessages();
+    setResetSent(false);
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailTouched(true);
+    if (!isValidEmail(email)) return;
+
+    clearMessages();
+    setResetLoading(true);
+    try {
+      await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+      });
+    } finally {
+      setResetLoading(false);
+      setResetSent(true);
+    }
   };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -233,35 +235,22 @@ export function LoginForm() {
     }
   };
 
-  return (
-    <div
-      style={{
-        minHeight: '100dvh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px 16px',
-        background: '#0A0A0A',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: 400 }}>
-        {/* Logo — on dark background */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
-          <Logo href="/" iconSize={32} onDark />
-        </div>
+  const footer = (
+    <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: '#6B6B6B' }}>
+      By continuing, you agree to our{" "}
+      <Link href="/terms" style={{ color: '#9a9a9a', textDecoration: 'underline', textUnderlineOffset: 2 }}>
+        Terms of Service
+      </Link>{" "}
+      and{" "}
+      <Link href="/privacy" style={{ color: '#9a9a9a', textDecoration: 'underline', textUnderlineOffset: 2 }}>
+        Privacy Policy
+      </Link>
+      .
+    </p>
+  );
 
-        {/* White card — matches homepage hero card */}
-        <div
-          style={{
-            background: '#fff',
-            border: '1px solid rgba(0,0,0,.06)',
-            borderRadius: 28,
-            padding: '32px 28px',
-          }}
-        >
+  return (
+    <AuthShell footer={footer}>
             {/* Username claim context */}
             {prefilledUsername && mode === "signup" && (
               <div
@@ -281,55 +270,157 @@ export function LoginForm() {
             )}
 
             {/* Mode toggle */}
-            <div
-              role="tablist"
-              aria-label="Authentication mode"
-              style={{
-                display: 'flex',
-                background: 'rgba(0,0,0,0.06)',
-                borderRadius: 10,
-                padding: 4,
-                marginBottom: 24,
-                gap: 4,
-              }}
-            >
-              {(["signup", "signin"] as Mode[]).map((m) => (
-                <button
-                  key={m}
-                  role="tab"
-                  aria-selected={mode === m}
-                  onClick={() => handleModeSwitch(m)}
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    borderRadius: 7,
-                    border: 'none',
-                    background: mode === m ? '#0A0A0A' : 'transparent',
-                    color: mode === m ? '#ffffff' : '#9a9a9a',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    transition: 'all 0.15s',
-                  }}
-                  onMouseEnter={(e) => { if (mode !== m) { e.currentTarget.style.color = '#0A0A0A'; e.currentTarget.style.background = 'rgba(0,0,0,.06)'; } }}
-                  onMouseLeave={(e) => { if (mode !== m) { e.currentTarget.style.color = '#9a9a9a'; e.currentTarget.style.background = 'transparent'; } }}
-                >
-                  {m === "signup" ? "Create account" : "Sign in"}
-                </button>
-              ))}
-            </div>
+            {mode !== "reset" && (
+              <div
+                role="tablist"
+                aria-label="Authentication mode"
+                style={{
+                  display: 'flex',
+                  background: 'rgba(0,0,0,0.06)',
+                  borderRadius: 10,
+                  padding: 4,
+                  marginBottom: 24,
+                  gap: 4,
+                }}
+              >
+                {(["signup", "signin"] as Mode[]).map((m) => (
+                  <button
+                    key={m}
+                    role="tab"
+                    aria-selected={mode === m}
+                    onClick={() => handleModeSwitch(m)}
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      borderRadius: 7,
+                      border: 'none',
+                      background: mode === m ? '#0A0A0A' : 'transparent',
+                      color: mode === m ? '#ffffff' : '#9a9a9a',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      transition: 'all 0.15s',
+                    }}
+                    onMouseEnter={(e) => { if (mode !== m) { e.currentTarget.style.color = '#0A0A0A'; e.currentTarget.style.background = 'rgba(0,0,0,.06)'; } }}
+                    onMouseLeave={(e) => { if (mode !== m) { e.currentTarget.style.color = '#9a9a9a'; e.currentTarget.style.background = 'transparent'; } }}
+                  >
+                    {m === "signup" ? "Create account" : "Sign in"}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Heading */}
             <h1 style={{ fontSize: 20, fontWeight: 600, color: '#0A0A0A', margin: '0 0 4px' }}>
-              {mode === "signup" ? "Create your account" : "Welcome back"}
+              {mode === "signup" ? "Create your account" : mode === "reset" ? "Reset your password" : "Welcome back"}
             </h1>
             <p style={{ fontSize: 14, color: '#6B6B6B', margin: '0 0 24px' }}>
               {mode === "signup"
                 ? "Start for free. No credit card required."
+                : mode === "reset"
+                ? "Enter your email and we'll send you a link to reset your password."
                 : "Sign in to continue to your dashboard."}
             </p>
 
+            {mode === "reset" ? (
+              <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: 16 }} noValidate>
+                <div>
+                  <label htmlFor="reset-email" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6B6B6B', marginBottom: 6 }}>
+                    Email address
+                  </label>
+                  <input
+                    id="reset-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); clearMessages(); setResetSent(false); }}
+                    onBlur={() => setEmailTouched(true)}
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    required
+                    disabled={resetLoading}
+                    style={emailError ? inputErrorStyle : inputStyle}
+                  />
+                  {emailError && (
+                    <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>{emailError}</p>
+                  )}
+                </div>
+
+                {resetSent && (
+                  <div
+                    role="status"
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 8,
+                      background: 'rgba(5,150,105,0.08)',
+                      border: '1px solid rgba(5,150,105,0.25)',
+                      fontSize: 14,
+                      color: '#047857',
+                    }}
+                  >
+                    If an account exists for that email, a reset link is on the way.
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={resetLoading}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    padding: '14px 0',
+                    fontSize: 15,
+                    fontWeight: 600,
+                    borderRadius: 10,
+                    border: 'none',
+                    background: '#0A0A0A',
+                    color: '#ffffff',
+                    cursor: resetLoading ? 'not-allowed' : 'pointer',
+                    opacity: resetLoading ? 0.6 : 1,
+                    fontFamily: 'inherit',
+                    transition: 'opacity 0.15s, transform 0.15s',
+                  }}
+                >
+                  {resetLoading && (
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        width: 16,
+                        height: 16,
+                        border: '2px solid currentColor',
+                        borderTopColor: 'transparent',
+                        borderRadius: '50%',
+                        animation: 'spin 0.75s linear infinite',
+                      }}
+                      aria-hidden="true"
+                    />
+                  )}
+                  Send reset link
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleModeSwitch("signin")}
+                  style={{
+                    textAlign: 'center',
+                    fontSize: 13,
+                    color: '#6B6B6B',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: 2,
+                  }}
+                >
+                  Back to sign in
+                </button>
+              </form>
+            ) : (
+              <>
             {/* Google OAuth */}
             <button
               type="button"
@@ -504,6 +595,27 @@ export function LoginForm() {
                 {passwordError && (
                   <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>{passwordError}</p>
                 )}
+                {mode === "signin" && (
+                  <p style={{ marginTop: 6, textAlign: 'right' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleModeSwitch("reset", email)}
+                      style={{
+                        fontSize: 12,
+                        color: '#6B6B6B',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        padding: 0,
+                        textDecoration: 'underline',
+                        textUnderlineOffset: 2,
+                      }}
+                    >
+                      Forgot password?
+                    </button>
+                  </p>
+                )}
               </div>
 
               {/* Confirm password — signup only */}
@@ -603,26 +715,8 @@ export function LoginForm() {
                 {mode === "signup" ? "Create account" : "Sign in"}
               </button>
             </form>
-        </div>
-
-        {/* Bottom links */}
-
-        <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: '#6B6B6B' }}>
-          By continuing, you agree to our{" "}
-          <Link href="/terms" style={{ color: '#9a9a9a', textDecoration: 'underline', textUnderlineOffset: 2 }}>
-            Terms of Service
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy" style={{ color: '#9a9a9a', textDecoration: 'underline', textUnderlineOffset: 2 }}>
-            Privacy Policy
-          </Link>
-          .
-        </p>
-      </div>
-
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
-    </div>
+              </>
+            )}
+    </AuthShell>
   );
 }

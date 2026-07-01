@@ -6,9 +6,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
 import { setActiveOwner } from "@/app/actions/team";
-import { Link2, BarChart3, Wallet } from "lucide-react";
+import { Link2, BarChart3, Wallet, PlayCircle, MessageSquareWarning } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import type { TeamEntry } from "@/lib/team";
+import { useWelcomeModal } from "@/components/dashboard/welcome-modal-context";
+import { useFeedbackModal } from "@/components/dashboard/feedback-modal-context";
 
 interface SidebarProps {
   user: User;
@@ -113,6 +115,7 @@ function AccountMenu({
   const [open, setOpen] = useState(false);
   const [switching, setSwitching] = useState<string | null>(null);
   const router = useRouter();
+  const { openWelcomeModal } = useWelcomeModal();
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -230,6 +233,14 @@ function AccountMenu({
 
             <button
               type="button"
+              onClick={() => { setOpen(false); openWelcomeModal(); }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface rounded-[var(--radius-sm)] transition-colors cursor-pointer"
+            >
+              <PlayCircle size={16} strokeWidth={1.5} aria-hidden="true" />
+              Watch intro
+            </button>
+            <button
+              type="button"
               onClick={() => { setOpen(false); router.push("/dashboard/account"); }}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface rounded-[var(--radius-sm)] transition-colors cursor-pointer"
             >
@@ -268,6 +279,8 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { openWelcomeModal } = useWelcomeModal();
+  const { openFeedbackModal } = useFeedbackModal();
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
@@ -309,7 +322,7 @@ export function Sidebar({
   ];
 
   const bottomItems = [
-    { href: "mailto:support@ultralink.bio?subject=Feedback", label: "Give feedback" },
+    { href: "/help", label: "Help" },
     { href: "https://t.me/ultralink", label: "Latest Updates" },
   ];
 
@@ -338,6 +351,28 @@ export function Sidebar({
       </nav>
 
       <div className="p-3 space-y-0.5 mt-3">
+        <button
+          type="button"
+          onClick={() => { openWelcomeModal(); onClose?.(); }}
+          className="w-full flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm transition-colors cursor-pointer"
+          style={{ color: "#9A9A9A" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
+        >
+          <PlayCircle size={18} strokeWidth={1.75} aria-hidden="true" />
+          Watch intro
+        </button>
+        <button
+          type="button"
+          onClick={() => { openFeedbackModal(); onClose?.(); }}
+          className="w-full flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm transition-colors cursor-pointer"
+          style={{ color: "#9A9A9A" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
+        >
+          <MessageSquareWarning size={18} strokeWidth={1.75} aria-hidden="true" />
+          Report a bug
+        </button>
         {bottomItems.map((item) => (
           <a
             key={item.label}

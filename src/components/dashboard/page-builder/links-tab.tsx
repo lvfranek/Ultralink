@@ -308,6 +308,12 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
             />
           </div>
 
+          <ColorPickerField
+            label="Text color"
+            value={linkStyle.textColor}
+            onChange={(v) => updateStyle({ textColor: v })}
+          />
+
           {error && <p className="text-xs text-red-400">{error}</p>}
 
           <div className="flex items-center justify-end pt-1">
@@ -675,6 +681,9 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
   const [addError, setAddError] = useState<string | null>(null);
   const [isAdding, startAdding] = useTransition();
 
+  const [addingHeading, setAddingHeading] = useState(false);
+  const [newHeadingLabel, setNewHeadingLabel] = useState("");
+
   const [addingSocial, setAddingSocial] = useState(false);
   const [newPlatform, setNewPlatform] = useState(SOCIAL_PLATFORMS[0].id);
   const [newSocialUrl, setNewSocialUrl] = useState("");
@@ -756,14 +765,16 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
     });
   }
 
-  function handleAddHeading() {
+  function handleAddHeadingSubmit() {
     setAddError(null);
     startAdding(async () => {
-      const result = await addLink(pageId, { label: "", url: "", item_type: "heading" });
+      const result = await addLink(pageId, { label: newHeadingLabel.trim(), url: "", item_type: "heading" });
       if ("error" in result) {
         setAddError(result.error);
       } else if (result.link) {
         onLinksChange([...links, result.link]);
+        setNewHeadingLabel("");
+        setAddingHeading(false);
       }
     });
   }
@@ -856,23 +867,55 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
               </button>
             </div>
           </div>
+        ) : addingHeading ? (
+          <div className="rounded-[10px] p-3 space-y-3 mt-1" style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)" }}>
+            <p className="text-sm font-medium text-text">New heading</p>
+            <input
+              type="text"
+              value={newHeadingLabel}
+              onChange={(e) => setNewHeadingLabel(e.target.value)}
+              placeholder="Section heading"
+              onKeyDown={(e) => { if (e.key === "Enter") handleAddHeadingSubmit(); }}
+              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+            />
+            {addError && <p className="text-xs text-red-400">{addError}</p>}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleAddHeadingSubmit}
+                disabled={isAdding || !newHeadingLabel.trim()}
+                className="flex-1 py-2 text-xs font-semibold bg-gold text-bg rounded-[var(--radius-sm)] hover:bg-gold-bright transition-colors disabled:opacity-40 cursor-pointer"
+              >
+                {isAdding ? "Adding…" : "Add heading"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAddingHeading(false); setAddError(null); }}
+                className="px-3 py-2 text-xs text-text-muted border border-border-strong rounded-[var(--radius-sm)] hover:bg-surface-2 cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         ) : (
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setAdding(true)}
-              className="flex-1 py-2.5 border border-dashed border-gold/30 text-gold text-sm font-medium rounded-[var(--radius)] hover:border-gold/60 hover:bg-gold-dim transition-all cursor-pointer"
-            >
-              + Add button
-            </button>
-            <button
-              type="button"
-              onClick={handleAddHeading}
-              disabled={isAdding}
-              className="flex-1 py-2.5 border border-dashed border-border-strong/60 text-text-muted text-sm font-medium rounded-[var(--radius)] hover:border-border-strong hover:bg-surface transition-all cursor-pointer disabled:opacity-50"
-            >
-              + Add heading
-            </button>
+          <div className="space-y-2">
+            {addError && <p className="text-xs text-red-400">{addError}</p>}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => { setAdding(true); setAddError(null); }}
+                className="flex-1 py-2.5 border border-dashed border-gold/30 text-gold text-sm font-medium rounded-[var(--radius)] hover:border-gold/60 hover:bg-gold-dim transition-all cursor-pointer"
+              >
+                + Add button
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAddingHeading(true); setAddError(null); }}
+                className="flex-1 py-2.5 border border-dashed border-gold/30 text-gold text-sm font-medium rounded-[var(--radius)] hover:border-gold/60 hover:bg-gold-dim transition-all cursor-pointer"
+              >
+                + Add heading
+              </button>
+            </div>
           </div>
         )}
       </SettingsCard>
