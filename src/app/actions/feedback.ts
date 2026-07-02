@@ -3,12 +3,8 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { resend } from "@/lib/resend";
 import { getEffectivePlan } from "@/lib/supabase/types";
-
-function escapeHtml(s: string) {
-  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
-}
+import { sendDiscordNotification } from "@/lib/notifications/discord";
 
 export async function submitFeedback(formData: FormData): Promise<{ ok?: true; error?: string }> {
   const supabase = await createClient();
@@ -38,37 +34,34 @@ export async function submitFeedback(formData: FormData): Promise<{ ok?: true; e
   const planLine =
     plan === "pro" ? `Pro · Tier ${profile?.plan_tier} · ${profile?.plan_interval}` : "Free";
 
-  const typeLabel = type === "bug" ? "Bug report" : "Feature request";
-  const subject = `[${typeLabel}] ${name} (${planLine})`;
+  const webhookUrl = type === "bug"
+    ? process.env.DISCORD_BUGS_WEBHOOK_URL
+    : process.env.DISCORD_FEATURES_WEBHOOK_URL;
 
-  const html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px; background: #141414; color: #fff;">
-      <h2 style="margin: 0 0 16px; font-size: 20px;">${typeLabel}</h2>
-      <table style="width: 100%; font-size: 14px; color: #9a9a9a; margin-bottom: 20px;">
-        <tr><td style="padding: 4px 0;">From:</td><td style="color: #fff;">${escapeHtml(name)} &lt;${escapeHtml(email)}&gt;</td></tr>
-        <tr><td style="padding: 4px 0;">Username:</td><td style="color: #fff;">${escapeHtml(profile?.username ?? "(unknown)")}</td></tr>
-        <tr><td style="padding: 4px 0;">User ID:</td><td style="color: #fff; font-family: monospace; font-size: 12px;">${user.id}</td></tr>
-        <tr><td style="padding: 4px 0;">Plan:</td><td style="color: #fff;">${planLine}</td></tr>
-        <tr><td style="padding: 4px 0;">Page:</td><td style="color: #fff;">${escapeHtml(pageUrl)}</td></tr>
-        <tr><td style="padding: 4px 0;">User agent:</td><td style="color: #9a9a9a; font-size: 12px;">${escapeHtml(userAgent)}</td></tr>
-      </table>
-      <div style="border-top: 1px solid #2a2a2a; padding-top: 16px;">
-        <p style="margin: 0 0 8px; color: #9a9a9a; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Message</p>
-        <div style="white-space: pre-wrap; color: #fff; font-size: 14px; line-height: 1.5;">${escapeHtml(message)}</div>
-      </div>
-    </div>
-  `;
+  const emoji = type === "bug" ? "🐛" : "💡";
+  const title = type === "bug" ? "Bug report" : "Feature request";
+  const color = type === "bug" ? 0xf56565 : 0x63b3ed;
+
+  const truncatedMessage = message.length > 1024
+    ? `${message.slice(0, 1000)}… (truncated — see admin panel)`
+    : message;
 
   try {
-    await resend.emails.send({
-      from: "Ultralink <hello@ultralink.bio>",
-      to: process.env.FEEDBACK_TO_EMAIL || "franek@ultralink.bio",
-      replyTo: email,
-      subject,
-      html,
-    });
+    await sendDiscordNotification({
+      title: `${emoji} ${title}`,
+      color,
+      fields: [
+        { name: "From", value: `${name} <${email}>`, inline: false },
+        { name: "Username", value: profile?.username ?? "(unknown)", inline: true },
+        { name: "User ID", value: user.id, inline: true },
+        { name: "Plan", value: planLine, inline: true },
+        { name: "Page", value: pageUrl || "(unknown)", inline: false },
+        { name: "User agent", value: userAgent.slice(0, 200) || "(unknown)", inline: false },
+        { name: "Message", value: truncatedMessage, inline: false },
+      ],
+    }, webhookUrl);
   } catch (err) {
-    console.error("Failed to send feedback email:", err);
+    console.error("Failed to send feedback notification:", err);
     return { error: "Something went wrong. Try again in a moment." };
   }
 

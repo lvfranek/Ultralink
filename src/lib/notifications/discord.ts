@@ -7,8 +7,8 @@ type DiscordEmbed = {
   footer?: { text: string };
 };
 
-export async function sendDiscordNotification(embed: DiscordEmbed): Promise<void> {
-  const url = process.env.DISCORD_WEBHOOK_URL;
+export async function sendDiscordNotification(embed: DiscordEmbed, webhookUrl?: string): Promise<void> {
+  const url = webhookUrl ?? process.env.DISCORD_WEBHOOK_URL;
   if (!url) return;
 
   try {

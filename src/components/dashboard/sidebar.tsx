@@ -118,7 +118,6 @@ function AccountMenu({
   const [open, setOpen] = useState(false);
   const [switching, setSwitching] = useState<string | null>(null);
   const router = useRouter();
-  const { openWelcomeModal } = useWelcomeModal();
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -234,14 +233,6 @@ function AccountMenu({
               </>
             )}
 
-            <button
-              type="button"
-              onClick={() => { setOpen(false); openWelcomeModal(); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface rounded-[var(--radius-sm)] transition-colors cursor-pointer"
-            >
-              <PlayCircle size={16} strokeWidth={1.5} aria-hidden="true" />
-              Watch intro
-            </button>
             <button
               type="button"
               onClick={() => { setOpen(false); router.push("/dashboard/account"); }}
