@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { emailInUse } from "@/app/actions/account";
+import { notifySignup } from "@/app/actions/notify";
 import { AuthShell, inputStyle, inputErrorStyle } from "../auth-shell";
 
 type Mode = "signin" | "signup" | "reset";
@@ -195,6 +196,7 @@ export function LoginForm() {
           }
           throw error;
         }
+        void notifySignup(username, email);
         setSuccessMessage(
           "Check your email — we sent you a confirmation link to activate your account."
         );

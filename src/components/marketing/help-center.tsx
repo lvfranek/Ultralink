@@ -57,14 +57,35 @@ export function HelpCenter() {
 
   useEffect(() => {
     if (query) return; // scrollspy only makes sense when all sections are visible
+
+    const intersecting = new Set<string>();
+
+    const pickActive = () => {
+      // Near the bottom of the page the last section may be too short to ever
+      // enter the intersection band above, so fall back to it explicitly.
+      const atBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      if (atBottom) {
+        setActiveSection(HELP_SECTIONS[HELP_SECTIONS.length - 1].id);
+        return;
+      }
+      // Otherwise use the bottom-most section currently in the band, since
+      // several sections can intersect it at once while scrolling.
+      for (let i = HELP_SECTIONS.length - 1; i >= 0; i--) {
+        if (intersecting.has(HELP_SECTIONS[i].id)) {
+          setActiveSection(HELP_SECTIONS[i].id);
+          return;
+        }
+      }
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-            break;
-          }
+          if (entry.isIntersecting) intersecting.add(entry.target.id);
+          else intersecting.delete(entry.target.id);
         }
+        pickActive();
       },
       { rootMargin: "-20% 0px -70% 0px" }
     );
@@ -72,7 +93,12 @@ export function HelpCenter() {
       const el = sectionRefs.current[section.id];
       if (el) observer.observe(el);
     }
-    return () => observer.disconnect();
+
+    window.addEventListener("scroll", pickActive, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", pickActive);
+    };
   }, [query]);
 
   return (

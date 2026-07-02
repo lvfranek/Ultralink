@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { sendDiscordNotification } from "@/lib/notifications/discord";
+import { getAdminStats } from "@/lib/admin/stats";
+import { getMonthlyEquivalentPrice, type BillingInterval } from "@/lib/config/pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +64,63 @@ async function syncSubscription(
   else console.log("[webhook] synced subscription", sub.id, "→", status, "uid:", uid);
 }
 
+function notifyNewPro(
+  supabase: ReturnType<typeof createServiceClient>,
+  sub: Stripe.Subscription,
+  userId?: string
+) {
+  void (async () => {
+    const uid = userId ?? sub.metadata?.user_id;
+    const item = sub.items.data[0];
+    const price = item?.price as Stripe.Price | undefined;
+    const tier = price?.metadata?.tier ? parseInt(price.metadata.tier) : null;
+    const interval = (price?.metadata?.interval as BillingInterval | undefined) ?? null;
+    if (!uid || !tier) return;
+
+    const [{ data: profile }, stats] = await Promise.all([
+      supabase.from("profiles").select("username").eq("id", uid).single(),
+      getAdminStats(),
+    ]);
+
+    const mrrAdded = getMonthlyEquivalentPrice(tier, interval);
+
+    await sendDiscordNotification({
+      title: "💰 New Pro subscription",
+      color: 0xc9a96e,
+      fields: [
+        { name: "Username", value: profile?.username ?? uid, inline: true },
+        { name: "Tier", value: `${tier} links`, inline: true },
+        { name: "Interval", value: interval ?? "unknown", inline: true },
+        { name: "MRR added", value: `$${mrrAdded.toFixed(2)}`, inline: true },
+        { name: "Total MRR", value: `$${stats.mrr.toFixed(2)}`, inline: true },
+        { name: "Total Pro", value: `${stats.totalPro} customers`, inline: true },
+      ],
+    });
+  })();
+}
+
+function notifyCanceled(
+  supabase: ReturnType<typeof createServiceClient>,
+  uid: string,
+  oldTier: number | null,
+  oldInterval: BillingInterval | null
+) {
+  void (async () => {
+    const { data: profile } = await supabase.from("profiles").select("username").eq("id", uid).single();
+    const mrrLost = oldTier ? getMonthlyEquivalentPrice(oldTier, oldInterval) : 0;
+
+    await sendDiscordNotification({
+      title: "⚠️ Pro subscription canceled",
+      color: 0xf56565,
+      fields: [
+        { name: "Username", value: profile?.username ?? uid, inline: true },
+        { name: "Was on", value: oldTier ? `${oldTier} links / ${oldInterval ?? "unknown"}` : "unknown", inline: true },
+        { name: "MRR lost", value: `$${mrrLost.toFixed(2)}`, inline: true },
+      ],
+    });
+  })();
+}
+
 export async function POST(req: Request) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -90,6 +150,7 @@ export async function POST(req: Request) {
 
         const sub = await stripe.subscriptions.retrieve(subId as string);
         await syncSubscription(supabase, sub, userId);
+        notifyNewPro(supabase, sub, userId);
         break;
       }
 
@@ -105,6 +166,11 @@ export async function POST(req: Request) {
         const uid = sub.metadata?.user_id;
         if (!uid) { console.warn("[webhook] deleted sub has no user_id", sub.id); break; }
 
+        const deletedItem = sub.items.data[0];
+        const deletedPrice = deletedItem?.price as Stripe.Price | undefined;
+        const oldTier = deletedPrice?.metadata?.tier ? parseInt(deletedPrice.metadata.tier) : null;
+        const oldInterval = (deletedPrice?.metadata?.interval as BillingInterval | undefined) ?? null;
+
         const { error } = await supabase
           .from("profiles")
           .update({
@@ -118,6 +184,7 @@ export async function POST(req: Request) {
 
         if (error) console.error("[webhook] delete sub error", error);
         else console.log("[webhook] subscription deleted uid:", uid);
+        notifyCanceled(supabase, uid, oldTier, oldInterval);
         break;
       }
 

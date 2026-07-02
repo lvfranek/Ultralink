@@ -113,3 +113,9 @@ export function getLinkCap(profile: SubProfile): number {
 export function planHasAnalytics(profile: Pick<Profile, "subscription_status" | "grace_period_ends_at">): boolean {
   return isProActive(profile);
 }
+
+export function getMonthlyEquivalentPrice(tier: number, interval: BillingInterval | null): number {
+  const tierConfig = PRO_PLAN.tiers.find((t) => t.links === tier);
+  if (!tierConfig) return 0;
+  return interval === "annual" ? tierConfig.annualPrice / 12 : tierConfig.monthlyPrice;
+}
