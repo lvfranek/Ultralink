@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { siteConfig } from "@/lib/config/site";
+import { getSiteUrl } from "@/lib/site-url";
 import { getLinkCap } from "@/lib/config/pricing";
 import { isProActive } from "@/lib/supabase/types";
 import { getActiveOwnerId } from "@/lib/team";
@@ -68,7 +68,7 @@ export default async function DashboardPage({
   return (
     <DashboardShell
       pages={(pagesResult.data ?? []) as Page[]}
-      siteUrl={siteConfig.url}
+      siteUrl={getSiteUrl()}
       initialSlug={initialSlug}
       linkCap={linkCap}
       upgraded={upgraded}

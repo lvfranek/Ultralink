@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { resend, inviteEmail } from "@/lib/resend";
 import { isProActive } from "@/lib/supabase/types";
-import { siteConfig } from "@/lib/config/site";
+import { getSiteUrl } from "@/lib/site-url";
 
 const ACTIVE_OWNER_COOKIE = "ultralink_active_owner";
 
@@ -101,7 +101,7 @@ export async function inviteEditor(
     html: inviteEmail({
       ownerUsername: profile.username,
       token,
-      siteUrl: siteConfig.url,
+      siteUrl: getSiteUrl(),
     }),
   });
 
@@ -141,7 +141,7 @@ export async function resendInvite(
     html: inviteEmail({
       ownerUsername: profile?.username ?? "Someone",
       token: invite.token,
-      siteUrl: siteConfig.url,
+      siteUrl: getSiteUrl(),
     }),
   });
 

@@ -4,9 +4,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { stripe } from "@/lib/stripe/server";
 import { getPriceId } from "@/lib/stripe/prices";
+import { getSiteUrl } from "@/lib/site-url";
 import type { BillingInterval, Tier } from "@/lib/config/pricing";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 type CheckoutResult = { url: string } | { loginUrl: string } | { error: string };
 
@@ -75,8 +74,8 @@ export async function createCheckoutSession({
     mode: "subscription",
     customer: customerId,
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${SITE_URL}/dashboard?upgraded=1`,
-    cancel_url: `${SITE_URL}/#pricing`,
+    success_url: `${getSiteUrl()}/dashboard?upgraded=1`,
+    cancel_url: `${getSiteUrl()}/#pricing`,
     allow_promotion_codes: true,
     subscription_data: {
       metadata: { user_id: user.id, tier: String(tier), interval },
@@ -106,7 +105,7 @@ export async function createPortalSession(): Promise<{ url: string } | { error: 
 
   const session = await stripe.billingPortal.sessions.create({
     customer: profile.stripe_customer_id,
-    return_url: `${SITE_URL}/dashboard/account`,
+    return_url: `${getSiteUrl()}/dashboard/account`,
   });
 
   return { url: session.url };

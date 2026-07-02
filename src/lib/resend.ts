@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -17,7 +18,7 @@ export const resend = new Resend(process.env.RESEND_API_KEY);
 export function inviteEmail({
   ownerUsername,
   token,
-  siteUrl = "https://ultralink.bio",
+  siteUrl = getSiteUrl(),
 }: {
   ownerUsername: string;
   token: string;
@@ -82,7 +83,7 @@ export function welcomeEmail({ name }: { name: string }): string {
         <p style="font-size:16px;line-height:1.7;color:#9A9AA2;margin:0 0 32px;">
           Your link page is ready. Set it up in minutes and share it everywhere.
         </p>
-        <a href="https://ultralink.bio/dashboard"
+        <a href="${getSiteUrl()}/dashboard"
            style="display:inline-block;padding:14px 28px;background:#FFFFFF;color:#0A0A0A;font-weight:600;font-size:15px;text-decoration:none;border-radius:8px;">
           Go to Dashboard →
         </a>

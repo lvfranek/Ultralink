@@ -6,11 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
 import { setActiveOwner } from "@/app/actions/team";
-import { Link2, BarChart3, Wallet, PlayCircle, MessageSquareWarning } from "lucide-react";
+import { Link2, BarChart3, Wallet, PlayCircle, MessageSquareWarning, Sparkles, Crown } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import type { TeamEntry } from "@/lib/team";
+import type { SubscriptionStatus } from "@/lib/supabase/types";
 import { useWelcomeModal } from "@/components/dashboard/welcome-modal-context";
 import { useFeedbackModal } from "@/components/dashboard/feedback-modal-context";
+import { UpgradeModal } from "@/components/dashboard/upgrade-modal";
 
 interface SidebarProps {
   user: User;
@@ -19,6 +21,7 @@ interface SidebarProps {
   activeOwnerId: string;
   selfUsername: string;
   teamMemberships: TeamEntry[];
+  activeOwnerSubscriptionStatus: SubscriptionStatus;
 }
 
 function NavItem({
@@ -276,11 +279,20 @@ export function Sidebar({
   activeOwnerId,
   selfUsername,
   teamMemberships,
+  activeOwnerSubscriptionStatus,
 }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const { openWelcomeModal } = useWelcomeModal();
   const { openFeedbackModal } = useFeedbackModal();
+
+  const isOwnerSelf = activeOwnerId === user.id;
+  const needsAttention =
+    activeOwnerSubscriptionStatus === "grace" ||
+    activeOwnerSubscriptionStatus === "canceled" ||
+    activeOwnerSubscriptionStatus === "past_due";
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
@@ -389,6 +401,36 @@ export function Sidebar({
         ))}
       </div>
 
+      {isOwnerSelf && (
+        <div className="px-3 pb-1">
+          {needsAttention ? (
+            <button
+              type="button"
+              onClick={() => { router.push("/dashboard/account"); onClose?.(); }}
+              className="w-full flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm font-medium transition-colors cursor-pointer"
+              style={{ color: "#F87171", background: "rgba(248,113,113,0.08)" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(248,113,113,0.14)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(248,113,113,0.08)"; }}
+            >
+              <Crown size={18} strokeWidth={1.75} aria-hidden="true" />
+              Manage plan
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => { setUpgradeOpen(true); onClose?.(); }}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px] text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(255,255,255,0.15)]"
+              style={{ background: "#FFFFFF", color: "#0A0A0A" }}
+            >
+              <Sparkles size={18} strokeWidth={2} aria-hidden="true" />
+              {activeOwnerSubscriptionStatus === "active" || activeOwnerSubscriptionStatus === "trialing"
+                ? "Upgrade plan"
+                : "Upgrade to Pro"}
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="p-3 mt-2">
         <AccountMenu
           user={user}
@@ -440,6 +482,8 @@ export function Sidebar({
           </div>
         </>
       )}
+
+      <UpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
     </>
   );
 }

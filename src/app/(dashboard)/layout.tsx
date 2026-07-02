@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardChrome } from "@/components/dashboard/dashboard-chrome";
 import { getActiveOwnerId, getTeamMemberships } from "@/lib/team";
+import type { SubscriptionStatus } from "@/lib/supabase/types";
 
 export default async function DashboardLayout({
   children,
@@ -26,6 +27,12 @@ export default async function DashboardLayout({
 
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
 
+  const { data: activeOwnerProfile } = await supabase
+    .from("profiles")
+    .select("subscription_status")
+    .eq("id", activeOwnerId)
+    .single();
+
   return (
     <>
       <style>{`html, body { background: #131313 !important; }`}</style>
@@ -38,6 +45,9 @@ export default async function DashboardLayout({
           selfUsername={profileResult.data?.username ?? ""}
           teamMemberships={memberships}
           hasSeenWelcome={profileResult.data?.has_seen_welcome ?? true}
+          activeOwnerSubscriptionStatus={
+            (activeOwnerProfile?.subscription_status as SubscriptionStatus) ?? "none"
+          }
         >
           {children}
         </DashboardChrome>

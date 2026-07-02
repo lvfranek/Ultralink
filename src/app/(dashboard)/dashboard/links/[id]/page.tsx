@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { siteConfig } from "@/lib/config/site";
+import { getSiteUrl } from "@/lib/site-url";
 import { PageBuilder } from "@/components/dashboard/page-builder/page-builder";
 import { getEffectivePlan } from "@/lib/supabase/types";
 import { getActiveOwnerId } from "@/lib/team";
@@ -68,7 +68,7 @@ export default async function EditLinkPage({
         initialSocials={socials}
         effectivePlan={effectivePlan}
         userId={user.id}
-        siteUrl={siteConfig.url}
+        siteUrl={getSiteUrl()}
       />
     </div>
   );

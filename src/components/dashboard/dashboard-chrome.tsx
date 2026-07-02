@@ -9,6 +9,7 @@ import { FeedbackModalContext } from "@/components/dashboard/feedback-modal-cont
 import { markWelcomeSeen } from "@/app/actions/welcome";
 import type { User } from "@supabase/supabase-js";
 import type { TeamEntry } from "@/lib/team";
+import type { SubscriptionStatus } from "@/lib/supabase/types";
 
 interface DashboardChromeProps {
   user: User;
@@ -18,6 +19,7 @@ interface DashboardChromeProps {
   selfUsername: string;
   teamMemberships: TeamEntry[];
   hasSeenWelcome: boolean;
+  activeOwnerSubscriptionStatus: SubscriptionStatus;
   children: React.ReactNode;
 }
 
@@ -29,6 +31,7 @@ export function DashboardChrome({
   selfUsername,
   teamMemberships,
   hasSeenWelcome,
+  activeOwnerSubscriptionStatus,
   children,
 }: DashboardChromeProps) {
   // Auto-open on first mount based on the server-loaded welcome state.
@@ -61,6 +64,7 @@ export function DashboardChrome({
           activeOwnerId={activeOwnerId}
           selfUsername={selfUsername}
           teamMemberships={teamMemberships}
+          activeOwnerSubscriptionStatus={activeOwnerSubscriptionStatus}
         />
         <main className="flex-1 overflow-y-auto pt-14 lg:pt-0">
           {children}
