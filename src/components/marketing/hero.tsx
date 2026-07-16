@@ -268,9 +268,11 @@ export function Hero() {
               }
               .hero-claim-form {
                 flex-wrap: wrap !important;
+                padding: 8px !important;
               }
               .hero-claim-input-row {
                 width: 100% !important;
+                padding-left: 10px !important;
               }
               .hero-claim-btn {
                 width: 100% !important;
