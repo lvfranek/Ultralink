@@ -59,9 +59,10 @@ export function Hero() {
       style={{ background: '#0A0A0A' }}
       aria-label="Hero"
     >
-      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '88px 24px 56px' }}>
+      <div className="hero-outer" style={{ maxWidth: 1140, margin: '0 auto', padding: '88px 24px 56px' }}>
         {/* White framed card — overflow:visible so the glow is never clipped */}
         <div
+          className="hero-card"
           style={{
             position: 'relative',
             background: '#fff',
@@ -75,6 +76,7 @@ export function Hero() {
         >
           {/* Main headline */}
           <h1
+            className="hero-heading"
             style={{
               fontWeight: 500,
               letterSpacing: '-0.02em',
@@ -115,6 +117,7 @@ export function Hero() {
             {/* Glow */}
             <div
               aria-hidden="true"
+              className="hero-claim-glow"
               style={{
                 position: 'absolute',
                 inset: -14,
@@ -140,6 +143,7 @@ export function Hero() {
               <form
                 onSubmit={handleClaim}
                 aria-label="Claim your username"
+                className="hero-claim-form"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -150,60 +154,63 @@ export function Hero() {
                   animation: shake ? 'shake 0.4s' : undefined,
                 }}
               >
-                <span
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: 16,
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0,
-                    userSelect: 'none',
-                  }}
-                >
-                  ultralink.bio/
-                </span>
-                <div style={{ position: 'relative', flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={username}
-                    onChange={(e) => handleUsernameChange(e.target.value)}
-                    placeholder="yourname"
-                    maxLength={32}
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    spellCheck={false}
-                    aria-label="Your username"
+                <div className="hero-claim-input-row" style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0, gap: 8 }}>
+                  <span
                     style={{
-                      width: '100%',
-                      minWidth: 0,
-                      border: 'none',
-                      outline: 'none',
-                      background: 'transparent',
+                      color: '#6B6B6B',
                       fontSize: 16,
-                      color: '#0A0A0A',
-                      padding: '8px 22px 8px 4px',
-                      fontFamily: 'inherit',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                      userSelect: 'none',
                     }}
-                  />
-                  {slugState === "checking" && (
-                    <span
-                      style={{ position: 'absolute', right: 4, width: 14, height: 14, border: '2px solid #9a9a9a', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.75s linear infinite' }}
-                      aria-hidden="true"
+                  >
+                    ultralink.bio/
+                  </span>
+                  <div style={{ position: 'relative', flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={username}
+                      onChange={(e) => handleUsernameChange(e.target.value)}
+                      placeholder="yourname"
+                      maxLength={32}
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      aria-label="Your username"
+                      style={{
+                        width: '100%',
+                        minWidth: 0,
+                        border: 'none',
+                        outline: 'none',
+                        background: 'transparent',
+                        fontSize: 16,
+                        color: '#0A0A0A',
+                        padding: '8px 22px 8px 4px',
+                        fontFamily: 'inherit',
+                      }}
                     />
-                  )}
-                  {slugState === "available" && (
-                    <svg style={{ position: 'absolute', right: 4, width: 16, height: 16, color: '#059669' }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                      <path d="M3 8l3.5 3.5L13 4.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                  {(slugState === "taken" || slugState === "invalid") && (
-                    <svg style={{ position: 'absolute', right: 4, width: 16, height: 16, color: '#dc2626' }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                      <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
-                    </svg>
-                  )}
+                    {slugState === "checking" && (
+                      <span
+                        style={{ position: 'absolute', right: 4, width: 14, height: 14, border: '2px solid #9a9a9a', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.75s linear infinite' }}
+                        aria-hidden="true"
+                      />
+                    )}
+                    {slugState === "available" && (
+                      <svg style={{ position: 'absolute', right: 4, width: 16, height: 16, color: '#059669' }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <path d="M3 8l3.5 3.5L13 4.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                    {(slugState === "taken" || slugState === "invalid") && (
+                      <svg style={{ position: 'absolute', right: 4, width: 16, height: 16, color: '#dc2626' }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
+                      </svg>
+                    )}
+                  </div>
                 </div>
                 <button
                   type="submit"
+                  className="hero-claim-btn"
                   style={{
                     flexShrink: 0,
                     background: '#0A0A0A',
@@ -244,6 +251,32 @@ export function Hero() {
               40%, 60% { transform: translateX(4px); }
             }
             @keyframes spin { to { transform: rotate(360deg); } }
+            @media (max-width: 480px) {
+              .hero-outer {
+                padding: 96px 16px 32px !important;
+              }
+              .hero-card {
+                padding: 40px 18px 36px !important;
+              }
+              .hero-heading {
+                font-size: clamp(32px, 9vw, 44px) !important;
+              }
+              .hero-claim-glow {
+                inset: -6px !important;
+                filter: blur(14px) !important;
+                opacity: 0.55 !important;
+              }
+              .hero-claim-form {
+                flex-wrap: wrap !important;
+              }
+              .hero-claim-input-row {
+                width: 100% !important;
+              }
+              .hero-claim-btn {
+                width: 100% !important;
+                padding: 12px 18px !important;
+              }
+            }
           `}</style>
 
           {/* Trust indicators */}

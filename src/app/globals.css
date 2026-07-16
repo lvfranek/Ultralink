@@ -90,11 +90,13 @@ body {
   --text-subtle: rgba(154,154,154,0.55);
 }
 
-/* Benefit cards — hover glow + lift */
+/* Benefit cards — hover glow + lift (hover-capable pointers only, so taps on touch devices don't get stuck "hovered") */
 .benefit { transition: transform .2s ease; }
-.benefit:hover { transform: translateY(-3px); }
 .benefit-glow { transition: opacity .25s ease; }
-.benefit:hover .benefit-glow { opacity: .75 !important; }
+@media (hover: hover) and (pointer: fine) {
+  .benefit:hover { transform: translateY(-3px); }
+  .benefit:hover .benefit-glow { opacity: .75 !important; }
+}
 
 /* Gradient frame — visible gradient border + soft outer glow for claim container */
 .claim-gradient-frame {
