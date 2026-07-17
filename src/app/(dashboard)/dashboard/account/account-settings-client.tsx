@@ -122,6 +122,7 @@ interface PlanCardProps {
   planTier: number | null;
   planInterval: PlanInterval | null;
   currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
   gracePeriodEndsAt: string | null;
   stripeCustomerId: string | null;
   linksUsed: number;
@@ -134,6 +135,7 @@ function PlanCard({
   planTier,
   planInterval,
   currentPeriodEnd,
+  cancelAtPeriodEnd,
   gracePeriodEndsAt,
   stripeCustomerId,
   linksUsed,
@@ -144,7 +146,9 @@ function PlanCard({
   const effectivePlan = getEffectivePlan({ subscription_status: subscriptionStatus });
   const atLimit = linksUsed >= linkCap;
   const isPastDue = subscriptionStatus === "grace";
-  const isCanceled = subscriptionStatus === "canceled";
+  const isFullyCanceled = subscriptionStatus === "canceled";
+  const isCancelPending = cancelAtPeriodEnd && !isFullyCanceled;
+  const isCanceled = isFullyCanceled || isCancelPending;
 
   const handleManageBilling = () => {
     startTransition(async () => {
@@ -159,6 +163,7 @@ function PlanCard({
   };
 
   const getBillingLabel = (status: SubscriptionStatus): string => {
+    if (isCancelPending) return "Access ends";
     switch (status) {
       case "active":
       case "trialing":
@@ -209,7 +214,7 @@ function PlanCard({
             )}
             {isCanceled && (
               <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 999, background: "rgba(255,255,255,0.06)", color: "#6B6B6B", border: "1px solid rgba(255,255,255,.10)" }}>
-                Canceled
+                {isCancelPending ? "Canceling" : "Canceled"}
               </span>
             )}
           </div>
@@ -263,7 +268,7 @@ function PlanCard({
               Upgrade
             </a>
           )}
-          {(isCanceled || isPastDue) && (
+          {(isFullyCanceled || isPastDue) && (
             <a
               href="/#pricing"
               style={{ display: "inline-flex", alignItems: "center", padding: "9px 18px", fontSize: 13, fontWeight: 600, borderRadius: 8, border: "none", background: "#ffffff", color: "#000000", textDecoration: "none", cursor: "pointer" }}
@@ -912,6 +917,7 @@ interface AccountSettingsClientProps {
   planTier: number | null;
   planInterval: PlanInterval | null;
   currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
   gracePeriodEndsAt: string | null;
   stripeCustomerId: string | null;
   isEditor: boolean;
@@ -928,6 +934,7 @@ export function AccountSettingsClient({
   planTier,
   planInterval,
   currentPeriodEnd,
+  cancelAtPeriodEnd,
   gracePeriodEndsAt,
   stripeCustomerId,
   isEditor,
@@ -951,6 +958,7 @@ export function AccountSettingsClient({
           planTier={planTier}
           planInterval={planInterval}
           currentPeriodEnd={currentPeriodEnd}
+          cancelAtPeriodEnd={cancelAtPeriodEnd}
           gracePeriodEndsAt={gracePeriodEndsAt}
           stripeCustomerId={stripeCustomerId}
           linksUsed={linksUsed}

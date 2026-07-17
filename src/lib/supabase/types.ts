@@ -22,6 +22,7 @@ export interface Profile {
   subscription_status: SubscriptionStatus;
   grace_period_ends_at: string | null;
   current_period_end: string | null;
+  cancel_at_period_end: boolean;
   has_seen_welcome: boolean;
 }
 

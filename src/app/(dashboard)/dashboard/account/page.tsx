@@ -22,7 +22,7 @@ export default async function AccountSettingsPage() {
   const [profileResult, pagesResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("username, subscription_status, grace_period_ends_at, plan_tier, plan_interval, current_period_end, stripe_customer_id")
+      .select("username, subscription_status, grace_period_ends_at, plan_tier, plan_interval, current_period_end, cancel_at_period_end, stripe_customer_id")
       .eq("id", user.id)
       .single(),
     supabase.from("pages").select("id", { count: "exact", head: true }).eq("owner_id", user.id),
@@ -35,6 +35,7 @@ export default async function AccountSettingsPage() {
     plan_tier: p?.plan_tier ?? null,
     plan_interval: (p?.plan_interval ?? null) as PlanInterval | null,
     current_period_end: p?.current_period_end ?? null,
+    cancel_at_period_end: p?.cancel_at_period_end ?? false,
     stripe_customer_id: p?.stripe_customer_id ?? null,
   };
 
@@ -94,6 +95,7 @@ export default async function AccountSettingsPage() {
       planTier={profile.plan_tier}
       planInterval={profile.plan_interval}
       currentPeriodEnd={profile.current_period_end}
+      cancelAtPeriodEnd={profile.cancel_at_period_end}
       gracePeriodEndsAt={profile.grace_period_ends_at}
       stripeCustomerId={profile.stripe_customer_id}
       isEditor={isEditor}

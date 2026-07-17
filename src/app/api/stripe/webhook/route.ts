@@ -51,6 +51,7 @@ async function syncSubscription(
     plan_tier: tier,
     plan_interval: interval,
     subscription_status: status,
+    cancel_at_period_end: sub.cancel_at_period_end ?? false,
     grace_period_ends_at: null,
   };
   if (currentPeriodEnd) updates.current_period_end = currentPeriodEnd;
@@ -179,6 +180,7 @@ export async function POST(req: Request) {
             plan_interval: null,
             grace_period_ends_at: null,
             current_period_end: null,
+            cancel_at_period_end: false,
           })
           .eq("id", uid);
 
@@ -229,6 +231,7 @@ export async function POST(req: Request) {
         const paymentSucceededUpdates: Record<string, unknown> = {
           subscription_status: "active",
           grace_period_ends_at: null,
+          cancel_at_period_end: subscription.cancel_at_period_end ?? false,
         };
         if (currentPeriodEnd) paymentSucceededUpdates.current_period_end = currentPeriodEnd;
 
