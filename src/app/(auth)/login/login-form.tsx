@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail } from "lucide-react";
@@ -101,6 +101,11 @@ export function LoginForm() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
+  const [bannerCode, setBannerCode] = useState<string | null>(null);
+  const [bannerHidden, setBannerHidden] = useState(false);
+  const [bannerNeedsEmail, setBannerNeedsEmail] = useState(false);
+  const [bannerResendSent, setBannerResendSent] = useState(false);
+
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
@@ -147,6 +152,52 @@ export function LoginForm() {
       if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
     };
   }, []);
+
+  // Detect an auth-callback failure from the query string (?error=) or the
+  // URL fragment (#error_code=...) that Supabase appends on expired/used links.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash;
+    const fragmentParams = hash ? new URLSearchParams(hash.slice(1)) : null;
+    const code = fragmentParams?.get("error_code") ?? searchParams.get("error");
+    if (code) setBannerCode(code);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const banner = useMemo(() => {
+    if (!bannerCode || bannerHidden) return null;
+    switch (bannerCode) {
+      case "otp_expired":
+        return {
+          title: "This link has expired.",
+          body: "Confirmation links are valid for 60 minutes. Sign in below, or request a new link.",
+          showResend: true,
+        };
+      case "access_denied":
+        return {
+          title: "This link is no longer valid.",
+          body: "It may have already been used, or expired. Sign in below to continue.",
+          showResend: true,
+        };
+      case "auth_callback_failed":
+        return {
+          title: "Something went wrong.",
+          body: "The confirmation didn't complete. Try signing in, or reset your password if you're stuck.",
+          showResend: false,
+        };
+      default:
+        return null;
+    }
+  }, [bannerCode, bannerHidden]);
+
+  const clearErrorFromUrl = useCallback(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+    if (searchParams.get("error")) {
+      router.replace("/login", { scroll: false });
+    }
+  }, [router, searchParams]);
 
   const clearMessages = () => {
     setError(null);
@@ -235,11 +286,34 @@ export function LoginForm() {
   const handleEmailChange = (value: string) => {
     setEmail(value);
     clearMessages();
+    if (bannerCode && !bannerHidden) {
+      setBannerHidden(true);
+      clearErrorFromUrl();
+    }
     if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
     if (mode !== "signup" || autoSwitching) return;
     setEmailCheckState("idle");
     if (!isValidEmail(value)) return;
     emailDebounceRef.current = setTimeout(() => checkEmailInUse(value), 500);
+  };
+
+  const handleBannerResend = async () => {
+    if (!isValidEmail(email)) {
+      setBannerNeedsEmail(true);
+      emailInputRef.current?.focus();
+      return;
+    }
+    setBannerNeedsEmail(false);
+    if (resendCooldown > 0 || resendLoading) return;
+    setResendLoading(true);
+    try {
+      await resendConfirmationEmail(email);
+      setBannerResendSent(true);
+    } finally {
+      setResendLoading(false);
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    }
+    clearErrorFromUrl();
   };
 
   const emailError = emailTouched && !isValidEmail(email)
@@ -484,6 +558,74 @@ export function LoginForm() {
 
   return (
     <AuthShell footer={footer}>
+            {/* Auth-callback error banner (expired/used confirmation links) */}
+            {banner && mode !== "reset" && (
+              <div
+                style={{
+                  marginBottom: 20,
+                  padding: '14px 16px',
+                  borderRadius: 12,
+                  background: 'rgba(220,38,38,0.05)',
+                  border: '1px solid rgba(220,38,38,0.18)',
+                }}
+              >
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#b91c1c', margin: 0 }}>
+                  {banner.title}
+                </p>
+                <p style={{ fontSize: 13, color: '#6B6B6B', margin: '4px 0 0', lineHeight: 1.5 }}>
+                  {banner.body}
+                </p>
+                {bannerNeedsEmail && (
+                  <p style={{ fontSize: 12, color: '#b91c1c', margin: '8px 0 0' }}>
+                    Enter your email to resend the confirmation.
+                  </p>
+                )}
+                {banner.showResend && !bannerResendSent && (
+                  <button
+                    type="button"
+                    onClick={handleBannerResend}
+                    disabled={resendLoading || resendCooldown > 0}
+                    style={{
+                      marginTop: 10,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: '#0A0A0A',
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      cursor: resendLoading || resendCooldown > 0 ? 'not-allowed' : 'pointer',
+                      opacity: resendLoading || resendCooldown > 0 ? 0.6 : 1,
+                      fontFamily: 'inherit',
+                      textDecoration: 'underline',
+                      textUnderlineOffset: 2,
+                    }}
+                  >
+                    {resendLoading && <Spinner />}
+                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend confirmation email"}
+                  </button>
+                )}
+                {bannerResendSent && (
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      marginTop: 10,
+                      padding: '4px 10px',
+                      borderRadius: 999,
+                      background: 'rgba(5,150,105,0.1)',
+                      color: '#047857',
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Sent — check your inbox.
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Username claim context */}
             {prefilledUsername && mode === "signup" && (
               <div

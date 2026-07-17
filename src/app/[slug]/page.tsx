@@ -131,6 +131,8 @@ export default async function BioPage({ params, searchParams }: Props) {
     .filter((l) => l.is_active)
     .sort((a, b) => a.position - b.position);
 
+  const firstButtonLink = activeLinks.find((l) => l.item_type === "button") ?? null;
+
   const socials = (typedPage.page_socials ?? []).sort((a, b) => a.position - b.position);
 
   const winBack = typedPage.win_back ?? { enabled: false, headline: "", url: "" };
@@ -148,7 +150,7 @@ export default async function BioPage({ params, searchParams }: Props) {
           rawTheme={typedPage.theme as Record<string, unknown>}
           avatarUrl={typedPage.avatar_url}
           title={typedPage.title}
-          firstLink={activeLinks[0] ?? null}
+          firstLink={firstButtonLink}
         />
       )}
 

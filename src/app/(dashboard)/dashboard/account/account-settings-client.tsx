@@ -158,6 +158,24 @@ function PlanCard({
     return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   };
 
+  const getBillingLabel = (status: SubscriptionStatus): string => {
+    switch (status) {
+      case "active":
+      case "trialing":
+        return "Next billing";
+      case "grace":
+        return "Payment due by";
+      case "canceled":
+        return "Access ends";
+      default:
+        return "Next billing";
+    }
+  };
+
+  const periodEndPassed = currentPeriodEnd ? new Date(currentPeriodEnd) < new Date() : false;
+  const showPeriodEndRow =
+    currentPeriodEnd && (effectivePlan === "pro" || isCanceled) && !(isCanceled && periodEndPassed);
+
   if (isEditor) {
     return (
       <div style={card}>
@@ -197,9 +215,9 @@ function PlanCard({
           </div>
         </div>
 
-        {currentPeriodEnd && effectivePlan === "pro" && (
+        {showPeriodEndRow && (
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-            <span style={{ fontSize: 14, color: "#9A9A9A" }}>Next billing</span>
+            <span style={{ fontSize: 14, color: "#9A9A9A" }}>{getBillingLabel(subscriptionStatus)}</span>
             <span style={{ fontSize: 14, fontWeight: 600, color: "#ffffff" }}>{formatDate(currentPeriodEnd)}</span>
           </div>
         )}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { WinBack, PageLink } from "@/lib/supabase/types";
-import { resolveTheme, fontVar, cornerRadius, resolveLinkStyle, DEFAULT_LINK_STYLE } from "@/lib/config/theme";
+import { resolveTheme, fontVar, cornerRadius, animClass, resolveLinkStyle, DEFAULT_LINK_STYLE } from "@/lib/config/theme";
 import type { Theme } from "@/lib/config/theme";
 import { isAdultConfirmed, showAdultGate } from "./adult-gate";
 
@@ -38,11 +38,14 @@ export function WinBackOverlay({
   const cardRef = useRef<HTMLDivElement>(null);
 
   const theme: Theme = resolveTheme(rawTheme);
-  const ls = firstLink ? resolveLinkStyle(firstLink) : DEFAULT_LINK_STYLE;
+  const cardBg = theme.pageBg.type === "image" ? "#0A0A0B" : theme.pageBg.value;
+  const ls = firstLink
+    ? resolveLinkStyle(firstLink)
+    : { ...DEFAULT_LINK_STYLE, fillType: "color" as const, fillValue: theme.colors.name, textColor: cardBg };
   const btnRadius = cornerRadius(ls.corner);
+  const btnAnimCls = animClass(ls.animation);
   const titleFont = fontVar(theme.fonts.title);
   const nameColor = theme.colors.name;
-  const cardBg = theme.pageBg.type === "image" ? "#0A0A0B" : theme.pageBg.value;
 
   useEffect(() => {
     setPrefersReducedMotion(
@@ -217,7 +220,7 @@ export function WinBackOverlay({
           href={winBack.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full flex items-center justify-center font-semibold text-sm py-3.5 mb-3 transition-opacity hover:opacity-85"
+          className={`w-full flex items-center justify-center font-semibold text-sm py-3.5 mb-3 transition-opacity hover:opacity-85 ${btnAnimCls}`}
           style={{
             background: ls.fillValue,
             color: ls.textColor,

@@ -2,7 +2,16 @@
 
 export type Theme = {
   preset: 'glacier' | 'sunset' | 'mint' | 'lilac' | 'custom';
-  pageBg: { type: 'color' | 'gradient' | 'image'; value: string; overlay: number; blur?: number };
+  pageBg: {
+    type: 'color' | 'gradient' | 'image';
+    value: string;
+    overlay: number;
+    blur?: number;
+    // Cache last-used values per type so mode-switching preserves them.
+    lastColor?: string;
+    lastGradient?: string;
+    lastImage?: string;
+  };
   fonts: { title: string; body: string };
   colors: {
     name: string;
@@ -205,6 +214,9 @@ export function resolveTheme(raw: Record<string, unknown> | null | undefined): T
       value: (pageBgRaw.value as string) ?? DEFAULT_THEME.pageBg.value,
       overlay: typeof pageBgRaw.overlay === 'number' ? pageBgRaw.overlay : DEFAULT_THEME.pageBg.overlay,
       blur: typeof pageBgRaw.blur === 'number' ? pageBgRaw.blur : 0,
+      lastColor: typeof pageBgRaw.lastColor === 'string' ? pageBgRaw.lastColor : undefined,
+      lastGradient: typeof pageBgRaw.lastGradient === 'string' ? pageBgRaw.lastGradient : undefined,
+      lastImage: typeof pageBgRaw.lastImage === 'string' ? pageBgRaw.lastImage : undefined,
     },
     fonts: {
       title: (fontsRaw.title as string) ?? DEFAULT_THEME.fonts.title,

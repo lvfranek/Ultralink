@@ -340,12 +340,33 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
   }
 
   function setPageBgType(type: Theme["pageBg"]["type"]) {
-    const defaults: Record<Theme["pageBg"]["type"], { value: string; overlay: number }> = {
-      color:    { value: "#FFFFFF", overlay: 0 },
-      gradient: { value: "linear-gradient(135deg, #06AEEF 0%, #A78BFA 100%)", overlay: 0 },
-      image:    { value: theme.pageBg.type === "image" ? theme.pageBg.value : "", overlay: 0.4 },
+    const currentType = theme.pageBg.type;
+    const currentValue = theme.pageBg.value;
+
+    // Save the current value into the type-specific cache before switching.
+    const cached: Partial<Theme["pageBg"]> = {};
+    if (currentType === "color") cached.lastColor = currentValue;
+    if (currentType === "gradient") cached.lastGradient = currentValue;
+    if (currentType === "image") cached.lastImage = currentValue;
+
+    // Restore the previous value for the new type (or fall back to a default).
+    const defaults: Record<Theme["pageBg"]["type"], string> = {
+      color: theme.pageBg.lastColor ?? "#FFFFFF",
+      gradient: theme.pageBg.lastGradient ?? "linear-gradient(135deg, #06AEEF 0%, #A78BFA 100%)",
+      image: theme.pageBg.lastImage ?? "",
     };
-    onChange(patchTheme(theme, { pageBg: { type, ...defaults[type] } }));
+
+    const newOverlay = type === "image" && theme.pageBg.overlay === 0 ? 0.4 : theme.pageBg.overlay;
+
+    onChange(patchTheme(theme, {
+      pageBg: {
+        ...theme.pageBg,
+        ...cached,
+        type,
+        value: defaults[type],
+        overlay: newOverlay,
+      },
+    }));
   }
 
   async function handleBgImageUpload(e: React.ChangeEvent<HTMLInputElement>) {

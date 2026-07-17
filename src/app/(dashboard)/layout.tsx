@@ -44,7 +44,7 @@ export default async function DashboardLayout({
           activeOwnerId={activeOwnerId}
           selfUsername={profileResult.data?.username ?? ""}
           teamMemberships={memberships}
-          hasSeenWelcome={profileResult.data?.has_seen_welcome ?? true}
+          hasSeenWelcome={profileResult.data?.has_seen_welcome ?? false}
           activeOwnerSubscriptionStatus={
             (activeOwnerProfile?.subscription_status as SubscriptionStatus) ?? "none"
           }
