@@ -3,13 +3,18 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { emailInUse } from "@/app/actions/account";
+import { emailInUse, resendConfirmationEmail } from "@/app/actions/account";
 import { notifySignup } from "@/app/actions/notify";
 import { AuthShell, inputStyle, inputErrorStyle } from "../auth-shell";
 
 type Mode = "signin" | "signup" | "reset";
+type View = "form" | "confirm-sent";
 type UsernameState = "idle" | "checking" | "available" | "taken" | "invalid";
+type EmailCheckState = "idle" | "checking" | "in-use";
+
+const RESEND_COOLDOWN_SECONDS = 30;
 
 function GoogleIcon() {
   return (
@@ -22,11 +27,53 @@ function GoogleIcon() {
   );
 }
 
+function Spinner() {
+  return (
+    <span
+      style={{
+        display: 'inline-block',
+        width: 16,
+        height: 16,
+        border: '2px solid currentColor',
+        borderTopColor: 'transparent',
+        borderRadius: '50%',
+        animation: 'spin 0.75s linear infinite',
+      }}
+      aria-hidden="true"
+    />
+  );
+}
+
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
+
+function friendlyAuthError(err: unknown): { message: string; unconfirmed?: boolean; wrongPassword?: boolean } {
+  const raw = err instanceof Error ? err.message : String(err);
+  const msg = raw.toLowerCase();
+
+  if (msg.includes("invalid login credentials")) {
+    return { message: "Wrong email or password. Try again, or reset your password.", wrongPassword: true };
+  }
+  if (msg.includes("email not confirmed") || msg.includes("not confirmed")) {
+    return { message: "Your email isn't confirmed yet. Check your inbox (and spam folder).", unconfirmed: true };
+  }
+  if (msg.includes("rate limit") || msg.includes("too many")) {
+    return { message: "Too many attempts. Wait a moment and try again." };
+  }
+  if (msg.includes("fetch") || msg.includes("network")) {
+    return { message: "Something went wrong. Check your connection and try again." };
+  }
+  if (msg.includes("password") && (msg.includes("least") || msg.includes("weak") || msg.includes("short"))) {
+    return { message: "Password must be at least 8 characters." };
+  }
+  if (msg.includes("unique") || msg.includes("duplicate")) {
+    return { message: "That username was just taken. Please choose another." };
+  }
+  return { message: "Something went wrong. Please try again." };
+}
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -36,18 +83,23 @@ export function LoginForm() {
   const prefilledUsername = searchParams.get("username") ?? "";
   const prefilledPlan = searchParams.get("plan") ?? "";
 
+  const [view, setView] = useState<View>("form");
   const [mode, setMode] = useState<Mode>("signup");
   const [email, setEmail] = useState("");
+  const [confirmedEmail, setConfirmedEmail] = useState("");
   const [username, setUsername] = useState(prefilledUsername);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unconfirmedError, setUnconfirmedError] = useState(false);
   const [emailInUseError, setEmailInUseError] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
@@ -55,11 +107,52 @@ export function LoginForm() {
   const [usernameTouched, setUsernameTouched] = useState(false);
 
   const [usernameState, setUsernameState] = useState<UsernameState>("idle");
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const usernameDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [emailCheckState, setEmailCheckState] = useState<EmailCheckState>("idle");
+  const [autoSwitching, setAutoSwitching] = useState(false);
+  const emailDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoSwitchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isSubmittingRef = useRef(false);
+
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+  const confirmPasswordInputRef = useRef<HTMLInputElement>(null);
+  const usernameInputRef = useRef<HTMLInputElement>(null);
+  const resendButtonRef = useRef<HTMLButtonElement>(null);
+  const resetStatusRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (prefilledPlan) setMode("signup");
   }, [prefilledPlan]);
+
+  // Resend cooldown ticker
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  // Focus the resend button when the confirmation screen appears
+  useEffect(() => {
+    if (view === "confirm-sent") {
+      requestAnimationFrame(() => resendButtonRef.current?.focus());
+    }
+  }, [view]);
+
+  useEffect(() => {
+    return () => {
+      if (usernameDebounceRef.current) clearTimeout(usernameDebounceRef.current);
+      if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
+      if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
+    };
+  }, []);
+
+  const clearMessages = () => {
+    setError(null);
+    setUnconfirmedError(false);
+    setEmailInUseError(false);
+  };
 
   const checkUsername = useCallback(async (value: string) => {
     if (!USERNAME_RE.test(value)) {
@@ -79,13 +172,74 @@ export function LoginForm() {
     const sanitized = value.toLowerCase().replace(/[^a-z0-9_]/g, "");
     setUsername(sanitized);
     clearMessages();
-    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (usernameDebounceRef.current) clearTimeout(usernameDebounceRef.current);
     if (sanitized.length < 3) {
       setUsernameState(sanitized.length === 0 ? "idle" : "invalid");
       return;
     }
     setUsernameState("checking");
-    debounceRef.current = setTimeout(() => checkUsername(sanitized), 400);
+    usernameDebounceRef.current = setTimeout(() => checkUsername(sanitized), 400);
+  };
+
+  const handleModeSwitch = useCallback((m: Mode, prefillEmail?: string) => {
+    setMode(m);
+    setEmailTouched(false);
+    setPasswordTouched(false);
+    setConfirmPasswordTouched(false);
+    setUsernameTouched(false);
+    setPassword("");
+    setConfirmPassword("");
+    setEmailCheckState("idle");
+    setAutoSwitching(false);
+    if (prefillEmail) setEmail(prefillEmail);
+    clearMessages();
+    setResetSent(false);
+
+    requestAnimationFrame(() => {
+      if (m === "signup") {
+        if (!prefillEmail) emailInputRef.current?.focus();
+        else usernameInputRef.current?.focus();
+      } else if (m === "signin") {
+        if (prefillEmail) passwordInputRef.current?.focus();
+        else emailInputRef.current?.focus();
+      } else {
+        emailInputRef.current?.focus();
+      }
+    });
+  }, []);
+
+  const triggerAutoSwitch = useCallback((emailValue: string) => {
+    if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
+    setEmailCheckState("in-use");
+    setAutoSwitching(true);
+    autoSwitchTimeoutRef.current = setTimeout(() => {
+      setAutoSwitching(false);
+      handleModeSwitch("signin", emailValue);
+    }, 1200);
+  }, [handleModeSwitch]);
+
+  const checkEmailInUse = useCallback(async (value: string) => {
+    if (!isValidEmail(value)) {
+      setEmailCheckState("idle");
+      return;
+    }
+    setEmailCheckState("checking");
+    const inUse = await emailInUse(value);
+    if (inUse) {
+      triggerAutoSwitch(value);
+    } else {
+      setEmailCheckState((s) => (s === "checking" ? "idle" : s));
+    }
+  }, [triggerAutoSwitch]);
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    clearMessages();
+    if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
+    if (mode !== "signup" || autoSwitching) return;
+    setEmailCheckState("idle");
+    if (!isValidEmail(value)) return;
+    emailDebounceRef.current = setTimeout(() => checkEmailInUse(value), 500);
   };
 
   const emailError = emailTouched && !isValidEmail(email)
@@ -113,31 +267,14 @@ export function LoginForm() {
       confirmPassword === password
     ));
 
-  const clearMessages = () => {
-    setError(null);
-    setEmailInUseError(false);
-    setSuccessMessage(null);
-  };
-
-  const handleModeSwitch = (m: Mode, prefillEmail?: string) => {
-    setMode(m);
-    setEmailTouched(false);
-    setPasswordTouched(false);
-    setConfirmPasswordTouched(false);
-    setUsernameTouched(false);
-    setPassword("");
-    setConfirmPassword("");
-    if (prefillEmail) setEmail(prefillEmail);
-    clearMessages();
-    setResetSent(false);
-  };
-
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingRef.current) return;
     setEmailTouched(true);
     if (!isValidEmail(email)) return;
 
     clearMessages();
+    isSubmittingRef.current = true;
     setResetLoading(true);
     try {
       await supabase.auth.resetPasswordForEmail(email, {
@@ -146,11 +283,14 @@ export function LoginForm() {
     } finally {
       setResetLoading(false);
       setResetSent(true);
+      isSubmittingRef.current = false;
+      requestAnimationFrame(() => resetStatusRef.current?.focus());
     }
   };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingRef.current || loading) return;
     setEmailTouched(true);
     setPasswordTouched(true);
     if (mode === "signup") {
@@ -160,14 +300,14 @@ export function LoginForm() {
     if (!isFormValid) return;
 
     clearMessages();
+    isSubmittingRef.current = true;
     setLoading(true);
 
     try {
       if (mode === "signup") {
         const inUse = await emailInUse(email);
         if (inUse) {
-          setEmailInUseError(true);
-          setLoading(false);
+          triggerAutoSwitch(email);
           return;
         }
 
@@ -187,19 +327,14 @@ export function LoginForm() {
             error.message.toLowerCase().includes("already registered") ||
             error.message.toLowerCase().includes("already exists")
           ) {
-            setEmailInUseError(true);
-            setLoading(false);
+            triggerAutoSwitch(email);
             return;
-          }
-          if (error.message.includes("unique") || error.message.includes("duplicate")) {
-            throw new Error("That username was just taken. Please choose another.");
           }
           throw error;
         }
         void notifySignup(username, email);
-        setSuccessMessage(
-          "Check your email — we sent you a confirmation link to activate your account."
-        );
+        setConfirmedEmail(email);
+        setView("confirm-sent");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -209,11 +344,18 @@ export function LoginForm() {
         router.push("/dashboard");
       }
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      const { message, unconfirmed, wrongPassword } = friendlyAuthError(err);
       setError(message);
+      if (unconfirmed) setUnconfirmedError(true);
+      if (wrongPassword) {
+        requestAnimationFrame(() => {
+          passwordInputRef.current?.focus();
+          passwordInputRef.current?.select();
+        });
+      }
     } finally {
       setLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 
@@ -230,11 +372,33 @@ export function LoginForm() {
       });
       if (error) throw error;
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Google sign-in failed. Please try again.";
+      const { message } = friendlyAuthError(err);
       setError(message);
       setGoogleLoading(false);
     }
+  };
+
+  const handleResend = async () => {
+    if (resendCooldown > 0 || resendLoading) return;
+    setResendLoading(true);
+    try {
+      await resendConfirmationEmail(confirmedEmail);
+    } finally {
+      setResendLoading(false);
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    }
+  };
+
+  const handleUseDifferentEmail = () => {
+    setView("form");
+    setMode("signup");
+    setEmail("");
+    setConfirmedEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setEmailCheckState("idle");
+    clearMessages();
+    requestAnimationFrame(() => emailInputRef.current?.focus());
   };
 
   const footer = (
@@ -250,6 +414,73 @@ export function LoginForm() {
       .
     </p>
   );
+
+  if (view === "confirm-sent") {
+    return (
+      <AuthShell footer={footer}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          <Mail size={24} color="#9a9a9a" aria-hidden="true" style={{ marginBottom: 16 }} />
+          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#0A0A0A', margin: '0 0 8px' }}>
+            Check your inbox.
+          </h1>
+          <p style={{ fontSize: 14, color: '#6B6B6B', margin: '0 0 8px', lineHeight: 1.5 }}>
+            We just sent a confirmation link to{" "}
+            <strong style={{ color: '#0A0A0A' }}>{confirmedEmail}</strong>. Click it to activate your account.
+          </p>
+          <p style={{ fontSize: 12, color: '#9a9a9a', margin: '0 0 24px' }}>
+            Didn&apos;t get it? Check your spam folder, or check that the address is right.
+          </p>
+
+          <div style={{ display: 'flex', gap: 10, width: '100%' }}>
+            <button
+              ref={resendButtonRef}
+              type="button"
+              onClick={handleResend}
+              disabled={resendLoading || resendCooldown > 0}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                padding: '12px 14px',
+                fontSize: 13,
+                fontWeight: 600,
+                borderRadius: 8,
+                border: '1px solid rgba(0,0,0,.12)',
+                background: 'transparent',
+                color: '#0A0A0A',
+                cursor: resendLoading || resendCooldown > 0 ? 'not-allowed' : 'pointer',
+                opacity: resendLoading || resendCooldown > 0 ? 0.5 : 1,
+                fontFamily: 'inherit',
+              }}
+            >
+              {resendLoading && <Spinner />}
+              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend email"}
+            </button>
+            <button
+              type="button"
+              onClick={handleUseDifferentEmail}
+              style={{
+                flex: 1,
+                padding: '12px 14px',
+                fontSize: 13,
+                fontWeight: 600,
+                borderRadius: 8,
+                border: '1px solid rgba(0,0,0,.12)',
+                background: 'transparent',
+                color: '#0A0A0A',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              Use a different email
+            </button>
+          </div>
+        </div>
+      </AuthShell>
+    );
+  }
 
   return (
     <AuthShell footer={footer}>
@@ -332,6 +563,7 @@ export function LoginForm() {
                     Email address
                   </label>
                   <input
+                    ref={emailInputRef}
                     id="reset-email"
                     type="email"
                     value={email}
@@ -350,7 +582,9 @@ export function LoginForm() {
 
                 {resetSent && (
                   <div
+                    ref={resetStatusRef}
                     role="status"
+                    tabIndex={-1}
                     style={{
                       padding: '10px 14px',
                       borderRadius: 8,
@@ -358,6 +592,7 @@ export function LoginForm() {
                       border: '1px solid rgba(5,150,105,0.25)',
                       fontSize: 14,
                       color: '#047857',
+                      outline: 'none',
                     }}
                   >
                     If an account exists for that email, a reset link is on the way.
@@ -386,21 +621,8 @@ export function LoginForm() {
                     transition: 'opacity 0.15s, transform 0.15s',
                   }}
                 >
-                  {resetLoading && (
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        width: 16,
-                        height: 16,
-                        border: '2px solid currentColor',
-                        borderTopColor: 'transparent',
-                        borderRadius: '50%',
-                        animation: 'spin 0.75s linear infinite',
-                      }}
-                      aria-hidden="true"
-                    />
-                  )}
-                  Send reset link
+                  {resetLoading && <Spinner />}
+                  {resetLoading ? "Sending reset link…" : "Send reset link"}
                 </button>
 
                 <button
@@ -450,22 +672,7 @@ export function LoginForm() {
               onMouseEnter={(e) => { if (!googleLoading && !loading) { e.currentTarget.style.background = 'rgba(0,0,0,.07)'; e.currentTarget.style.transform = 'scale(0.98)'; } }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.03)'; e.currentTarget.style.transform = 'scale(1)'; }}
             >
-              {googleLoading ? (
-                <span
-                  style={{
-                    display: 'inline-block',
-                    width: 16,
-                    height: 16,
-                    border: '2px solid currentColor',
-                    borderTopColor: 'transparent',
-                    borderRadius: '50%',
-                    animation: 'spin 0.75s linear infinite',
-                  }}
-                  aria-hidden="true"
-                />
-              ) : (
-                <GoogleIcon />
-              )}
+              {googleLoading ? <Spinner /> : <GoogleIcon />}
               Continue with Google
             </button>
 
@@ -488,21 +695,48 @@ export function LoginForm() {
                   Email address
                 </label>
                 <input
+                  ref={emailInputRef}
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => { setEmail(e.target.value); clearMessages(); }}
+                  onChange={(e) => handleEmailChange(e.target.value)}
                   onBlur={() => setEmailTouched(true)}
                   placeholder="you@example.com"
                   autoComplete="email"
                   required
-                  disabled={loading}
+                  disabled={loading || autoSwitching}
                   style={emailError || emailInUseError ? inputErrorStyle : inputStyle}
                 />
                 {emailError && (
                   <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>{emailError}</p>
                 )}
-                {emailInUseError && (
+                {mode === "signup" && emailCheckState === "in-use" && (
+                  <p
+                    style={{
+                      marginTop: 6,
+                      fontSize: 12,
+                      color: '#6B6B6B',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        width: 12,
+                        height: 12,
+                        border: '2px solid #9a9a9a',
+                        borderTopColor: 'transparent',
+                        borderRadius: '50%',
+                        animation: 'spin 0.75s linear infinite',
+                      }}
+                      aria-hidden="true"
+                    />
+                    You already have an account. Signing you in…
+                  </p>
+                )}
+                {emailInUseError && emailCheckState !== "in-use" && (
                   <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>
                     An account with this email already exists.{" "}
                     <button
@@ -533,6 +767,7 @@ export function LoginForm() {
                   </label>
                   <div style={{ position: 'relative' }}>
                     <input
+                      ref={usernameInputRef}
                       id="username"
                       type="text"
                       value={username}
@@ -541,7 +776,7 @@ export function LoginForm() {
                       placeholder="your_username"
                       autoComplete="username"
                       required
-                      disabled={loading}
+                      disabled={loading || autoSwitching}
                       style={{
                         ...(usernameError ? inputErrorStyle : inputStyle),
                         paddingRight: 36,
@@ -583,6 +818,7 @@ export function LoginForm() {
                   )}
                 </label>
                 <input
+                  ref={passwordInputRef}
                   id="password"
                   type="password"
                   value={password}
@@ -591,7 +827,7 @@ export function LoginForm() {
                   placeholder={mode === "signup" ? "At least 8 characters" : "Your password"}
                   autoComplete={mode === "signup" ? "new-password" : "current-password"}
                   required
-                  disabled={loading}
+                  disabled={loading || autoSwitching}
                   style={passwordError ? inputErrorStyle : inputStyle}
                 />
                 {passwordError && (
@@ -627,6 +863,7 @@ export function LoginForm() {
                     Confirm password
                   </label>
                   <input
+                    ref={confirmPasswordInputRef}
                     id="confirm-password"
                     type="password"
                     value={confirmPassword}
@@ -635,7 +872,7 @@ export function LoginForm() {
                     placeholder="Re-enter your password"
                     autoComplete="new-password"
                     required
-                    disabled={loading}
+                    disabled={loading || autoSwitching}
                     style={confirmPasswordError ? inputErrorStyle : inputStyle}
                   />
                   {confirmPasswordError && (
@@ -657,28 +894,38 @@ export function LoginForm() {
                   }}
                 >
                   {error}
-                </div>
-              )}
-
-              {successMessage && (
-                <div
-                  role="status"
-                  style={{
-                    padding: '10px 14px',
-                    borderRadius: 8,
-                    background: 'rgba(5,150,105,0.08)',
-                    border: '1px solid rgba(5,150,105,0.25)',
-                    fontSize: 14,
-                    color: '#047857',
-                  }}
-                >
-                  {successMessage}
+                  {unconfirmedError && (
+                    <>
+                      {" "}
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setConfirmedEmail(email);
+                          await resendConfirmationEmail(email);
+                          setResendCooldown(RESEND_COOLDOWN_SECONDS);
+                        }}
+                        style={{
+                          color: '#b91c1c',
+                          textDecoration: 'underline',
+                          textUnderlineOffset: 2,
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          font: 'inherit',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Resend confirmation
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
 
               <button
                 type="submit"
-                disabled={loading || googleLoading}
+                disabled={loading || googleLoading || autoSwitching}
                 style={{
                   width: '100%',
                   display: 'flex',
@@ -692,29 +939,18 @@ export function LoginForm() {
                   border: 'none',
                   background: '#0A0A0A',
                   color: '#ffffff',
-                  cursor: loading || googleLoading ? 'not-allowed' : 'pointer',
-                  opacity: loading || googleLoading ? 0.6 : 1,
+                  cursor: loading || googleLoading || autoSwitching ? 'not-allowed' : 'pointer',
+                  opacity: loading || googleLoading || autoSwitching ? 0.6 : 1,
                   fontFamily: 'inherit',
                   transition: 'opacity 0.15s, transform 0.15s',
                 }}
-                onMouseEnter={(e) => { if (!loading && !googleLoading) { e.currentTarget.style.opacity = '0.82'; e.currentTarget.style.transform = 'scale(0.98)'; } }}
-                onMouseLeave={(e) => { e.currentTarget.style.opacity = loading || googleLoading ? '0.6' : '1'; e.currentTarget.style.transform = 'scale(1)'; }}
+                onMouseEnter={(e) => { if (!loading && !googleLoading && !autoSwitching) { e.currentTarget.style.opacity = '0.82'; e.currentTarget.style.transform = 'scale(0.98)'; } }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = loading || googleLoading || autoSwitching ? '0.6' : '1'; e.currentTarget.style.transform = 'scale(1)'; }}
               >
-                {loading && (
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      width: 16,
-                      height: 16,
-                      border: '2px solid currentColor',
-                      borderTopColor: 'transparent',
-                      borderRadius: '50%',
-                      animation: 'spin 0.75s linear infinite',
-                    }}
-                    aria-hidden="true"
-                  />
-                )}
-                {mode === "signup" ? "Create account" : "Sign in"}
+                {loading && <Spinner />}
+                {loading
+                  ? (mode === "signup" ? "Creating account…" : "Signing in…")
+                  : (mode === "signup" ? "Create account" : "Sign in")}
               </button>
             </form>
               </>

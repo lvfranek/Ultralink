@@ -22,6 +22,13 @@ export async function emailInUse(email: string): Promise<boolean> {
   return users.some((u) => u.email?.toLowerCase() === normalized);
 }
 
+export async function resendConfirmationEmail(email: string): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({ type: "signup", email });
+  if (error) return { error: error.message };
+  return {};
+}
+
 export async function checkUsernameAvailable(
   username: string,
   excludeId?: string

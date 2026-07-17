@@ -97,6 +97,7 @@ export async function inviteEditor(
   await resend.emails.send({
     from: "Ultralink <hello@ultralink.bio>",
     to: [normalizedEmail],
+    replyTo: user.email,
     subject: `${profile.username} invited you to Ultralink`,
     html: inviteEmail({
       ownerUsername: profile.username,
@@ -137,6 +138,7 @@ export async function resendInvite(
   await resend.emails.send({
     from: "Ultralink <hello@ultralink.bio>",
     to: [invite.email],
+    replyTo: user.email,
     subject: `${profile?.username ?? "Someone"} invited you to Ultralink`,
     html: inviteEmail({
       ownerUsername: profile?.username ?? "Someone",
