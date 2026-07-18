@@ -85,11 +85,12 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
   const overlay = t.pageBg.overlay ?? 0;
   const bgBlur = t.pageBg.blur ?? 0;
 
-  const heroFadeColor: string = (() => {
-    if (t.pageBg.type === "color") return t.pageBg.value;
-    if (t.pageBg.type === "gradient") return gradientEndColor(t.pageBg.value);
-    return "#000000";
-  })();
+  // Only solid-color backgrounds get a fade baked into the hero image — it blends
+  // the image bottom edge into a flat color seamlessly. Gradient backgrounds must
+  // stay off the image entirely (the gradient's end color tinting the whole photo
+  // reads as a broken color wash), so the hero renders unmodified and the gradient
+  // begins right below it.
+  const heroFadeColor: string | null = t.pageBg.type === "color" ? t.pageBg.value : null;
 
   // Contrast for the bottom panel is judged against the actual page background,
   // not the name/handle text colors — those are independent user picks and can't
@@ -139,10 +140,12 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
             alt={page.title || page.slug}
             className="absolute inset-0 w-full h-full object-cover"
           />
-          <div
-            className="absolute inset-0"
-            style={{ background: `linear-gradient(to bottom, transparent 40%, ${heroFadeColor} 100%)` }}
-          />
+          {heroFadeColor && (
+            <div
+              className="absolute inset-0"
+              style={{ background: `linear-gradient(to bottom, transparent 40%, ${heroFadeColor} 100%)` }}
+            />
+          )}
         </div>
       )}
 
@@ -398,6 +401,7 @@ function LinkButton({ link, index, isPreview }: { link: PageLink; index: number;
   const animCls = animClass(ls.animation);
 
   const redirectHref = isPreview ? link.url : `/r/${link.id}`;
+  const iconUrl = link.icon && link.icon.startsWith("http") ? link.icon : null;
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     if (!link.is_adult || isPreview) return;
@@ -413,7 +417,7 @@ function LinkButton({ link, index, isPreview }: { link: PageLink; index: number;
       rel="noopener noreferrer"
       onClick={handleClick}
       className={[
-        "relative flex items-center gap-3 w-full font-medium transition-brightness duration-150 active:scale-[0.99]",
+        "relative flex items-center w-full font-medium transition-brightness duration-150 active:scale-[0.99]",
         "px-5 py-4 text-sm",
         animCls,
       ].filter(Boolean).join(" ")}
@@ -424,30 +428,22 @@ function LinkButton({ link, index, isPreview }: { link: PageLink; index: number;
         animationDelay: ls.animation !== "none" ? `${index * 120}ms` : undefined,
       }}
     >
-      {/* Link icon */}
-      {link.icon && !link.icon.startsWith("http") && (
-        <span className="flex-shrink-0 opacity-70" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-          </svg>
+      {/* Icon/thumbnail float on the left without occupying flex space, so the
+          label below always centers on the full button width. */}
+      {(iconUrl || link.thumbnail_url) && (
+        <span className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-2" aria-hidden="true">
+          {iconUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={iconUrl} alt="" className="flex-shrink-0 w-5 h-5 object-contain rounded-sm" />
+          )}
+          {link.thumbnail_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={link.thumbnail_url} alt="" className="flex-shrink-0 w-10 h-10 rounded-sm object-cover" />
+          )}
         </span>
       )}
-      {link.icon && link.icon.startsWith("http") && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={link.icon} alt="" className="flex-shrink-0 w-5 h-5 object-contain rounded-sm" />
-      )}
 
-      {/* Thumbnail */}
-      {link.thumbnail_url && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={link.thumbnail_url}
-          alt=""
-          className="flex-shrink-0 w-10 h-10 rounded-sm object-cover"
-        />
-      )}
-
-      <span className="flex-1 text-center">{link.label || link.url}</span>
+      <span className="w-full text-center">{link.label || link.url}</span>
 
     </a>
   );

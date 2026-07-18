@@ -140,21 +140,27 @@ body {
   .theme-anim-pulse { animation: none; }
 }
 
+/* Analytics headline tiles — subtle lavender glow on hover */
+.ul-analytics-tile:hover {
+  border-color: rgba(167,139,250,.35) !important;
+  box-shadow: 0 0 0 1px rgba(167,139,250,.12), 0 0 24px rgba(167,139,250,.12);
+}
+
 /* Analytics custom date-range popover — dark theme for react-day-picker */
 .ul-daypicker .rdp-root {
-  --rdp-accent-color: #ffffff;
-  --rdp-accent-background-color: rgba(255,255,255,.14);
+  --rdp-accent-color: #A78BFA;
+  --rdp-accent-background-color: rgba(167,139,250,.12);
   --rdp-today-color: #ffffff;
-  --rdp-range_start-color: #000000;
-  --rdp-range_end-color: #000000;
-  --rdp-range_start-date-background-color: #ffffff;
-  --rdp-range_end-date-background-color: #ffffff;
+  --rdp-range_start-color: #ffffff;
+  --rdp-range_end-color: #ffffff;
+  --rdp-range_start-date-background-color: #A78BFA;
+  --rdp-range_end-date-background-color: #A78BFA;
   --rdp-disabled-opacity: 0.35;
   --rdp-outside-opacity: 0.4;
   color: #ffffff;
 }
 .ul-daypicker .rdp-day_button:hover:not([disabled]) {
-  background-color: #2A2A2A;
+  background-color: rgba(255,255,255,.08);
   border-radius: 100%;
 }
 .ul-daypicker .rdp-weekday {

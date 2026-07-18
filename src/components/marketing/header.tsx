@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 
@@ -12,6 +12,26 @@ const NAV_LINKS = [
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 12);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Same glass look at rest; scrolling over busy hero content darkens the pill
+  // so nav text stays readable against arbitrary light/dark background art.
+  const pillStyle = {
+    background: scrolled ? "rgba(10,10,10,.55)" : "rgba(255,255,255,.05)",
+    backdropFilter: "blur(14px)",
+    WebkitBackdropFilter: "blur(14px)",
+    border: scrolled ? "1px solid rgba(255,255,255,.14)" : "1px solid rgba(255,255,255,.10)",
+    transition: "background 0.2s ease, border-color 0.2s ease",
+  };
 
   return (
     <>
@@ -38,12 +58,9 @@ export function Header() {
           {/* Logo — left, wrapped in matching glass pill */}
           <div
             style={{
+              ...pillStyle,
               display: 'flex',
               alignItems: 'center',
-              background: 'rgba(255,255,255,.05)',
-              backdropFilter: 'blur(14px)',
-              WebkitBackdropFilter: 'blur(14px)',
-              border: '1px solid rgba(255,255,255,.10)',
               borderRadius: 999,
               padding: '8px 14px',
             }}
@@ -54,12 +71,9 @@ export function Header() {
           {/* Glass pill — right (desktop) */}
           <div
             style={{
+              ...pillStyle,
               alignItems: "center",
               gap: 2,
-              background: "rgba(255,255,255,.05)",
-              backdropFilter: "blur(14px)",
-              WebkitBackdropFilter: "blur(14px)",
-              border: "1px solid rgba(255,255,255,.10)",
               borderRadius: 999,
               padding: 5,
             }}
@@ -124,10 +138,7 @@ export function Header() {
           <button
             className="md:hidden"
             style={{
-              background: "rgba(255,255,255,.05)",
-              backdropFilter: "blur(14px)",
-              WebkitBackdropFilter: "blur(14px)",
-              border: "1px solid rgba(255,255,255,.10)",
+              ...pillStyle,
               borderRadius: 999,
               padding: "10px 14px",
               cursor: "pointer",

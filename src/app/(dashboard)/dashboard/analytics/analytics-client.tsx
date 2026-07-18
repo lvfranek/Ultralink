@@ -143,7 +143,7 @@ function prevPeriodLabel(range: RangeKey, startStr: string, endStr: string): str
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-[14px] border p-5 ${className}`}
+      className={`ul-analytics-tile rounded-[14px] border p-5 transition-colors duration-200 ${className}`}
       style={{ background: "#1A1A1A", borderColor: "rgba(255,255,255,.08)" }}
     >
       {children}
@@ -162,15 +162,15 @@ function CardTitle({ children }: { children: React.ReactNode }) {
 function Delta({ current, prev, periodLabel }: { current: number; prev: number; periodLabel: string }) {
   const delta = calcDelta(current, prev);
   if (delta === null) {
-    return <span className="text-xs font-medium" style={{ color: "#6B6B6B" }}>New</span>;
+    return <span className="text-xs font-medium" style={{ color: "#9A9A9A" }}>New</span>;
   }
   const positive = delta >= 0;
   return (
     <div>
-      <span className="text-xs font-medium" style={{ color: positive ? "#4ade80" : "#f87171" }}>
+      <span className="text-xs font-medium" style={{ color: positive ? "#4ADE80" : "#F87171" }}>
         {fmtDelta(delta)}
       </span>
-      <p className="text-[10px] mt-0.5" style={{ color: "#6B6B6B" }}>{periodLabel}</p>
+      <p className="text-[10px] mt-0.5" style={{ color: "#9A9A9A" }}>{periodLabel}</p>
     </div>
   );
 }
@@ -216,7 +216,52 @@ function SegmentedPill<T extends string>({
 
 // ─── Charts ───────────────────────────────────────────────────────────────────
 
-const PIE_COLORS = ["#ffffff", "#C9A86A", "#6B6B6B", "#4A4A4A", "#3A3A3A", "#2E2E2E", "#252525"];
+const PIE_COLORS = [
+  "#A78BFA", // lavender — Ultralink brand
+  "rgba(255,255,255,.8)", // white variant
+  "#4ADE80", // soft green
+  "#06AEEF", // Glacier blue
+  "#F87171", // soft red
+  "rgba(255,255,255,.35)", // Other
+];
+
+function ActivityTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: { dataKey?: string; value?: number }[];
+  label?: string | number;
+}) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div
+      style={{
+        background: "#141414",
+        border: "1px solid rgba(255,255,255,.08)",
+        borderRadius: 10,
+        padding: 12,
+        fontSize: 12,
+      }}
+    >
+      <p style={{ color: "#ffffff", marginBottom: 6, fontWeight: 500 }}>
+        {shortDate(String(label))}
+      </p>
+      {payload.map((p) => (
+        <div key={p.dataKey} className="flex items-center gap-1.5" style={{ marginTop: 2 }}>
+          <span
+            className="w-1.5 h-1.5 rounded-full shrink-0"
+            style={{ background: p.dataKey === "views" ? "#A78BFA" : "#ffffff" }}
+          />
+          <span style={{ color: "#ffffff" }}>
+            {p.dataKey === "views" ? "Views" : "Clicks"}: {p.value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function ActivityChart({ data, loading }: { data: AnalyticsData | null; loading: boolean }) {
   if (loading || !data) {
@@ -239,53 +284,43 @@ function ActivityChart({ data, loading }: { data: AnalyticsData | null; loading:
       <ComposedChart data={data.timeseries} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
         <defs>
           <linearGradient id="viewsGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#ffffff" stopOpacity={0.12} />
-            <stop offset="95%" stopColor="#ffffff" stopOpacity={0} />
+            <stop offset="5%" stopColor="#A78BFA" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#A78BFA" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid vertical={false} stroke="rgba(255,255,255,.05)" />
+        <CartesianGrid vertical={false} stroke="rgba(255,255,255,.06)" />
         <XAxis
           dataKey="date"
           ticks={filteredTicks}
           tickFormatter={shortDate}
-          tick={{ fill: "#6B6B6B", fontSize: 10 }}
+          tick={{ fill: "#9A9A9A", fontSize: 11 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: "#6B6B6B", fontSize: 10 }}
+          tick={{ fill: "#9A9A9A", fontSize: 11 }}
           axisLine={false}
           tickLine={false}
           allowDecimals={false}
         />
         <Tooltip
-          contentStyle={{
-            background: "#1A1A1A",
-            border: "1px solid rgba(255,255,255,.12)",
-            borderRadius: 8,
-            fontSize: 12,
-            color: "#ffffff",
-          }}
-          labelFormatter={(label) => shortDate(String(label))}
-          formatter={(value, name) => [
-            value,
-            name === "views" ? "Views" : "Clicks",
-          ]}
+          content={<ActivityTooltip />}
         />
         <Area
           type="monotone"
           dataKey="views"
-          stroke="#ffffff"
-          strokeWidth={1.5}
+          stroke="#A78BFA"
+          strokeWidth={2}
           fill="url(#viewsGrad)"
           dot={false}
         />
         <Line
           type="monotone"
           dataKey="clicks"
-          stroke="#C9A86A"
+          stroke="#ffffff"
           strokeWidth={1.5}
           dot={false}
+          activeDot={{ r: 3, fill: "#ffffff", stroke: "#ffffff" }}
         />
       </ComposedChart>
     </ResponsiveContainer>
@@ -466,7 +501,7 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
         <div
           className="sticky top-0 z-10 flex flex-wrap items-center gap-3 px-4 sm:px-6 py-3"
           style={{
-            background: "linear-gradient(90deg, rgba(124,58,237,.35), rgba(59,130,246,.35))",
+            background: "linear-gradient(to right, rgba(167,139,250,.15), rgba(6,174,239,.1))",
             borderBottom: "1px solid rgba(255,255,255,.10)",
             backdropFilter: "blur(8px)",
           }}
@@ -576,7 +611,7 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                 {exampleData && !loading && (
                   <span
                     className="text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded"
-                    style={{ background: "rgba(168,85,247,.15)", color: "#c4b5fd" }}
+                    style={{ background: "rgba(167,139,250,.18)", color: "#A78BFA" }}
                   >
                     Example
                   </span>
@@ -589,14 +624,17 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                   periodLabel={periodLabel}
                 />
               )}
-              {tile.label === "Clicks" && !loading && (data?.winbackShown ?? 0) > 0 && (
-                <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: "#6B6B6B" }}>
-                  Win-Back: {fmt(data!.winbackShown)} shown · {fmt(data!.winbackClicks)} recovered (
-                  {data!.winbackShown > 0
-                    ? Math.round((data!.winbackClicks / data!.winbackShown) * 100)
-                    : 0}%)
-                </p>
-              )}
+              {tile.label === "Clicks" && !loading && (data?.winbackShown ?? 0) > 0 && (() => {
+                const rate = data!.winbackShown > 0
+                  ? Math.round((data!.winbackClicks / data!.winbackShown) * 100)
+                  : 0;
+                return (
+                  <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: "#9A9A9A" }}>
+                    Win-Back: {fmt(data!.winbackShown)} shown · {fmt(data!.winbackClicks)} recovered (
+                    <span style={{ color: rate > 0 ? "#A78BFA" : "#9A9A9A" }}>{rate}%</span>)
+                  </p>
+                );
+              })()}
             </Card>
           ))}
         </div>
@@ -607,11 +645,11 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
             <CardTitle>Activity</CardTitle>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#ffffff" }} />
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#A78BFA" }} />
                 <span className="text-xs" style={{ color: "#6B6B6B" }}>Views</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#C9A86A" }} />
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#ffffff" }} />
                 <span className="text-xs" style={{ color: "#6B6B6B" }}>Clicks</span>
               </div>
             </div>
@@ -643,10 +681,10 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                     <span className="text-xs font-medium tabular-nums" style={{ color: "#ffffff" }}>
                       {fmt(c.count)}
                     </span>
-                    <div className="w-16 h-1 rounded-full overflow-hidden" style={{ background: "#2A2A2A" }}>
+                    <div className="w-16 h-1 rounded-full overflow-hidden" style={{ background: "transparent" }}>
                       <div
                         className="h-full rounded-full"
-                        style={{ width: `${c.pct}%`, background: "#ffffff" }}
+                        style={{ width: `${c.pct}%`, background: "rgba(167,139,250,.25)" }}
                       />
                     </div>
                   </div>
@@ -689,6 +727,8 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                   data.devices.total > 0
                     ? Math.round((count / data.devices.total) * 100)
                     : 0;
+                const fill =
+                  key === "mobile" ? "#A78BFA" : key === "desktop" ? "rgba(255,255,255,.5)" : "rgba(167,139,250,.25)";
                 return (
                   <div key={key} className="space-y-1">
                     <div className="flex items-center justify-between">
@@ -702,7 +742,7 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#2A2A2A" }}>
                       <div
                         className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${pct}%`, background: "#ffffff" }}
+                        style={{ width: `${pct}%`, background: fill }}
                       />
                     </div>
                   </div>
@@ -742,10 +782,10 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                       {link.url}
                     </p>
                   </div>
-                  <span className="text-xs font-medium tabular-nums shrink-0" style={{ color: "#ffffff" }}>
+                  <span className="text-xs font-bold tabular-nums shrink-0" style={{ color: "#ffffff" }}>
                     {fmt(link.clicks)}
                   </span>
-                  <span className="text-xs tabular-nums shrink-0 w-8 text-right" style={{ color: "#6B6B6B" }}>
+                  <span className="text-xs tabular-nums shrink-0 w-8 text-right" style={{ color: "#9A9A9A" }}>
                     {link.pct}%
                   </span>
                 </div>

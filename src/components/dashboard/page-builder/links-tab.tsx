@@ -33,17 +33,6 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SOCIALS = 20;
 
-const ICON_OPTIONS = [
-  { id: "link",     label: "Link",     path: "M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" },
-  { id: "music",    label: "Music",    path: "M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" },
-  { id: "video",    label: "Video",    path: "M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" },
-  { id: "shopping", label: "Shop",     path: "M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" },
-  { id: "mail",     label: "Email",    path: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" },
-  { id: "star",     label: "Star",     path: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" },
-  { id: "heart",    label: "Heart",    path: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" },
-  { id: "globe",    label: "Globe",    path: "M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253" },
-];
-
 // ─── Link item ────────────────────────────────────────────────────────────────
 
 interface LinkItemProps {
@@ -70,7 +59,6 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
   const [label, setLabel] = useState(link.label);
   const [url, setUrl] = useState(link.url);
   const [isAdult, setIsAdult] = useState(link.is_adult);
-  const [showIconPicker, setShowIconPicker] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(link.icon);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(link.thumbnail_url);
 
@@ -200,7 +188,7 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
     if (upErr) { setError(upErr.message); setUploadingThumb(false); return; }
     const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(filename);
     setSelectedIcon(publicUrl);
-    setShowIconPicker(false);
+    onPreview(link.id, { icon: publicUrl });
     setUploadingThumb(false);
   }
 
@@ -252,15 +240,9 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
               <img src={thumbnailUrl} alt="" className="w-8 h-8 rounded object-cover flex-shrink-0" />
             )}
 
-            {selectedIcon && !thumbnailUrl && (
-              selectedIcon.startsWith("http") ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={selectedIcon} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
-              ) : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 flex-shrink-0 text-text-muted">
-                  <path strokeLinecap="round" strokeLinejoin="round" d={ICON_OPTIONS.find(i => i.id === selectedIcon)?.path} />
-                </svg>
-              )
+            {selectedIcon && selectedIcon.startsWith("http") && !thumbnailUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={selectedIcon} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
             )}
           </>
         )}
@@ -413,48 +395,31 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
           <div className="border-t border-border pt-4">
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs font-medium text-text-muted">Icon</label>
-              <button type="button" onClick={() => setShowIconPicker((v) => !v)} className="text-xs text-gold hover:text-gold-bright cursor-pointer">
-                {selectedIcon ? "Change" : "Pick icon"}
+              {selectedIcon && selectedIcon.startsWith("http") && (
+                <button
+                  type="button"
+                  onClick={() => { setSelectedIcon(null); onPreview(link.id, { icon: null }); }}
+                  className="text-xs text-text-subtle hover:text-red-400 cursor-pointer"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {selectedIcon && selectedIcon.startsWith("http") && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={selectedIcon} alt="Icon" className="w-8 h-8 object-contain rounded-[var(--radius-sm)] border border-border flex-shrink-0" />
+              )}
+              <input ref={iconFileRef} type="file" accept="image/*" className="hidden" onChange={handleIconFileUpload} />
+              <button
+                type="button"
+                onClick={() => iconFileRef.current?.click()}
+                disabled={uploadingThumb}
+                className="text-xs text-text-muted border border-border-strong px-2.5 py-1.5 rounded cursor-pointer hover:bg-surface disabled:opacity-50"
+              >
+                {uploadingThumb ? "Uploading…" : selectedIcon ? "Change icon" : "Upload icon"}
               </button>
             </div>
-
-            {showIconPicker && (
-              <div className="p-3 bg-surface-2 border border-border-strong rounded-[var(--radius-sm)] space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => { setSelectedIcon(null); setShowIconPicker(false); }}
-                    className={`p-2 rounded border text-xs cursor-pointer ${!selectedIcon ? "border-gold/60 bg-gold-dim" : "border-border hover:border-border-strong"}`}
-                  >
-                    None
-                  </button>
-                  {ICON_OPTIONS.map((icon) => (
-                    <button
-                      key={icon.id}
-                      type="button"
-                      onClick={() => { setSelectedIcon(icon.id); setShowIconPicker(false); }}
-                      title={icon.label}
-                      className={`p-2 rounded border cursor-pointer ${selectedIcon === icon.id ? "border-gold/60 bg-gold-dim text-gold" : "border-border hover:border-border-strong text-text-muted"}`}
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d={icon.path} />
-                      </svg>
-                    </button>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2">
-                  <input ref={iconFileRef} type="file" accept="image/*" className="hidden" onChange={handleIconFileUpload} />
-                  <button
-                    type="button"
-                    onClick={() => iconFileRef.current?.click()}
-                    disabled={uploadingThumb}
-                    className="text-xs text-text-muted border border-border-strong px-2.5 py-1.5 rounded cursor-pointer hover:bg-surface disabled:opacity-50"
-                  >
-                    {uploadingThumb ? "Uploading…" : "Upload image icon"}
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Thumbnail */}
