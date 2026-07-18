@@ -53,21 +53,16 @@ export function LivePreview({ page, links, socials, theme, winBack, isPro }: Liv
         )}
       </div>
 
-      {/* Content frame — no border, just rounded clip + shadow for depth */}
+      {/* Content frame — full-bleed on mobile, phone-frame mockup on desktop */}
       <div
-        className="relative flex flex-col"
+        className="relative flex flex-col w-full h-full md:w-[390px] md:h-[88%] md:max-h-[844px] md:rounded-[44px] md:shadow-[0_24px_80px_rgba(0,0,0,0.5)]"
         style={{
-          width: 390,
-          height: "88%",
-          maxHeight: 844,
-          borderRadius: 44,
-          boxShadow: "0 24px 80px rgba(0,0,0,0.5)",
           overflow: "hidden",
         }}
       >
         {/* Scrollable content — no scrollbar chrome */}
         <div
-          className="absolute inset-0 overflow-y-auto"
+          className="absolute inset-0 overflow-y-auto no-scrollbar"
           style={{ scrollbarWidth: "none" }}
         >
           <ProfilePageView

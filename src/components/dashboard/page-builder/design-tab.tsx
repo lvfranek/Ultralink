@@ -95,19 +95,28 @@ export function ColorPickerField({
     if (!triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
     const popoverH = 290;
+    const popoverW = 224; // react-colorful is 200px + padding 0.75rem (12px) * 2 = 224px
     const spaceBelow = window.innerHeight - rect.bottom;
+
+    // Calculate horizontal positioning: align left first, or right if it overflows, clamped to screen edges
+    let left = rect.left;
+    if (left + popoverW > window.innerWidth - 8) {
+      left = rect.right - popoverW;
+    }
+    left = Math.max(8, Math.min(left, window.innerWidth - popoverW - 8));
+
     if (spaceBelow < popoverH + 8) {
       setPopoverStyle({
         position: "fixed",
         bottom: window.innerHeight - rect.top + 4,
-        right: window.innerWidth - rect.right,
+        left,
         zIndex: 9999,
       });
     } else {
       setPopoverStyle({
         position: "fixed",
         top: rect.bottom + 4,
-        right: window.innerWidth - rect.right,
+        left,
         zIndex: 9999,
       });
     }
@@ -115,6 +124,12 @@ export function ColorPickerField({
 
   useLayoutEffect(() => {
     if (open) updatePosition();
+  }, [open, updatePosition]);
+
+  useEffect(() => {
+    if (!open) return;
+    window.addEventListener("resize", updatePosition);
+    return () => window.removeEventListener("resize", updatePosition);
   }, [open, updatePosition]);
 
   const pickerContent = (

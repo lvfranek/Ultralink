@@ -36,7 +36,7 @@ export default async function DashboardLayout({
   return (
     <>
       <style>{`html, body { background: #131313 !important; }`}</style>
-      <div className="flex h-screen overflow-hidden dark-theme" style={{ background: "#131313" }}>
+      <div className="flex h-dvh overflow-hidden dark-theme" style={{ background: "#131313" }}>
         <DashboardChrome
           user={user}
           displayName={profileResult.data?.display_name}

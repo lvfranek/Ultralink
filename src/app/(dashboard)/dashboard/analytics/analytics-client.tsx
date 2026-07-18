@@ -188,18 +188,22 @@ function SegmentedPill<T extends string>({
 }) {
   return (
     <div
-      className="flex items-center p-[3px] rounded-full gap-0.5 flex-wrap"
-      style={{ background: "#2A2A2A", border: "1px solid rgba(255,255,255,.08)" }}
+      className="flex items-center p-[3px] rounded-full gap-0.5 overflow-x-auto no-scrollbar max-w-[calc(100vw-32px)] sm:max-w-none"
+      style={{
+        background: "#2A2A2A",
+        border: "1px solid rgba(255,255,255,.08)",
+        whiteSpace: "nowrap",
+      }}
     >
       {options.map((opt) =>
         opt.value === "custom" && customSlot ? (
-          <div key={opt.value}>{customSlot}</div>
+          <div key={opt.value} className="shrink-0">{customSlot}</div>
         ) : (
           <button
             key={opt.value}
             type="button"
             onClick={() => onChange(opt.value)}
-            className="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer"
+            className="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer shrink-0"
             style={
               value === opt.value
                 ? { background: "#ffffff", color: "#000000" }
@@ -391,6 +395,18 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
   const [isPending, startTransition] = useTransition();
   const [hydrated, setHydrated] = useState(false);
 
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileCustomOpen, setMobileCustomOpen] = useState(false);
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 640);
+    }
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Hydrate from URL, then localStorage (per-page), then default.
   useEffect(() => {
     const urlPage = searchParams.get("page");
@@ -563,21 +579,88 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
               )}
 
               {/* Range selector */}
-              <SegmentedPill
-                options={RANGE_OPTIONS}
-                value={range}
-                onChange={setRange}
-                customSlot={
-                  <CustomRangePopover
-                    value={
-                      customStart && customEnd
-                        ? { from: new Date(`${customStart}T00:00:00`), to: new Date(`${customEnd}T00:00:00`) }
-                        : undefined
-                    }
-                    onApply={handleCustomApply}
-                  />
-                }
-              />
+              {isMobile ? (
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <select
+                      value={range}
+                      onChange={(e) => {
+                        const val = e.target.value as RangeKey;
+                        if (val === "custom") {
+                          setMobileCustomOpen(true);
+                        } else {
+                          setRange(val);
+                        }
+                      }}
+                      className="h-8 pl-3 pr-8 text-xs rounded-full cursor-pointer appearance-none"
+                      style={{
+                        background: "#2A2A2A",
+                        border: "1px solid rgba(255,255,255,.08)",
+                        color: "#ffffff",
+                        outline: "none",
+                      }}
+                    >
+                      {RANGE_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[8px] text-[#9A9A9A]">
+                      ▼
+                    </span>
+                  </div>
+
+                  {range === "custom" && (
+                    <button
+                      type="button"
+                      onClick={() => setMobileCustomOpen(true)}
+                      className="h-8 px-3 rounded-full flex items-center gap-1 cursor-pointer transition-colors text-xs font-medium"
+                      style={{
+                        background: "#2A2A2A",
+                        border: "1px solid rgba(255,255,255,.08)",
+                        color: "#ffffff",
+                      }}
+                      aria-label="Edit custom range"
+                    >
+                      <span>✏️</span>
+                      <span>Edit</span>
+                    </button>
+                  )}
+
+                  {mobileCustomOpen && (
+                    <CustomRangePopover
+                      value={
+                        customStart && customEnd
+                          ? { from: new Date(`${customStart}T00:00:00`), to: new Date(`${customEnd}T00:00:00`) }
+                          : undefined
+                      }
+                      onApply={(r) => {
+                        handleCustomApply(r);
+                        setMobileCustomOpen(false);
+                      }}
+                      defaultOpen={true}
+                      onClose={() => setMobileCustomOpen(false)}
+                    />
+                  )}
+                </div>
+              ) : (
+                <SegmentedPill
+                  options={RANGE_OPTIONS}
+                  value={range}
+                  onChange={setRange}
+                  customSlot={
+                    <CustomRangePopover
+                      value={
+                        customStart && customEnd
+                          ? { from: new Date(`${customStart}T00:00:00`), to: new Date(`${customEnd}T00:00:00`) }
+                          : undefined
+                      }
+                      onApply={handleCustomApply}
+                    />
+                  }
+                />
+              )}
             </div>
             {range === "custom" && customSummary && (
               <p className="text-xs" style={{ color: "#6B6B6B" }}>{customSummary}</p>

@@ -61,7 +61,7 @@ export default async function EditLinkPage({
   const effectivePlan = getEffectivePlan(subProfile);
 
   return (
-    <div className="flex flex-col h-screen lg:h-dvh">
+    <div className="flex flex-col h-[calc(100dvh-3.5rem)] lg:h-dvh">
       <PageBuilder
         page={page}
         initialLinks={links}
