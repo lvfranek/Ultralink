@@ -13,6 +13,7 @@ import type { SubscriptionStatus } from "@/lib/supabase/types";
 import { useWelcomeModal } from "@/components/dashboard/welcome-modal-context";
 import { useFeedbackModal } from "@/components/dashboard/feedback-modal-context";
 import { UpgradeModal } from "@/components/dashboard/upgrade-modal";
+import { useNavigationLoading, SpinnerRing } from "@/components/dashboard/navigation-loading";
 
 interface SidebarProps {
   user: User;
@@ -39,6 +40,8 @@ function NavItem({
   disabled?: boolean;
   onClick?: () => void;
 }) {
+  const { startLoading } = useNavigationLoading();
+
   const cls = [
     "flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm font-medium transition-all duration-150",
     active
@@ -67,7 +70,15 @@ function NavItem({
   }
 
   return (
-    <Link href={href} className={`${cls} ${hoverCls}`} style={activeStyle} onClick={onClick}>
+    <Link
+      href={href}
+      className={`${cls} ${hoverCls}`}
+      style={activeStyle}
+      onClick={() => {
+        if (!active) startLoading();
+        onClick?.();
+      }}
+    >
       {icon}
       <span>{label}</span>
     </Link>
@@ -118,6 +129,7 @@ function AccountMenu({
   const [open, setOpen] = useState(false);
   const [switching, setSwitching] = useState<string | null>(null);
   const router = useRouter();
+  const { startLoading } = useNavigationLoading();
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -214,18 +226,20 @@ function AccountMenu({
                       key={acct.id}
                       type="button"
                       onClick={() => handleSwitchOwner(acct.id)}
-                      disabled={isLoading}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius-sm)] transition-colors cursor-pointer hover:bg-surface disabled:opacity-50"
+                      disabled={!!switching}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius-sm)] transition-colors cursor-pointer hover:bg-surface disabled:cursor-wait"
                       style={{ textAlign: "left" }}
                     >
                       <Avatar name={acct.name} size={24} />
                       <span className="flex-1 text-xs font-medium text-text truncate">{acct.name}</span>
                       <RoleBadge role={acct.role} />
-                      {isActive && (
+                      {isLoading ? (
+                        <SpinnerRing size={14} strokeWidth={2.5} />
+                      ) : isActive ? (
                         <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="#C9A86A" strokeWidth="2" aria-hidden="true">
                           <path d="M3 8l3.5 3.5L13 4.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
-                      )}
+                      ) : null}
                     </button>
                   );
                 })}
@@ -235,7 +249,7 @@ function AccountMenu({
 
             <button
               type="button"
-              onClick={() => { setOpen(false); router.push("/dashboard/account"); }}
+              onClick={() => { setOpen(false); startLoading(); router.push("/dashboard/account"); }}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface rounded-[var(--radius-sm)] transition-colors cursor-pointer"
             >
               <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">

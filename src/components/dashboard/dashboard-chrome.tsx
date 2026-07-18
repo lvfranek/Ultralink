@@ -6,6 +6,7 @@ import { WelcomeModal } from "@/components/dashboard/welcome-modal";
 import { WelcomeModalContext } from "@/components/dashboard/welcome-modal-context";
 import { FeedbackModal } from "@/components/dashboard/feedback-modal";
 import { FeedbackModalContext } from "@/components/dashboard/feedback-modal-context";
+import { NavigationLoadingProvider } from "@/components/dashboard/navigation-loading";
 import { markWelcomeSeen } from "@/app/actions/welcome";
 import type { User } from "@supabase/supabase-js";
 import type { TeamEntry } from "@/lib/team";
@@ -55,28 +56,30 @@ export function DashboardChrome({
   const openFeedbackModal = () => setFeedbackOpen(true);
 
   return (
-    <WelcomeModalContext.Provider value={{ openWelcomeModal }}>
-      <FeedbackModalContext.Provider value={{ openFeedbackModal }}>
-        <Sidebar
-          user={user}
-          displayName={displayName}
-          username={username}
-          activeOwnerId={activeOwnerId}
-          selfUsername={selfUsername}
-          teamMemberships={teamMemberships}
-          activeOwnerSubscriptionStatus={activeOwnerSubscriptionStatus}
-        />
-        <main className="flex-1 overflow-y-auto pt-14 lg:pt-0">
-          {children}
-        </main>
-        <WelcomeModal open={open} onClose={handleClose} displayName={displayName} />
-        <FeedbackModal
-          open={feedbackOpen}
-          onClose={() => setFeedbackOpen(false)}
-          defaultName={displayName || username || ""}
-          defaultEmail={user.email ?? ""}
-        />
-      </FeedbackModalContext.Provider>
-    </WelcomeModalContext.Provider>
+    <NavigationLoadingProvider>
+      <WelcomeModalContext.Provider value={{ openWelcomeModal }}>
+        <FeedbackModalContext.Provider value={{ openFeedbackModal }}>
+          <Sidebar
+            user={user}
+            displayName={displayName}
+            username={username}
+            activeOwnerId={activeOwnerId}
+            selfUsername={selfUsername}
+            teamMemberships={teamMemberships}
+            activeOwnerSubscriptionStatus={activeOwnerSubscriptionStatus}
+          />
+          <main className="flex-1 overflow-y-auto pt-14 lg:pt-0">
+            {children}
+          </main>
+          <WelcomeModal open={open} onClose={handleClose} displayName={displayName} />
+          <FeedbackModal
+            open={feedbackOpen}
+            onClose={() => setFeedbackOpen(false)}
+            defaultName={displayName || username || ""}
+            defaultEmail={user.email ?? ""}
+          />
+        </FeedbackModalContext.Provider>
+      </WelcomeModalContext.Provider>
+    </NavigationLoadingProvider>
   );
 }

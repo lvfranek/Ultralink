@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { Page } from "@/lib/supabase/types";
 import { deletePage } from "@/app/actions/pages";
 import { DuplicateLinkModal } from "./duplicate-link-modal";
+import { useNavigationLoading } from "@/components/dashboard/navigation-loading";
 
 interface LinksListProps {
   pages: Page[];
@@ -31,6 +32,7 @@ function PageRow({
   const [showDuplicate, setShowDuplicate] = useState(false);
   const [deleting, startDelete] = useTransition();
   const router = useRouter();
+  const { startLoading } = useNavigationLoading();
 
   const pageUrl = `${siteUrl}/${page.slug}`;
 
@@ -126,6 +128,7 @@ function PageRow({
           style={{ color: "#9A9A9A" }}
           onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,.08)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
+          onClick={startLoading}
           aria-label="Edit"
         >
           <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -191,7 +194,7 @@ function PageRow({
           sourcePageId={page.id}
           sourceSlug={page.slug}
           onClose={() => setShowDuplicate(false)}
-          onDuplicated={(newPageId) => router.push(`/dashboard/links/${newPageId}`)}
+          onDuplicated={(newPageId) => { startLoading(); router.push(`/dashboard/links/${newPageId}`); }}
         />
       )}
     </div>
