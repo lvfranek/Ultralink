@@ -74,6 +74,24 @@ export function Hero() {
             overflow: 'visible',
           }}
         >
+          {/* Beta badge */}
+          <span
+            style={{
+              display: 'inline-block',
+              padding: '4px 16px',
+              borderRadius: 999,
+              background: '#0A0A0A',
+              color: '#fff',
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              marginBottom: 20,
+            }}
+          >
+            Beta
+          </span>
+
           {/* Main headline */}
           <h1
             className="hero-heading"
