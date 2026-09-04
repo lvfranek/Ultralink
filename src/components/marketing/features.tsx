@@ -1,5 +1,3 @@
-const GRADIENT = 'linear-gradient(110deg,#FBC2A4,#F7A8C4,#C9A7F2,#A7C7F7)';
-
 const MAIN_BENEFITS = [
   {
     icon: (
@@ -118,38 +116,20 @@ const ADVANCED_BENEFITS = [
 function BenefitCard({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
     <div
-      className="benefit"
-      style={{ position: 'relative', isolation: 'isolate', borderRadius: 16 }}
+      className="benefit-card"
+      style={{
+        position: 'relative',
+        background: '#fff',
+        color: '#0A0A0A',
+        border: '1px solid rgba(0,0,0,.06)',
+        borderRadius: 16,
+        padding: 22,
+        flex: '1 1 240px',
+      }}
     >
-      <div
-        aria-hidden
-        className="benefit-glow"
-        style={{
-          position: 'absolute',
-          inset: -3,
-          borderRadius: 19,
-          background: GRADIENT,
-          filter: 'blur(16px)',
-          opacity: 0,
-          zIndex: 0,
-        }}
-      />
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 1,
-          background: '#fff',
-          color: '#0A0A0A',
-          border: '1px solid rgba(0,0,0,.06)',
-          borderRadius: 16,
-          padding: 22,
-          height: '100%',
-        }}
-      >
-        <div style={{ color: '#8a8a8a', marginBottom: 14 }}>{icon}</div>
-        <h3 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 6px', color: '#0A0A0A' }}>{title}</h3>
-        <p style={{ color: '#5a5a5a', fontSize: 13.5, lineHeight: 1.5, margin: 0 }}>{body}</p>
-      </div>
+      <div style={{ color: '#8a8a8a', marginBottom: 14 }}>{icon}</div>
+      <h3 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 6px', color: '#0A0A0A' }}>{title}</h3>
+      <p style={{ color: '#5a5a5a', fontSize: 13.5, lineHeight: 1.5, margin: 0 }}>{body}</p>
     </div>
   );
 }
@@ -157,8 +137,8 @@ function BenefitCard({ icon, title, body }: { icon: React.ReactNode; title: stri
 import React from 'react';
 
 const GRID: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+  display: 'flex',
+  flexWrap: 'wrap',
   gap: 16,
 };
 

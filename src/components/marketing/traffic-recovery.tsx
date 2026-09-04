@@ -1,5 +1,3 @@
-const GRADIENT = 'linear-gradient(110deg,#FBC2A4,#F7A8C4,#C9A7F2,#A7C7F7)';
-
 const STEPS = [
   {
     number: "01",
@@ -69,69 +67,51 @@ export function TrafficRecovery() {
 
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          display: 'flex',
+          flexWrap: 'wrap',
           gap: 16,
         }}
       >
         {STEPS.map((step) => (
           <div
             key={step.number}
-            className="benefit"
-            style={{ position: 'relative', isolation: 'isolate', borderRadius: 16 }}
+            className="benefit-card"
+            style={{
+              position: 'relative',
+              background: '#fff',
+              color: '#0A0A0A',
+              border: '1px solid rgba(0,0,0,.06)',
+              borderRadius: 16,
+              padding: 24,
+              flex: '1 1 220px',
+            }}
           >
             <div
-              aria-hidden
-              className="benefit-glow"
               style={{
-                position: 'absolute',
-                inset: -3,
-                borderRadius: 19,
-                background: GRADIENT,
-                filter: 'blur(16px)',
-                opacity: 0,
-                zIndex: 0,
-              }}
-            />
-            <div
-              style={{
-                position: 'relative',
-                zIndex: 1,
-                background: '#fff',
-                color: '#0A0A0A',
-                border: '1px solid rgba(0,0,0,.06)',
-                borderRadius: 16,
-                padding: 24,
-                height: '100%',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                background: 'rgba(0,0,0,0.05)',
+                border: '1px solid rgba(0,0,0,.08)',
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                color: '#8a8a8a',
+                marginBottom: 16,
               }}
             >
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 36,
-                  height: 36,
-                  borderRadius: '50%',
-                  background: 'rgba(0,0,0,0.05)',
-                  border: '1px solid rgba(0,0,0,.08)',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  color: '#8a8a8a',
-                  marginBottom: 16,
-                }}
-              >
-                {step.number}
-              </div>
-              <div style={{ color: '#8a8a8a', marginBottom: 10 }}>{step.icon}</div>
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: '#0A0A0A', margin: '0 0 6px' }}>
-                {step.label}
-              </h3>
-              <p style={{ fontSize: 13.5, lineHeight: 1.55, color: '#5a5a5a', margin: 0 }}>
-                {step.description}
-              </p>
+              {step.number}
             </div>
+            <div style={{ color: '#8a8a8a', marginBottom: 10 }}>{step.icon}</div>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: '#0A0A0A', margin: '0 0 6px' }}>
+              {step.label}
+            </h3>
+            <p style={{ fontSize: 13.5, lineHeight: 1.55, color: '#5a5a5a', margin: 0 }}>
+              {step.description}
+            </p>
           </div>
         ))}
       </div>

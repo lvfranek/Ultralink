@@ -91,11 +91,19 @@ body {
 }
 
 /* Benefit cards — hover glow + lift (hover-capable pointers only, so taps on touch devices don't get stuck "hovered") */
-.benefit { transition: transform .2s ease; }
-.benefit-glow { transition: opacity .25s ease; }
+.benefit-card {
+  transition: transform .2s ease, box-shadow .25s ease;
+  box-shadow: 0 0 0 0 rgba(0,0,0,0);
+}
 @media (hover: hover) and (pointer: fine) {
-  .benefit:hover { transform: translateY(-3px); }
-  .benefit:hover .benefit-glow { opacity: .75 !important; }
+  .benefit-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      -14px -14px 32px -10px rgba(251,194,164,.55),
+       14px -14px 32px -10px rgba(247,168,196,.5),
+      -14px  16px 32px -10px rgba(201,167,242,.5),
+       14px  16px 32px -10px rgba(167,199,247,.55);
+  }
 }
 
 /* Gradient frame — visible gradient border + soft outer glow for claim container */
