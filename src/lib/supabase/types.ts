@@ -70,7 +70,6 @@ export interface PageLink {
   layout: string;
   is_active: boolean;
   icon: string | null;
-  thumbnail_url: string | null;
   is_adult: boolean;
   fill_type: string;
   fill_value: string;

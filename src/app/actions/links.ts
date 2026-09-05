@@ -35,7 +35,7 @@ async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createCli
 export async function addLink(
   pageId: string,
   data: {
-    label: string; url: string; icon?: string; thumbnail_url?: string; is_adult?: boolean;
+    label: string; url: string; icon?: string; is_adult?: boolean;
     fill_type?: string; fill_value?: string; text_color?: string; corner?: string; animation?: string;
     item_type?: "button" | "heading";
   }
@@ -72,7 +72,6 @@ export async function addLink(
       label: data.label.trim(),
       url: normalizedUrl,
       icon: data.icon ?? null,
-      thumbnail_url: data.thumbnail_url ?? null,
       is_adult: data.is_adult ?? false,
       fill_type: data.fill_type ?? 'color',
       fill_value: data.fill_value ?? '#06AEEF',
@@ -94,7 +93,7 @@ export async function addLink(
 export async function updateLink(
   id: string,
   data: {
-    label?: string; url?: string; icon?: string | null; thumbnail_url?: string | null;
+    label?: string; url?: string; icon?: string | null;
     is_adult?: boolean; is_active?: boolean;
     fill_type?: string; fill_value?: string; text_color?: string; corner?: string; animation?: string;
   }
@@ -129,7 +128,6 @@ export async function updateLink(
       ...(data.label !== undefined ? { label: data.label.trim() } : {}),
       ...(normalizedUrl !== undefined ? { url: normalizedUrl } : {}),
       ...(data.icon !== undefined ? { icon: data.icon } : {}),
-      ...(data.thumbnail_url !== undefined ? { thumbnail_url: data.thumbnail_url } : {}),
       ...(data.is_adult !== undefined ? { is_adult: data.is_adult } : {}),
       ...(data.is_active !== undefined ? { is_active: data.is_active } : {}),
       ...(data.fill_type !== undefined ? { fill_type: data.fill_type } : {}),

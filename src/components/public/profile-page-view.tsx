@@ -428,18 +428,12 @@ function LinkButton({ link, index, isPreview }: { link: PageLink; index: number;
         animationDelay: ls.animation !== "none" ? `${index * 120}ms` : undefined,
       }}
     >
-      {/* Icon/thumbnail float on the left without occupying flex space, so the
+      {/* Icon floats on the left without occupying flex space, so the
           label below always centers on the full button width. */}
-      {(iconUrl || link.thumbnail_url) && (
+      {iconUrl && (
         <span className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-2" aria-hidden="true">
-          {iconUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={iconUrl} alt="" className="flex-shrink-0 w-5 h-5 object-contain rounded-sm" />
-          )}
-          {link.thumbnail_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={link.thumbnail_url} alt="" className="flex-shrink-0 w-10 h-10 rounded-sm object-cover" />
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={iconUrl} alt="" className="flex-shrink-0 w-5 h-5 object-contain rounded-sm" />
         </span>
       )}
 

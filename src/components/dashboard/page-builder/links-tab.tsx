@@ -60,7 +60,6 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
   const [url, setUrl] = useState(link.url);
   const [isAdult, setIsAdult] = useState(link.is_adult);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(link.icon);
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(link.thumbnail_url);
 
   // Locked at mount and updated only after a successful DB save, so dirty check
   // stays correct even when the link prop updates due to live preview propagation.
@@ -69,8 +68,7 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadingThumb, setUploadingThumb] = useState(false);
-  const thumbInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingIcon, setUploadingIcon] = useState(false);
   const iconFileRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -80,7 +78,6 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
     url !== link.url ||
     isAdult !== link.is_adult ||
     selectedIcon !== link.icon ||
-    thumbnailUrl !== link.thumbnail_url ||
     linkStyle.fillType !== saved.fillType ||
     linkStyle.fillValue !== saved.fillValue ||
     linkStyle.textColor !== saved.textColor ||
@@ -119,7 +116,6 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
       url,
       is_adult: isAdult,
       icon: selectedIcon,
-      thumbnail_url: thumbnailUrl,
       fill_type: linkStyle.fillType,
       fill_value: linkStyle.fillValue,
       text_color: linkStyle.textColor,
@@ -134,7 +130,7 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
     savedStyleRef.current = linkStyle;
     onUpdate({
       ...link,
-      label, url, is_adult: isAdult, icon: selectedIcon, thumbnail_url: thumbnailUrl,
+      label, url, is_adult: isAdult, icon: selectedIcon,
       fill_type: linkStyle.fillType, fill_value: linkStyle.fillValue, text_color: linkStyle.textColor,
       corner: linkStyle.corner, animation: linkStyle.animation,
     });
@@ -157,23 +153,6 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
     setExpanded((v) => !v);
   }
 
-  async function handleThumbUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = "";
-    if (!ALLOWED_TYPES.includes(file.type)) { setError("Image files only."); return; }
-    if (file.size > MAX_FILE_SIZE) { setError("Max 5 MB."); return; }
-
-    setUploadingThumb(true);
-    const supabase = createClient();
-    const filename = `${userId}/links/${Date.now()}_thumb.jpg`;
-    const { error: upErr } = await supabase.storage.from("media").upload(filename, file, { upsert: true });
-    if (upErr) { setError(upErr.message); setUploadingThumb(false); return; }
-    const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(filename);
-    setThumbnailUrl(publicUrl);
-    setUploadingThumb(false);
-  }
-
   async function handleIconFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -181,15 +160,15 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
     if (!ALLOWED_TYPES.includes(file.type)) { setError("Image files only."); return; }
     if (file.size > MAX_FILE_SIZE) { setError("Max 5 MB."); return; }
 
-    setUploadingThumb(true);
+    setUploadingIcon(true);
     const supabase = createClient();
     const filename = `${userId}/links/${Date.now()}_icon.png`;
     const { error: upErr } = await supabase.storage.from("media").upload(filename, file, { upsert: true });
-    if (upErr) { setError(upErr.message); setUploadingThumb(false); return; }
+    if (upErr) { setError(upErr.message); setUploadingIcon(false); return; }
     const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(filename);
     setSelectedIcon(publicUrl);
     onPreview(link.id, { icon: publicUrl });
-    setUploadingThumb(false);
+    setUploadingIcon(false);
   }
 
   function handleDelete() {
@@ -235,12 +214,7 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
               style={{ background: btnBg, borderRadius: btnRadius === '9999px' ? '9999px' : '4px' }}
             />
 
-            {thumbnailUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={thumbnailUrl} alt="" className="w-8 h-8 rounded object-cover flex-shrink-0" />
-            )}
-
-            {selectedIcon && selectedIcon.startsWith("http") && !thumbnailUrl && (
+            {selectedIcon && selectedIcon.startsWith("http") && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={selectedIcon} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
             )}
@@ -414,38 +388,12 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
               <button
                 type="button"
                 onClick={() => iconFileRef.current?.click()}
-                disabled={uploadingThumb}
+                disabled={uploadingIcon}
                 className="text-xs text-text-muted border border-border-strong px-2.5 py-1.5 rounded cursor-pointer hover:bg-surface disabled:opacity-50"
               >
-                {uploadingThumb ? "Uploading…" : selectedIcon ? "Change icon" : "Upload icon"}
+                {uploadingIcon ? "Uploading…" : selectedIcon ? "Change icon" : "Upload icon"}
               </button>
             </div>
-          </div>
-
-          {/* Thumbnail */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-medium text-text-muted">Thumbnail image</label>
-              {thumbnailUrl && (
-                <button type="button" onClick={() => setThumbnailUrl(null)} className="text-xs text-text-subtle hover:text-red-400 cursor-pointer">Remove</button>
-              )}
-            </div>
-            {thumbnailUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={thumbnailUrl} alt="Thumbnail" className="w-full h-24 object-cover rounded-[var(--radius-sm)] border border-border" />
-            ) : (
-              <div className="flex items-center gap-2">
-                <input ref={thumbInputRef} type="file" accept="image/*" className="hidden" onChange={handleThumbUpload} />
-                <button
-                  type="button"
-                  onClick={() => thumbInputRef.current?.click()}
-                  disabled={uploadingThumb}
-                  className="text-xs text-text-muted border border-border-strong px-2.5 py-1.5 rounded cursor-pointer hover:bg-surface-2 disabled:opacity-50"
-                >
-                  {uploadingThumb ? "Uploading…" : "Upload thumbnail"}
-                </button>
-              </div>
-            )}
           </div>
 
           {/* 18+ gate toggle */}
