@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveOwnerId } from "@/lib/team";
+import { normalizeUrl, isValidUrl } from "@/lib/url";
 import type { PageSocial } from "@/lib/supabase/types";
 
 const MAX_SOCIALS = 20;
@@ -30,6 +31,9 @@ export async function addSocial(
   if (!data.url.trim()) return { error: "URL is required." };
   if (!data.platform) return { error: "Platform is required." };
 
+  const normalizedUrl = normalizeUrl(data.url);
+  if (!isValidUrl(normalizedUrl)) return { error: "Please enter a valid URL." };
+
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
   const owns = await verifyPageOwnership(supabase, pageId, activeOwnerId);
   if (!owns) return { error: "Page not found." };
@@ -48,7 +52,7 @@ export async function addSocial(
     .insert({
       page_id: pageId,
       platform: data.platform,
-      url: data.url.trim(),
+      url: normalizedUrl,
       position: count ?? 0,
     })
     .select()
@@ -76,6 +80,13 @@ export async function updateSocial(
 
   if (!existing) return { error: "Social link not found." };
 
+  let normalizedUrl: string | undefined;
+  if (data.url !== undefined) {
+    if (!data.url.trim()) return { error: "URL is required." };
+    normalizedUrl = normalizeUrl(data.url);
+    if (!isValidUrl(normalizedUrl)) return { error: "Please enter a valid URL." };
+  }
+
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
   const owns = await verifyPageOwnership(supabase, existing.page_id, activeOwnerId);
   if (!owns) return { error: "Not authorized." };
@@ -84,7 +95,7 @@ export async function updateSocial(
     .from("page_socials")
     .update({
       ...(data.platform !== undefined ? { platform: data.platform } : {}),
-      ...(data.url !== undefined ? { url: data.url.trim() } : {}),
+      ...(normalizedUrl !== undefined ? { url: normalizedUrl } : {}),
     })
     .eq("id", id);
 

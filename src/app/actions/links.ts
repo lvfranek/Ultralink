@@ -4,24 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveOwnerId } from "@/lib/team";
+import { normalizeUrl, isValidUrl } from "@/lib/url";
 import type { PageLink } from "@/lib/supabase/types";
 
 export type LinkActionResult = { error: string } | { ok: true; link?: PageLink };
-
-function normalizeUrl(url: string): string {
-  const trimmed = url.trim();
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  return `https://${trimmed}`;
-}
-
-function isValidUrl(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createClient>>, pageId: string, activeOwnerId: string): Promise<boolean> {
   const { count } = await supabase
