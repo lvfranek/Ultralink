@@ -84,7 +84,7 @@ export function LoginForm() {
   const prefilledPlan = searchParams.get("plan") ?? "";
 
   const [view, setView] = useState<View>("form");
-  const [mode, setMode] = useState<Mode>("signup");
+  const [mode, setMode] = useState<Mode>(prefilledUsername || prefilledPlan ? "signup" : "signin");
   const [email, setEmail] = useState("");
   const [confirmedEmail, setConfirmedEmail] = useState("");
   const [username, setUsername] = useState(prefilledUsername);
