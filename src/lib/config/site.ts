@@ -5,7 +5,4 @@ export const siteConfig = {
     "The premium link-in-bio platform for creators and agencies. Fast pages, real analytics, no cloaking, no bans.",
   url: "https://ultralink.bio",
   supportEmail: "support@ultralink.bio",
-  socialLinks: {
-    telegram: "https://t.me/ultralink",
-  },
 } as const;

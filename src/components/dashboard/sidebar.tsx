@@ -340,7 +340,6 @@ export function Sidebar({
 
   const bottomItems = [
     { href: "/help", label: "Help" },
-    { href: "https://t.me/ultralink", label: "Latest Updates" },
   ];
 
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (

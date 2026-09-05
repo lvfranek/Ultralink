@@ -17,7 +17,6 @@ const FOOTER_LINKS = {
   ],
   Support: [
     { label: "Contact", href: `mailto:${siteConfig.supportEmail}` },
-    { label: "Agency news", href: siteConfig.socialLinks.telegram },
   ],
 };
 
