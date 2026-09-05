@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { PasswordInput } from "@/components/ui/password-input";
 import { updateUsername, updateEmail, updatePassword } from "@/app/actions/account";
 import { createPortalSession } from "@/app/actions/billing";
 import { inviteEditor, removeEditor, revokeInvite, resendInvite } from "@/app/actions/team";
@@ -663,7 +664,7 @@ function EmailCard({ email }: { email: string }) {
             </FieldRow>
             <FieldRow>
               <label style={label}>Current password</label>
-              <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="Verify it&apos;s you" autoComplete="current-password" style={input} />
+              <PasswordInput value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="Verify it&apos;s you" autoComplete="current-password" style={input} toggleColor="#6B6B6B" />
             </FieldRow>
             {status && <StatusMsg type={status.type}>{status.msg}</StatusMsg>}
             <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
@@ -715,15 +716,15 @@ function PasswordCard() {
       <div style={cardBody}>
         <FieldRow>
           <label style={label}>Current password</label>
-          <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" placeholder="Your current password" style={input} />
+          <PasswordInput value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" placeholder="Your current password" style={input} toggleColor="#6B6B6B" />
         </FieldRow>
         <FieldRow>
           <label style={label}>New password <span style={{ fontWeight: 400, color: "#6B6B6B" }}>(min. 8 characters)</span></label>
-          <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} autoComplete="new-password" placeholder="At least 8 characters" style={input} />
+          <PasswordInput value={newPassword} onChange={(e) => setNewPassword(e.target.value)} autoComplete="new-password" placeholder="At least 8 characters" style={input} toggleColor="#6B6B6B" />
         </FieldRow>
         <FieldRow>
           <label style={label}>Confirm new password</label>
-          <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" placeholder="Repeat new password" style={mismatch ? inputError : input} />
+          <PasswordInput value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" placeholder="Repeat new password" style={mismatch ? inputError : input} toggleColor="#6B6B6B" />
           {mismatch && <p style={{ marginTop: 6, fontSize: 12, color: "#ef4444" }}>Passwords don&apos;t match.</p>}
         </FieldRow>
         {status && <StatusMsg type={status.type}>{status.msg}</StatusMsg>}

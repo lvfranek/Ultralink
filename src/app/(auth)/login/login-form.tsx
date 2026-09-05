@@ -7,6 +7,7 @@ import { Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { emailInUse, resendConfirmationEmail } from "@/app/actions/account";
 import { notifySignup } from "@/app/actions/notify";
+import { PasswordInput } from "@/components/ui/password-input";
 import { AuthShell, inputStyle, inputErrorStyle } from "../auth-shell";
 
 type Mode = "signin" | "signup" | "reset";
@@ -965,10 +966,9 @@ export function LoginForm() {
                     <span style={{ fontWeight: 400, color: '#9a9a9a', marginLeft: 4 }}>(min. 8 characters)</span>
                   )}
                 </label>
-                <input
+                <PasswordInput
                   ref={passwordInputRef}
                   id="password"
-                  type="password"
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); clearMessages(); }}
                   onBlur={() => setPasswordTouched(true)}
@@ -1010,10 +1010,9 @@ export function LoginForm() {
                   <label htmlFor="confirm-password" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6B6B6B', marginBottom: 6 }}>
                     Confirm password
                   </label>
-                  <input
+                  <PasswordInput
                     ref={confirmPasswordInputRef}
                     id="confirm-password"
-                    type="password"
                     value={confirmPassword}
                     onChange={(e) => { setConfirmPassword(e.target.value); clearMessages(); }}
                     onBlur={() => setConfirmPasswordTouched(true)}

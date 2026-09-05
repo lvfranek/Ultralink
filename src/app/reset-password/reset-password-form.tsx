@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { PasswordInput } from "@/components/ui/password-input";
 import { inputStyle, inputErrorStyle } from "@/app/(auth)/auth-shell";
 
 export function ResetPasswordForm() {
@@ -61,9 +62,8 @@ export function ResetPasswordForm() {
           <label htmlFor="new-password" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6B6B6B', marginBottom: 6 }}>
             New password <span style={{ fontWeight: 400, color: '#9a9a9a' }}>(min. 8 characters)</span>
           </label>
-          <input
+          <PasswordInput
             id="new-password"
-            type="password"
             value={password}
             onChange={(e) => { setPassword(e.target.value); setError(null); }}
             onBlur={() => setPasswordTouched(true)}
@@ -82,9 +82,8 @@ export function ResetPasswordForm() {
           <label htmlFor="confirm-new-password" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6B6B6B', marginBottom: 6 }}>
             Confirm new password
           </label>
-          <input
+          <PasswordInput
             id="confirm-new-password"
-            type="password"
             value={confirmPassword}
             onChange={(e) => { setConfirmPassword(e.target.value); setError(null); }}
             onBlur={() => setConfirmTouched(true)}

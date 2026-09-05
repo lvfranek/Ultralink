@@ -6,11 +6,32 @@ import { createClient } from "@/lib/supabase/server";
 import { validateSlug } from "@/lib/slug";
 import { getLinkCap } from "@/lib/config/pricing";
 import { getActiveOwnerId } from "@/lib/team";
+import type { Theme } from "@/lib/config/theme";
 
 export type ActionResult =
   | { error: string }
   | { ok: true }
   | { ok: true; pageId: string };
+
+// Starting point for every newly created page — modeled on a hand-designed
+// reference page so a fresh page looks intentional instead of a blank slate.
+const NEW_PAGE_BIO = "Hello world!";
+const NEW_PAGE_AVATAR_URL = "/favicon/favicon.png";
+const NEW_PAGE_THEME: Theme = {
+  preset: "custom",
+  pageBg: { type: "color", value: "#1E1E1E", overlay: 0 },
+  fonts: { title: "inter", body: "inter" },
+  colors: { name: "#FFFFFF", handle: "#DADADA", icons: "#DADADA" },
+};
+const NEW_PAGE_LINK = {
+  label: "Link 1",
+  url: "http://www.instagram.com/",
+  fill_type: "color",
+  fill_value: "#b8c9ff",
+  text_color: "#000000",
+  corner: "rounded",
+  animation: "none",
+};
 
 export async function createPage(
   _prev: ActionResult | null,
@@ -54,13 +75,32 @@ export async function createPage(
 
   const { data: page, error } = await supabase
     .from("pages")
-    .insert({ owner_id: activeOwnerId, slug, title })
+    .insert({
+      owner_id: activeOwnerId,
+      slug,
+      title,
+      bio: NEW_PAGE_BIO,
+      avatar_url: NEW_PAGE_AVATAR_URL,
+      theme: NEW_PAGE_THEME,
+    })
     .select()
     .single();
 
   if (error) {
     if (error.code === "23505") return { error: "That username is already taken." };
     return { error: error.message };
+  }
+
+  const { error: linkError } = await supabase.from("page_links").insert({
+    page_id: page.id,
+    ...NEW_PAGE_LINK,
+    item_type: "button",
+    position: 0,
+  });
+  if (linkError) {
+    // The page itself was created successfully — don't fail the whole
+    // action over the cosmetic starter link.
+    console.error("Failed to insert starter link for new page:", linkError);
   }
 
   revalidatePath("/dashboard");
