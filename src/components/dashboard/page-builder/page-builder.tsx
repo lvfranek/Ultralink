@@ -473,7 +473,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                     >
                       <span className="text-sm text-text">Custom Domain</span>
                       <span className="text-[10px] px-1.5 py-0.5 bg-surface-2 text-text-subtle border border-border-strong rounded font-semibold uppercase tracking-wider">
-                        Phase 5
+                        Coming Soon
                       </span>
                     </div>
                     <WinBackControl

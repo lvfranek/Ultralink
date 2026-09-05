@@ -10,7 +10,7 @@ interface AdvancedTabProps {
 function ComingSoonBadge() {
   return (
     <span className="text-[10px] px-1.5 py-0.5 bg-surface-2 text-text-subtle border border-border-strong rounded font-semibold uppercase tracking-wider">
-      Phase 5
+      Coming Soon
     </span>
   );
 }
@@ -52,7 +52,7 @@ export function AdvancedTab({ page, onChange }: AdvancedTabProps) {
 
       {/* Coming soon stubs */}
       <div className="mt-6 space-y-3">
-        <p className="text-xs font-medium text-text-subtle uppercase tracking-widest">Coming in Phase 5</p>
+        <p className="text-xs font-medium text-text-subtle uppercase tracking-widest">Coming Soon</p>
 
         {[
           {
