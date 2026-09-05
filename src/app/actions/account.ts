@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { getSiteUrl } from "@/lib/site-url";
 
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
 
@@ -24,7 +25,11 @@ export async function emailInUse(email: string): Promise<boolean> {
 
 export async function resendConfirmationEmail(email: string): Promise<{ error?: string }> {
   const supabase = await createClient();
-  const { error } = await supabase.auth.resend({ type: "signup", email });
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+    options: { emailRedirectTo: `${getSiteUrl()}/dashboard` },
+  });
   if (error) return { error: error.message };
   return {};
 }

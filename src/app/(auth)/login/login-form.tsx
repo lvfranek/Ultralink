@@ -352,7 +352,7 @@ export function LoginForm() {
     setResetLoading(true);
     try {
       await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
     } finally {
       setResetLoading(false);
@@ -389,7 +389,10 @@ export function LoginForm() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            // Final destination after the confirm-page verification (not the
+            // link the email itself points to — that's set by the Supabase
+            // email template, see /auth/confirm).
+            emailRedirectTo: `${window.location.origin}/dashboard`,
             data: {
               username,
               plan: prefilledPlan || undefined,
