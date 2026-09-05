@@ -115,7 +115,7 @@ export function Header() {
               Login
             </Link>
             <Link
-              href="/login"
+              href="/login?mode=signup"
               style={{
                 background: "#fff",
                 color: "#0A0A0A",
@@ -223,7 +223,7 @@ export function Header() {
               Login
             </Link>
             <Link
-              href="/login"
+              href="/login?mode=signup"
               onClick={() => setMobileOpen(false)}
               style={{
                 background: "#fff",

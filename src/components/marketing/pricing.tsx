@@ -184,7 +184,7 @@ export function Pricing() {
           </ul>
 
           <a
-            href="/login"
+            href="/login?mode=signup"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
