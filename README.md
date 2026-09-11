@@ -52,6 +52,10 @@ build a fast, branded link page and see real analytics behind every click.
 
 [ultralink.bio](https://ultralink.bio)
 
+### 📺 Introduction
+
+[![Ultralink — introduction video](https://img.youtube.com/vi/kuKPoWWQGdk/maxresdefault.jpg)](https://www.youtube.com/watch?v=kuKPoWWQGdk)
+
 ## 🚦 Getting Started
 
 **Prerequisites:** Node.js 20+, a Supabase project, and Stripe/Resend accounts (test mode is fine).
