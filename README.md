@@ -3,7 +3,7 @@
 One link. Your entire world. Ultralink is a premium link-in-bio platform for creators and agencies —
 build a fast, branded link page and see real analytics behind every click. No cloaking, no bans.
 
-![Ultralink](public/ultralink.png)
+![Ultralink](public/ultralink-poster.jpg)
 
 ## ⌨️ Tech Stack
 
