@@ -46,6 +46,7 @@ const ADVANCED_BENEFITS = [
     ),
     title: 'Custom domains',
     body: 'Put your own domain on your page — your brand, your URL.',
+    comingSoon: true,
   },
   {
     icon: (
@@ -113,7 +114,17 @@ const ADVANCED_BENEFITS = [
   },
 ];
 
-function BenefitCard({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+function BenefitCard({
+  icon,
+  title,
+  body,
+  comingSoon,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+  comingSoon?: boolean;
+}) {
   return (
     <div
       className="benefit-card"
@@ -128,7 +139,38 @@ function BenefitCard({ icon, title, body }: { icon: React.ReactNode; title: stri
       }}
     >
       <div style={{ color: '#8a8a8a', marginBottom: 14 }}>{icon}</div>
-      <h3 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 6px', color: '#0A0A0A' }}>{title}</h3>
+      <h3
+        style={{
+          fontSize: 15,
+          fontWeight: 600,
+          margin: '0 0 6px',
+          color: '#0A0A0A',
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 8,
+        }}
+      >
+        {title}
+        {comingSoon && (
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 500,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              color: '#5a5a5a',
+              background: 'rgba(0,0,0,.04)',
+              border: '1px solid rgba(0,0,0,.08)',
+              borderRadius: 999,
+              padding: '2px 7px',
+            }}
+          >
+            Coming soon
+          </span>
+        )}
+      </h3>
       <p style={{ color: '#5a5a5a', fontSize: 13.5, lineHeight: 1.5, margin: 0 }}>{body}</p>
     </div>
   );
