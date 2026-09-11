@@ -52,13 +52,6 @@ build a fast, branded link page and see real analytics behind every click.
 
 [ultralink.bio](https://ultralink.bio)
 
-### 📺 Introduction
-
-<video src="public/Ultralink%20Intro.mp4" poster="public/ultralink-poster.jpg" controls muted playsinline width="100%">
-  Your renderer can't play embedded video —
-  <a href="public/Ultralink%20Intro.mp4">watch Ultralink Intro.mp4</a> instead.
-</video>
-
 ## 🚦 Getting Started
 
 **Prerequisites:** Node.js 20+, a Supabase project, and Stripe/Resend accounts (test mode is fine).
