@@ -51,7 +51,7 @@ export async function getAdminStats(): Promise<AdminStats> {
     service.from("profiles").select("*", { count: "exact", head: true }),
     service
       .from("profiles")
-      .select("plan_tier, plan_interval, subscription_status")
+      .select("id, plan_tier, plan_interval, subscription_status")
       .in("subscription_status", ACTIVE_STATUSES),
     service
       .from("profiles")
@@ -63,7 +63,11 @@ export async function getAdminStats(): Promise<AdminStats> {
     service.from("profiles").select("*", { count: "exact", head: true }).eq("subscription_status", "canceled"),
   ]);
 
-  const breakdown = proBreakdown ?? [];
+  // The admin account has Pro for free — it's not a paying customer, so keep
+  // it out of revenue and conversion numbers.
+  const adminId = process.env.ADMIN_USER_ID;
+  const breakdown = (proBreakdown ?? []).filter((r) => r.id !== adminId);
+  const excludedAdmin = (proBreakdown?.length ?? 0) - breakdown.length;
   const tierBreakdown: TierBreakdownRow[] = TIERS.map((tier) => {
     const rows = breakdown.filter((r) => r.plan_tier === tier);
     const monthlyCustomers = rows.filter((r) => r.plan_interval === "monthly").length;
@@ -74,7 +78,7 @@ export async function getAdminStats(): Promise<AdminStats> {
 
   const mrr = tierBreakdown.reduce((sum, row) => sum + row.mrr, 0);
   const totalPro = breakdown.length;
-  const total = totalUsers ?? 0;
+  const total = (totalUsers ?? 0) - excludedAdmin;
 
   return {
     totalUsers: total,
