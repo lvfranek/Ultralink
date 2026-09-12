@@ -24,10 +24,14 @@ const inter = Inter({
   display: "swap",
 });
 
+// Theme fonts below are only used on bio pages that pick them in the Design
+// tab, so they aren't preloaded on every page. Geist (UI) and Inter (default
+// page font) stay preloaded.
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
   display: "swap",
+  preload: false,
   weight: ["400", "500", "600", "700", "800", "900"],
 });
 
@@ -35,6 +39,7 @@ const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-poppins",
   display: "swap",
+  preload: false,
   weight: ["400", "500", "600", "700"],
 });
 
@@ -42,24 +47,28 @@ const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
   display: "swap",
+  preload: false,
 });
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
   display: "swap",
+  preload: false,
 });
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
   display: "swap",
+  preload: false,
 });
 
 const cormorant = Cormorant({
   subsets: ["latin"],
   variable: "--font-cormorant",
   display: "swap",
+  preload: false,
   weight: ["400", "500", "600", "700"],
 });
 
@@ -67,6 +76,7 @@ const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
   variable: "--font-bebas",
   display: "swap",
+  preload: false,
   weight: "400",
 });
 
