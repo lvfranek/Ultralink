@@ -65,10 +65,10 @@ export async function updateUsername(username: string): Promise<{ error?: string
 
   if (error) return { error: error.message };
   if (!data || data.length === 0) {
-    // Row missing or RLS blocked the update — upsert as fallback
+    // Row missing — insert it as a fallback
     const { error: upsertError } = await supabase
       .from("profiles")
-      .upsert({ id: user.id, username }, { onConflict: "id" });
+      .insert({ id: user.id, username });
     if (upsertError) return { error: upsertError.message };
   }
 

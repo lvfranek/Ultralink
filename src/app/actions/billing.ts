@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { stripe } from "@/lib/stripe/server";
 import { getPriceId } from "@/lib/stripe/prices";
 import { getSiteUrl } from "@/lib/site-url";
@@ -57,7 +58,8 @@ export async function createCheckoutSession({
       metadata: { user_id: user.id },
     });
     customerId = customer.id;
-    await supabase
+    // Billing columns aren't user-writable (see 20260911_lock_profile_columns.sql)
+    await createServiceClient()
       .from("profiles")
       .update({ stripe_customer_id: customerId })
       .eq("id", user.id);

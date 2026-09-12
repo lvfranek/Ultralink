@@ -15,7 +15,7 @@
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
     "lucide-react": "^1.21.0",
-    "next": "16.2.9",
+    "next": "^16.3.4",
     "react": "19.2.4",
     "react-colorful": "^5.7.0",
     "react-day-picker": "^10.0.1",
@@ -32,7 +32,7 @@
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.2.9",
+    "eslint-config-next": "^16.3.4",
     "tailwindcss": "^4",
     "typescript": "^5.9.3"
   }
