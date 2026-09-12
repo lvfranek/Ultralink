@@ -7,6 +7,7 @@ import { Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { emailInUse, resendConfirmationEmail } from "@/app/actions/account";
 import { notifySignup } from "@/app/actions/notify";
+import { siteConfig } from "@/lib/config/site";
 import { PasswordInput } from "@/components/ui/password-input";
 import { AuthShell, inputStyle, inputErrorStyle } from "../auth-shell";
 
@@ -106,6 +107,7 @@ export function LoginForm() {
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const [bannerCode, setBannerCode] = useState<string | null>(null);
+  const [bannerDetail, setBannerDetail] = useState<string | null>(null);
   const [bannerHidden, setBannerHidden] = useState(false);
   const [bannerNeedsEmail, setBannerNeedsEmail] = useState(false);
   const [bannerResendSent, setBannerResendSent] = useState(false);
@@ -165,6 +167,9 @@ export function LoginForm() {
     const fragmentParams = hash ? new URLSearchParams(hash.slice(1)) : null;
     const code = fragmentParams?.get("error_code") ?? searchParams.get("error");
     if (code) setBannerCode(code);
+    const detail = fragmentParams?.get("error_description") ?? searchParams.get("error_description");
+    // Comes from the URL, so keep it short — it's shown as plain text
+    if (detail) setBannerDetail(detail.slice(0, 200));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -186,11 +191,15 @@ export function LoginForm() {
       case "auth_callback_failed":
         return {
           title: "Something went wrong.",
-          body: "The confirmation didn't complete. Try signing in, or reset your password if you're stuck.",
+          body: "The sign-in didn't complete. Try again, or reset your password if you're stuck.",
           showResend: false,
         };
       default:
-        return null;
+        return {
+          title: "We couldn't sign you in.",
+          body: `Please try again. If it keeps happening, email ${siteConfig.supportEmail} with the details below.`,
+          showResend: false,
+        };
     }
   }, [bannerCode, bannerHidden]);
 
@@ -581,6 +590,9 @@ export function LoginForm() {
                 </p>
                 <p style={{ fontSize: 13, color: '#6B6B6B', margin: '4px 0 0', lineHeight: 1.5 }}>
                   {banner.body}
+                </p>
+                <p style={{ fontSize: 12, color: '#9a9a9a', margin: '6px 0 0', lineHeight: 1.5, wordBreak: 'break-word' }}>
+                  Details: {bannerDetail ? `${bannerDetail} (${bannerCode})` : bannerCode}
                 </p>
                 {bannerNeedsEmail && (
                   <p style={{ fontSize: 12, color: '#b91c1c', margin: '8px 0 0' }}>
