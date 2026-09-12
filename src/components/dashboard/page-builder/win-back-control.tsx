@@ -1,13 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import type { WinBack } from "@/lib/supabase/types";
+import type { PageLink, WinBack } from "@/lib/supabase/types";
+import type { Theme } from "@/lib/config/theme";
+import { isValidUrl, normalizeUrl } from "@/lib/url";
 import { UpgradeModal } from "@/components/dashboard/upgrade-modal";
+import { WinBackDialog } from "@/components/public/win-back-overlay";
 
 interface WinBackControlProps {
   value: WinBack;
   onChange: (v: WinBack) => void;
   isPro: boolean;
+  /** Page data the popup preview is styled from */
+  theme: Theme;
+  avatarUrl: string | null;
+  title: string;
+  firstLink: PageLink | null;
 }
 
 function Toggle({ checked, onToggle }: { checked: boolean; onToggle: () => void }) {
@@ -39,9 +47,10 @@ function rowSummary(value: WinBack): string {
   return "On";
 }
 
-export function WinBackControl({ value, onChange, isPro }: WinBackControlProps) {
+export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title, firstLink }: WinBackControlProps) {
   const [expanded, setExpanded] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   if (!isPro) {
     return (
@@ -70,6 +79,10 @@ export function WinBackControl({ value, onChange, isPro }: WinBackControlProps) 
   }
 
   const charCount = value.headline.length;
+  // Same condition as the live page: the popup only appears once it has a link.
+  // Saving adds https:// to bare domains, so the preview does too.
+  const previewUrl = value.url.trim() ? normalizeUrl(value.url) : "";
+  const canPreview = value.enabled && isValidUrl(previewUrl);
 
   return (
     <div style={{ borderBottom: "1px solid rgba(255,255,255,.06)" }}>
@@ -156,7 +169,37 @@ export function WinBackControl({ value, onChange, isPro }: WinBackControlProps) 
               onToggle={() => onChange({ ...value, age_gate: !value.age_gate })}
             />
           </div>
+
+          {/* Preview — opens the exact popup visitors see */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setPreviewOpen(true)}
+              disabled={!canPreview}
+              className="w-full flex items-center justify-center gap-1.5 bg-surface-2 border border-border-strong text-text rounded-[var(--radius)] px-3 py-2 text-xs font-medium cursor-pointer transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-2"
+            >
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5" aria-hidden>
+                <path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" strokeLinejoin="round" />
+                <circle cx="8" cy="8" r="2" />
+              </svg>
+              Preview popup
+            </button>
+            {!canPreview && value.enabled && (
+              <p className="text-xs text-text-subtle mt-1.5">Add a valid link to preview the popup.</p>
+            )}
+          </div>
         </div>
+      )}
+
+      {previewOpen && (
+        <WinBackDialog
+          winBack={{ ...value, url: previewUrl }}
+          theme={theme}
+          avatarUrl={avatarUrl}
+          title={title}
+          firstLink={firstLink}
+          onDismiss={() => setPreviewOpen(false)}
+        />
       )}
     </div>
   );

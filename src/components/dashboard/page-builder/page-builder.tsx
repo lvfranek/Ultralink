@@ -298,7 +298,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
 
             {/* Middle: live preview — always visible on md+, mobile only in preview mode */}
             <div className={`${mobileView === "preview" ? "flex" : "hidden md:flex"} flex-1 relative overflow-hidden`}>
-              <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} winBack={winBack} isPro={effectivePlan === "pro"} />
+              <LivePreview page={previewPage} links={activeLinks} socials={socials} theme={theme} isPro={effectivePlan === "pro"} />
             </div>
 
             {/* Right: settings panel — always visible on md+, mobile only in edit mode */}
@@ -480,6 +480,10 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                       value={winBack}
                       onChange={(v) => { setWinBack(v); setIsDirty(true); }}
                       isPro={effectivePlan === "pro"}
+                      theme={theme}
+                      avatarUrl={previewPage.avatar_url}
+                      title={previewPage.title}
+                      firstLink={activeLinks.find((l) => l.item_type === "button") ?? null}
                     />
                   </div>
                 </SettingsCard>
