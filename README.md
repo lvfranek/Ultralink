@@ -22,6 +22,8 @@ build a fast, branded link page and see real analytics behind every click.
 | Charts      | [Recharts](https://recharts.org) — analytics dashboard        |
 | Icons       | Lucide                                                        |
 | Hosting     | Vercel                                                        |
+| Testing     | [Vitest](https://vitest.dev) — unit tests                     |
+| CI          | GitHub Actions — lint, tests and build on every push          |
 
 ## 🚀 Features
 
@@ -120,6 +122,38 @@ inflate MRR.
 new signups (email or Google), new Pro subscriptions with updated MRR, cancellations, and bug
 reports / feature requests from the in-app feedback form.
 
+## 🧪 Testing & Quality
+
+**Unit tests** ([Vitest](https://vitest.dev)) cover the core business logic — the code where a
+silent mistake costs money or data:
+
+- **Billing** — who counts as Pro, grace periods, link limits per plan, MRR math, and a consistency
+  check of the pricing table (annual is always cheaper, prices add up).
+- **Analytics** — device detection (phone, tablet, desktop, bots and link previews) and referrer cleanup.
+- **Input handling** — URL normalization (`youtube.com` → `https://youtube.com`, no `javascript:` links),
+  page-slug rules and reserved names.
+- **Themes** — broken or outdated saved designs fall back to safe defaults instead of crashing.
+
+Tests live next to the code they test (`src/lib/**/*.test.ts`) and need no database or API keys.
+
+```bash
+npm test              # run once
+npm run test:watch    # re-run on every save
+```
+
+**Continuous integration.** Every push to `main` and every pull request runs
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml): **lint → unit tests → production build**
+(which includes type checking). It needs no secrets. The badge at the top of this README shows the
+current status.
+
+**Linting.** ESLint with the Next.js and React Hooks rules, at zero errors and warnings. The few
+intentional exceptions (code that must read browser-only APIs like `localStorage` after the page
+loads) are disabled line by line, each with a comment explaining why.
+
+**Accessibility.** The homepage scores 100 for accessibility in Lighthouse: sufficient color
+contrast, labeled controls, a "Skip to main content" link, visible focus rings, and a logical
+Tab order on desktop and mobile.
+
 ## 📁 Project Structure
 
 ```
@@ -145,7 +179,7 @@ src/
     dashboard/            Shell, sidebar, modals, page-builder/
     public/               Public page view, age gate, win-back overlay, social icons
     ui/
-  lib/
+  lib/                    Business logic, with unit tests next to it (*.test.ts)
     supabase/             Browser, server, and service-role clients + types
     stripe/               Stripe server client + price/tier mapping
     analytics/            Analytics helpers
@@ -153,6 +187,7 @@ src/
 supabase/
   migrations/             Schema migrations (run in filename order)
   storage-policies.sql    Policies for the public `media` bucket
+.github/workflows/ci.yml  CI: lint, tests, build
 ```
 
 ## ☁️ Deployment
