@@ -69,7 +69,8 @@ export function Header() {
           </div>
 
           {/* Glass pill — right (desktop) */}
-          <div
+          <nav
+            aria-label="Primary"
             style={{
               ...pillStyle,
               alignItems: "center",
@@ -138,7 +139,7 @@ export function Header() {
             >
               Sign up for free
             </Link>
-          </div>
+          </nav>
 
           {/* Mobile hamburger */}
           <button
@@ -185,6 +186,7 @@ export function Header() {
         inert={!mobileOpen}
       >
         <nav
+          aria-label="Mobile"
           style={{
             position: "absolute",
             top: 72,

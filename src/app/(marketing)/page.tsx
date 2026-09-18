@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div style={{ background: "#0A0A0A", minHeight: "100dvh" }}>
+    <div style={{ background: "#0A0A0A", minHeight: "100dvh", overflowX: "hidden", overflowY: "visible" }}>
       {/* Invisible until focused with Tab — lets keyboard users jump past the menu */}
       <a
         href="#main"

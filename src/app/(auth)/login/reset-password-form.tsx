@@ -63,7 +63,6 @@ export function ResetPasswordForm({
             border: "1px solid rgba(5,150,105,0.25)",
             fontSize: 14,
             color: "#047857",
-            outline: "none",
           }}
         >
           If an account exists for that email, a reset link is on the way.

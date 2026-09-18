@@ -550,7 +550,6 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                     background: "#2A2A2A",
                     border: "1px solid rgba(255,255,255,.08)",
                     color: "#ffffff",
-                    outline: "none",
                   }}
                 >
                   {pages.map((p) => (
@@ -580,7 +579,6 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                         background: "#2A2A2A",
                         border: "1px solid rgba(255,255,255,.08)",
                         color: "#ffffff",
-                        outline: "none",
                       }}
                     >
                       {RANGE_OPTIONS.map((opt) => (

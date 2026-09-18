@@ -21,7 +21,9 @@ const FOOTER_LINKS = {
 
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   const [hovered, setHovered] = useState(false);
-  const external = href.startsWith("http") || href.startsWith("mailto");
+  // Only real webpages open in a new tab — a mailto: link just hands off to
+  // the OS mail client, so it gets no target/rel and no "opens in new tab" hint.
+  const opensNewTab = href.startsWith("http");
   return (
     <Link
       href={href}
@@ -33,7 +35,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
         textDecoration: "none",
         transition: "color 0.15s",
       }}
-      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      {...(opensNewTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
     >
       {children}
     </Link>

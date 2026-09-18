@@ -7,9 +7,9 @@ export const inputStyle: React.CSSProperties = {
   color: "#0A0A0A",
   borderRadius: 8,
   padding: "12px 14px",
-  fontSize: 14,
+  // 16px, not 14px: anything smaller makes iOS Safari zoom in on focus
+  fontSize: 16,
   fontFamily: "inherit",
-  outline: "none",
   boxSizing: "border-box",
 };
 

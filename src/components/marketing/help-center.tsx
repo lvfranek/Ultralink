@@ -131,8 +131,14 @@ export function HelpCenter() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search videos…"
                 aria-label="Search help videos"
-                className="w-full pl-9 pr-4 py-2.5 text-sm rounded-full focus:outline-none"
-                style={{ background: "#141414", border: "1px solid rgba(255,255,255,.10)", color: "#fff" }}
+                className="w-full pl-9 pr-4 py-2.5 rounded-full focus:outline-none"
+                style={{
+                  background: "#141414",
+                  border: "1px solid rgba(255,255,255,.10)",
+                  color: "#fff",
+                  // 16px, not the 14px `text-sm` gives: smaller makes iOS Safari zoom in on focus
+                  fontSize: 16,
+                }}
               />
             </div>
           </div>

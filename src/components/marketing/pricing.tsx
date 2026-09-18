@@ -365,7 +365,8 @@ export function Pricing() {
                     background: "rgba(0,0,0,.03)",
                     border: "1px solid rgba(0,0,0,.10)",
                     color: "#0A0A0A",
-                    fontSize: 14,
+                    // 16px, not 14px: anything smaller makes iOS Safari zoom in on focus
+                    fontSize: 16,
                     borderRadius: 9,
                     padding: "10px 12px",
                     cursor: "pointer",
