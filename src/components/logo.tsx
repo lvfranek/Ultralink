@@ -9,18 +9,9 @@ interface LogoProps {
   onDark?: boolean;
 }
 
-export function Logo({
-  className = "",
-  iconSize = 28,
-  showWordmark = true,
-  href = "/",
-  onDark = false,
-}: LogoProps) {
+export function Logo({ className = "", iconSize = 28, showWordmark = true, href = "/", onDark = false }: LogoProps) {
   const content = (
-    <span
-      className={`inline-flex items-center gap-2.5 select-none ${className}`}
-      aria-label="Ultralink"
-    >
+    <span className={`inline-flex items-center gap-2.5 select-none ${className}`} aria-label="Ultralink">
       <Image
         src="/logo.svg"
         alt=""
@@ -42,7 +33,10 @@ export function Logo({
 
   if (href) {
     return (
-      <Link href={href} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-text rounded-sm inline-flex items-center">
+      <Link
+        href={href}
+        className="focus:outline-none focus-visible:ring-2 focus-visible:ring-text rounded-sm inline-flex items-center"
+      >
         {content}
       </Link>
     );

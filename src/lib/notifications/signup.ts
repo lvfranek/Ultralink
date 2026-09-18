@@ -3,11 +3,7 @@ import { getUserCount } from "@/lib/admin/stats";
 
 export type SignupMethod = "Email" | "Google";
 
-export async function sendSignupNotification(
-  username: string,
-  email: string,
-  method: SignupMethod,
-): Promise<void> {
+export async function sendSignupNotification(username: string, email: string, method: SignupMethod): Promise<void> {
   try {
     const totalUsers = await getUserCount();
     await sendDiscordNotification({

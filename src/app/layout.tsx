@@ -85,8 +85,7 @@ export const metadata: Metadata = {
     default: "Ultralink — One link. Your entire world.",
     template: "%s | Ultralink",
   },
-  description:
-    "The premium link-in-bio platform for creators and agencies. Fast pages and real analytics.",
+  description: "The premium link-in-bio platform for creators and agencies. Fast pages and real analytics.",
   metadataBase: new URL("https://ultralink.bio"),
   icons: {
     icon: "/favicon/favicon.png",
@@ -122,10 +121,12 @@ export default function RootLayout({
         bebasNeue.variable,
         "h-full",
       ].join(" ")}
-      style={{ background: '#0A0A0A' }}
+      style={{ background: "#0A0A0A" }}
       suppressHydrationWarning
     >
-      <body className="min-h-dvh antialiased" style={{ background: '#0A0A0A' }}>{children}</body>
+      <body className="min-h-dvh antialiased" style={{ background: "#0A0A0A" }}>
+        {children}
+      </body>
     </html>
   );
 }

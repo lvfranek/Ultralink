@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkSlugAvailable } from "@/app/actions/pages";
 
-const GRADIENT = 'linear-gradient(110deg,#FBC2A4 0%,#F7A8C4 33%,#C9A7F2 66%,#A7C7F7 100%)';
+const GRADIENT = "linear-gradient(110deg,#FBC2A4 0%,#F7A8C4 33%,#C9A7F2 66%,#A7C7F7 100%)";
 
 type SlugState = "idle" | "checking" | "available" | "taken" | "invalid";
 
@@ -55,37 +55,34 @@ export function Hero() {
   };
 
   return (
-    <section
-      style={{ background: '#0A0A0A' }}
-      aria-label="Hero"
-    >
-      <div className="hero-outer" style={{ maxWidth: 1140, margin: '0 auto', padding: '88px 24px 56px' }}>
+    <section style={{ background: "#0A0A0A" }} aria-label="Hero">
+      <div className="hero-outer" style={{ maxWidth: 1140, margin: "0 auto", padding: "88px 24px 56px" }}>
         {/* White framed card — overflow:visible so the glow is never clipped */}
         <div
           className="hero-card"
           style={{
-            position: 'relative',
-            background: '#fff',
-            color: '#0A0A0A',
+            position: "relative",
+            background: "#fff",
+            color: "#0A0A0A",
             borderRadius: 28,
-            border: '1px solid rgba(0,0,0,.06)',
-            padding: '80px 32px 72px',
-            textAlign: 'center',
-            overflow: 'visible',
+            border: "1px solid rgba(0,0,0,.06)",
+            padding: "80px 32px 72px",
+            textAlign: "center",
+            overflow: "visible",
           }}
         >
           {/* Beta badge */}
           <span
             style={{
-              display: 'inline-block',
-              padding: '4px 16px',
+              display: "inline-block",
+              padding: "4px 16px",
               borderRadius: 999,
-              background: '#0A0A0A',
-              color: '#fff',
+              background: "#0A0A0A",
+              color: "#fff",
               fontSize: 11,
               fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
               marginBottom: 20,
             }}
           >
@@ -97,11 +94,11 @@ export function Hero() {
             className="hero-heading"
             style={{
               fontWeight: 500,
-              letterSpacing: '-0.02em',
-              fontSize: 'clamp(38px, 6vw, 62px)',
+              letterSpacing: "-0.02em",
+              fontSize: "clamp(38px, 6vw, 62px)",
               lineHeight: 1.05,
-              margin: '0 0 20px',
-              color: '#0A0A0A',
+              margin: "0 0 20px",
+              color: "#0A0A0A",
             }}
           >
             Move your audience anywhere,
@@ -112,10 +109,10 @@ export function Hero() {
           {/* Subhead — forced two-line break */}
           <p
             style={{
-              color: '#6B6B6B',
+              color: "#6B6B6B",
               fontSize: 18,
               lineHeight: 1.6,
-              margin: '0 auto 38px',
+              margin: "0 auto 38px",
               maxWidth: 620,
             }}
           >
@@ -129,30 +126,28 @@ export function Hero() {
             isolation:isolate keeps z-index values local.
             overflow:visible on the card means the glow is never cut off.
           */}
-          <div
-            style={{ position: 'relative', maxWidth: 560, margin: '0 auto 14px', isolation: 'isolate' }}
-          >
+          <div style={{ position: "relative", maxWidth: 560, margin: "0 auto 14px", isolation: "isolate" }}>
             {/* Glow */}
             <div
               aria-hidden="true"
               className="hero-claim-glow"
               style={{
-                position: 'absolute',
+                position: "absolute",
                 inset: -14,
                 borderRadius: 28,
                 background: GRADIENT,
-                filter: 'blur(26px)',
+                filter: "blur(26px)",
                 opacity: 0.7,
                 zIndex: 0,
-                pointerEvents: 'none',
+                pointerEvents: "none",
               }}
             />
             {/* Gradient border frame */}
             <div
               style={{
-                position: 'relative',
+                position: "relative",
                 zIndex: 1,
-                width: '100%',
+                width: "100%",
                 borderRadius: 18,
                 padding: 1.5,
                 background: GRADIENT,
@@ -163,28 +158,31 @@ export function Hero() {
                 aria-label="Claim your username"
                 className="hero-claim-form"
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
+                  display: "flex",
+                  alignItems: "center",
                   gap: 8,
-                  background: '#fff',
+                  background: "#fff",
                   borderRadius: 16.5,
-                  padding: '8px 8px 8px 18px',
-                  animation: shake ? 'shake 0.4s' : undefined,
+                  padding: "8px 8px 8px 18px",
+                  animation: shake ? "shake 0.4s" : undefined,
                 }}
               >
-                <div className="hero-claim-input-row" style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0, gap: 8 }}>
+                <div
+                  className="hero-claim-input-row"
+                  style={{ display: "flex", alignItems: "center", flex: 1, minWidth: 0, gap: 8 }}
+                >
                   <span
                     style={{
-                      color: '#6B6B6B',
+                      color: "#6B6B6B",
                       fontSize: 16,
-                      whiteSpace: 'nowrap',
+                      whiteSpace: "nowrap",
                       flexShrink: 0,
-                      userSelect: 'none',
+                      userSelect: "none",
                     }}
                   >
                     ultralink.bio/
                   </span>
-                  <div style={{ position: 'relative', flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
+                  <div style={{ position: "relative", flex: 1, minWidth: 0, display: "flex", alignItems: "center" }}>
                     <input
                       ref={inputRef}
                       type="text"
@@ -197,30 +195,54 @@ export function Hero() {
                       spellCheck={false}
                       aria-label="Your username"
                       style={{
-                        width: '100%',
+                        width: "100%",
                         minWidth: 0,
-                        border: 'none',
-                        outline: 'none',
-                        background: 'transparent',
+                        border: "none",
+                        outline: "none",
+                        background: "transparent",
                         fontSize: 16,
-                        color: '#0A0A0A',
-                        padding: '8px 22px 8px 4px',
-                        fontFamily: 'inherit',
+                        color: "#0A0A0A",
+                        padding: "8px 22px 8px 4px",
+                        fontFamily: "inherit",
                       }}
                     />
                     {slugState === "checking" && (
                       <span
-                        style={{ position: 'absolute', right: 4, width: 14, height: 14, border: '2px solid #9a9a9a', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.75s linear infinite' }}
+                        style={{
+                          position: "absolute",
+                          right: 4,
+                          width: 14,
+                          height: 14,
+                          border: "2px solid #9a9a9a",
+                          borderTopColor: "transparent",
+                          borderRadius: "50%",
+                          display: "inline-block",
+                          animation: "spin 0.75s linear infinite",
+                        }}
                         aria-hidden="true"
                       />
                     )}
                     {slugState === "available" && (
-                      <svg style={{ position: 'absolute', right: 4, width: 16, height: 16, color: '#059669' }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <svg
+                        style={{ position: "absolute", right: 4, width: 16, height: 16, color: "#059669" }}
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        aria-hidden="true"
+                      >
                         <path d="M3 8l3.5 3.5L13 4.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     )}
                     {(slugState === "taken" || slugState === "invalid") && (
-                      <svg style={{ position: 'absolute', right: 4, width: 16, height: 16, color: '#dc2626' }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <svg
+                        style={{ position: "absolute", right: 4, width: 16, height: 16, color: "#dc2626" }}
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        aria-hidden="true"
+                      >
                         <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
                       </svg>
                     )}
@@ -231,20 +253,26 @@ export function Hero() {
                   className="hero-claim-btn"
                   style={{
                     flexShrink: 0,
-                    background: '#0A0A0A',
-                    color: '#fff',
-                    border: 'none',
+                    background: "#0A0A0A",
+                    color: "#fff",
+                    border: "none",
                     borderRadius: 12,
-                    padding: '12px 18px',
+                    padding: "12px 18px",
                     fontWeight: 500,
                     fontSize: 15,
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    transition: 'opacity 0.15s, transform 0.15s',
+                    whiteSpace: "nowrap",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    transition: "opacity 0.15s, transform 0.15s",
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8'; e.currentTarget.style.transform = 'scale(0.97)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)'; }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = "0.8";
+                    e.currentTarget.style.transform = "scale(0.97)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = "1";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
                 >
                   Claim my link →
                 </button>
@@ -253,12 +281,12 @@ export function Hero() {
           </div>
 
           {/* Micro-copy */}
-          <p style={{ color: slugState === "taken" ? '#dc2626' : '#6B6B6B', fontSize: 13, marginTop: 14 }}>
+          <p style={{ color: slugState === "taken" ? "#dc2626" : "#6B6B6B", fontSize: 13, marginTop: 14 }}>
             {slugState === "taken"
               ? "That username is already taken."
               : slugState === "invalid" && username.length > 0
-              ? "2–30 chars, a–z 0–9 -"
-              : "Free forever, no credit card required."}
+                ? "2–30 chars, a–z 0–9 -"
+                : "Free forever, no credit card required."}
           </p>
 
           <style>{`
@@ -307,24 +335,31 @@ export function Hero() {
           {/* Trust indicators */}
           <div
             style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "center",
               gap: 24,
               marginTop: 30,
-              color: '#6B6B6B',
+              color: "#6B6B6B",
               fontSize: 13,
             }}
           >
-            {[
-              "Social media safe by default",
-              "Real analytics",
-              "Built-in age gate",
-            ].map((item) => (
-              <span key={item} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <svg viewBox="0 0 12 12" fill="none" style={{ width: 12, height: 12, flexShrink: 0 }} aria-hidden="true">
-                  <path d="M2 6l2.5 2.5L10 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            {["Social media safe by default", "Real analytics", "Built-in age gate"].map((item) => (
+              <span key={item} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <svg
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  style={{ width: 12, height: 12, flexShrink: 0 }}
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M2 6l2.5 2.5L10 3"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
                 {item}
               </span>

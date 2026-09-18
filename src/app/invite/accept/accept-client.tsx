@@ -63,7 +63,15 @@ export function AcceptInviteClient({ token }: { token: string }) {
         {pending ? (
           <>
             <span
-              style={{ display: "inline-block", width: 14, height: 14, border: "2px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.75s linear infinite" }}
+              style={{
+                display: "inline-block",
+                width: 14,
+                height: 14,
+                border: "2px solid currentColor",
+                borderTopColor: "transparent",
+                borderRadius: "50%",
+                animation: "spin 0.75s linear infinite",
+              }}
               aria-hidden="true"
             />
             Joining…

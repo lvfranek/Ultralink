@@ -16,9 +16,7 @@ const FOOTER_LINKS = {
     { label: "Terms of Service", href: "/terms" },
     { label: "Imprint", href: "/imprint" },
   ],
-  Support: [
-    { label: "Contact", href: `mailto:${siteConfig.supportEmail}` },
-  ],
+  Support: [{ label: "Contact", href: `mailto:${siteConfig.supportEmail}` }],
 };
 
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
@@ -31,9 +29,9 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
       onMouseLeave={() => setHovered(false)}
       style={{
         fontSize: 14,
-        color: hovered ? '#0A0A0A' : '#6B6B6B',
-        textDecoration: 'none',
-        transition: 'color 0.15s',
+        color: hovered ? "#0A0A0A" : "#6B6B6B",
+        textDecoration: "none",
+        transition: "color 0.15s",
       }}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
     >
@@ -46,35 +44,32 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer
-      style={{ background: '#0A0A0A' }}
-      aria-label="Footer"
-    >
-      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 24px 40px' }}>
+    <footer style={{ background: "#0A0A0A" }} aria-label="Footer">
+      <div style={{ maxWidth: 1140, margin: "0 auto", padding: "0 24px 40px" }}>
         {/* White card — mirrors the hero and section card language */}
         <div
           style={{
-            background: '#fff',
-            color: '#0A0A0A',
+            background: "#fff",
+            color: "#0A0A0A",
             borderRadius: 28,
-            border: '1px solid rgba(0,0,0,.06)',
-            padding: 'clamp(36px, 5vw, 56px) clamp(28px, 5vw, 48px) clamp(24px, 4vw, 36px)',
+            border: "1px solid rgba(0,0,0,.06)",
+            padding: "clamp(36px, 5vw, 56px) clamp(28px, 5vw, 48px) clamp(24px, 4vw, 36px)",
           }}
         >
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
               gap: 40,
             }}
           >
             {/* Brand column */}
-            <div style={{ gridColumn: 'span 1' }}>
+            <div style={{ gridColumn: "span 1" }}>
               <Logo className="mb-4" />
               <p
                 style={{
                   fontSize: 14,
-                  color: '#6B6B6B',
+                  color: "#6B6B6B",
                   lineHeight: 1.65,
                   maxWidth: 220,
                   marginTop: 16,
@@ -93,9 +88,9 @@ export function Footer() {
                   style={{
                     fontSize: 11,
                     fontWeight: 600,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    color: 'rgba(10,10,10,0.6)',
+                    textTransform: "uppercase",
+                    letterSpacing: "0.1em",
+                    color: "rgba(10,10,10,0.6)",
                     marginBottom: 16,
                   }}
                 >
@@ -103,11 +98,11 @@ export function Footer() {
                 </p>
                 <ul
                   style={{
-                    listStyle: 'none',
+                    listStyle: "none",
                     padding: 0,
                     margin: 0,
-                    display: 'flex',
-                    flexDirection: 'column',
+                    display: "flex",
+                    flexDirection: "column",
                     gap: 12,
                   }}
                 >
@@ -126,20 +121,18 @@ export function Footer() {
             style={{
               marginTop: 44,
               paddingTop: 24,
-              borderTop: '1px solid rgba(0,0,0,.06)',
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              borderTop: "1px solid rgba(0,0,0,.06)",
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
               gap: 16,
             }}
           >
-            <p style={{ fontSize: 12, color: 'rgba(10,10,10,0.6)', margin: 0 }}>
+            <p style={{ fontSize: 12, color: "rgba(10,10,10,0.6)", margin: 0 }}>
               &copy; {year} Ultralink. All rights reserved.
             </p>
-            <p style={{ fontSize: 12, color: 'rgba(10,10,10,0.6)', margin: 0 }}>
-              Built for influencer agencies.
-            </p>
+            <p style={{ fontSize: 12, color: "rgba(10,10,10,0.6)", margin: 0 }}>Built for influencer agencies.</p>
           </div>
         </div>
       </div>

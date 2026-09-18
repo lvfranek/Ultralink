@@ -50,8 +50,13 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
       const { error: uploadErr } = await supabase.storage
         .from("media")
         .upload(filename, blob, { contentType: "image/jpeg", upsert: true });
-      if (uploadErr) { setUploadError(uploadErr.message); return; }
-      const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(filename);
+      if (uploadErr) {
+        setUploadError(uploadErr.message);
+        return;
+      }
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("media").getPublicUrl(filename);
       onChange({ avatar_url: publicUrl });
     } finally {
       setUploading(false);
@@ -68,7 +73,7 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
       <FieldRow label="Photo">
         <div className="flex items-center gap-2">
           {page.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
+            // eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer
             <img
               src={page.avatar_url}
               alt="Avatar"
@@ -82,13 +87,7 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
               {(page.title || "U").charAt(0).toUpperCase()}
             </div>
           )}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileSelect}
-          />
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -116,7 +115,7 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
         <SegmentedControl
           options={[
             { id: "circle" as AvatarStyle, label: "Circle" },
-            { id: "hero"   as AvatarStyle, label: "Hero" },
+            { id: "hero" as AvatarStyle, label: "Hero" },
           ]}
           value={page.avatar_style ?? "circle"}
           onChange={(v) => onChange({ avatar_style: v })}
@@ -124,9 +123,7 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
       </FieldRow>
 
       {page.avatar_style === "hero" && !page.avatar_url && (
-        <p className="text-xs text-text-subtle pb-1 pt-0.5 pl-0">
-          Hero style needs a photo — upload one to enable.
-        </p>
+        <p className="text-xs text-text-subtle pb-1 pt-0.5 pl-0">Hero style needs a photo — upload one to enable.</p>
       )}
 
       {/* Name row — full flex-1 width */}
@@ -157,13 +154,7 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
         </div>
       </div>
 
-      {cropSrc && (
-        <AvatarCropModal
-          imageSrc={cropSrc}
-          onCancel={() => setCropSrc(null)}
-          onApply={handleCropApply}
-        />
-      )}
+      {cropSrc && <AvatarCropModal imageSrc={cropSrc} onCancel={() => setCropSrc(null)} onApply={handleCropApply} />}
     </div>
   );
 }

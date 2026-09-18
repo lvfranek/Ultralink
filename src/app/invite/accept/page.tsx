@@ -8,11 +8,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function AcceptInvitePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ token?: string }>;
-}) {
+export default async function AcceptInvitePage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const { token } = await searchParams;
 
   if (!token) {
@@ -37,11 +33,7 @@ export default async function AcceptInvitePage({
   }
 
   // Fetch owner username for display
-  const { data: ownerProfile } = await service
-    .from("profiles")
-    .select("username")
-    .eq("id", invite.owner_id)
-    .single();
+  const { data: ownerProfile } = await service.from("profiles").select("username").eq("id", invite.owner_id).single();
 
   const ownerUsername = ownerProfile?.username ?? "Someone";
 
@@ -53,9 +45,7 @@ export default async function AcceptInvitePage({
 
   if (!user) {
     const loginUrl = `/login?next=${encodeURIComponent(`/invite/accept?token=${token}`)}&email=${encodeURIComponent(invite.email)}`;
-    return (
-      <InviteCard state="unauthenticated" ownerUsername={ownerUsername} loginUrl={loginUrl} />
-    );
+    return <InviteCard state="unauthenticated" ownerUsername={ownerUsername} loginUrl={loginUrl} />;
   }
 
   if ((user.email ?? "").toLowerCase() !== invite.email.toLowerCase()) {
@@ -67,9 +57,7 @@ export default async function AcceptInvitePage({
     );
   }
 
-  return (
-    <InviteCard state="ready" ownerUsername={ownerUsername} token={token} />
-  );
+  return <InviteCard state="ready" ownerUsername={ownerUsername} token={token} />;
 }
 
 // ─── Server-rendered card shells ──────────────────────────────────────────────
@@ -105,7 +93,9 @@ function Card({ children }: { children: React.ReactNode }) {
 
 function Logo() {
   return (
-    <p style={{ fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A86A", margin: "0 0 28px" }}>
+    <p
+      style={{ fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A86A", margin: "0 0 28px" }}
+    >
       ultralink
     </p>
   );
@@ -141,8 +131,19 @@ function InviteCard({
             margin: "0 auto 20px",
           }}
         >
-          <svg viewBox="0 0 24 24" style={{ width: 24, height: 24, color: "#ef4444" }} fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-            <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" strokeLinecap="round" strokeLinejoin="round" />
+          <svg
+            viewBox="0 0 24 24"
+            style={{ width: 24, height: 24, color: "#ef4444" }}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
         <h1 style={{ fontSize: 20, fontWeight: 700, color: "#ffffff", margin: "0 0 12px" }}>
@@ -161,11 +162,10 @@ function InviteCard({
           You&apos;ve been invited.
         </h1>
         <p style={{ fontSize: 15, color: "#9A9A9A", lineHeight: 1.6, margin: "0 0 32px" }}>
-          <strong style={{ color: "#ffffff" }}>{ownerUsername}</strong> invited you to collaborate on their Ultralink pages as an Editor.
+          <strong style={{ color: "#ffffff" }}>{ownerUsername}</strong> invited you to collaborate on their Ultralink
+          pages as an Editor.
         </p>
-        <p style={{ fontSize: 13, color: "#6B6B6B", margin: "0 0 20px" }}>
-          Sign in or create an account to accept.
-        </p>
+        <p style={{ fontSize: 13, color: "#6B6B6B", margin: "0 0 20px" }}>Sign in or create an account to accept.</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <a
             href={loginUrl}
@@ -192,11 +192,10 @@ function InviteCard({
   return (
     <Card>
       <Logo />
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: "#ffffff", margin: "0 0 12px" }}>
-        You&apos;ve been invited.
-      </h1>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: "#ffffff", margin: "0 0 12px" }}>You&apos;ve been invited.</h1>
       <p style={{ fontSize: 15, color: "#9A9A9A", lineHeight: 1.6, margin: "0 0 32px" }}>
-        <strong style={{ color: "#ffffff" }}>{ownerUsername}</strong> invited you to collaborate on their Ultralink pages as an Editor.
+        <strong style={{ color: "#ffffff" }}>{ownerUsername}</strong> invited you to collaborate on their Ultralink
+        pages as an Editor.
       </p>
       <AcceptInviteClient token={token!} />
     </Card>

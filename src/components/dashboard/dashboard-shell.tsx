@@ -49,14 +49,20 @@ export function DashboardShell({
   return (
     <div className="min-h-full" style={{ background: "#131313" }}>
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-
         {/* Upgraded success banner */}
         {showUpgradedBanner && (
           <div
             className="flex items-center gap-3 mb-6 px-4 py-3 rounded-xl"
             style={{ background: "rgba(5,150,105,0.10)", border: "1px solid rgba(5,150,105,0.25)" }}
           >
-            <svg viewBox="0 0 16 16" className="w-4 h-4 shrink-0" fill="none" stroke="#10b981" strokeWidth="1.5" aria-hidden="true">
+            <svg
+              viewBox="0 0 16 16"
+              className="w-4 h-4 shrink-0"
+              fill="none"
+              stroke="#10b981"
+              strokeWidth="1.5"
+              aria-hidden="true"
+            >
               <path d="M2 8l4 4 8-8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <p className="text-sm font-medium" style={{ color: "#10b981" }}>
@@ -72,19 +78,32 @@ export function DashboardShell({
             style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)" }}
           >
             <div className="flex items-center gap-3">
-              <svg viewBox="0 0 16 16" className="w-4 h-4 shrink-0" fill="none" stroke="#ef4444" strokeWidth="1.5" aria-hidden="true">
+              <svg
+                viewBox="0 0 16 16"
+                className="w-4 h-4 shrink-0"
+                fill="none"
+                stroke="#ef4444"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
                 <circle cx="8" cy="8" r="6" />
                 <path d="M8 5v3.5l2 1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <p className="text-sm" style={{ color: "#ef4444" }}>
-                Your payment failed. Update your card by{" "}
-                <strong>{formatDate(gracePeriodEndsAt)}</strong> or your pages will go offline.
+                Your payment failed. Update your card by <strong>{formatDate(gracePeriodEndsAt)}</strong> or your pages
+                will go offline.
               </p>
             </div>
             <Link
               href="/dashboard/account"
               className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg"
-              style={{ background: "rgba(220,38,38,0.15)", color: "#ef4444", textDecoration: "none", border: "1px solid rgba(220,38,38,0.3)", whiteSpace: "nowrap" }}
+              style={{
+                background: "rgba(220,38,38,0.15)",
+                color: "#ef4444",
+                textDecoration: "none",
+                border: "1px solid rgba(220,38,38,0.3)",
+                whiteSpace: "nowrap",
+              }}
             >
               Manage billing
             </Link>
@@ -99,8 +118,10 @@ export function DashboardShell({
           >
             <p className="text-sm" style={{ color: "#9A9A9A" }}>
               Your subscription has ended.{" "}
-              <strong style={{ color: "#ffffff" }}>{hiddenCount} {hiddenCount === 1 ? "page is" : "pages are"} hidden</strong>.
-              Resubscribe to restore them.
+              <strong style={{ color: "#ffffff" }}>
+                {hiddenCount} {hiddenCount === 1 ? "page is" : "pages are"} hidden
+              </strong>
+              . Resubscribe to restore them.
             </p>
             <Link
               href="/#pricing"
@@ -144,7 +165,14 @@ export function DashboardShell({
               className="inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold rounded-full transition-opacity hover:opacity-85 cursor-pointer"
               style={{ background: "#ffffff", color: "#000000" }}
             >
-              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+              <svg
+                viewBox="0 0 16 16"
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                aria-hidden="true"
+              >
                 <path d="M8 3v10M3 8h10" strokeLinecap="round" />
               </svg>
               New link
@@ -159,8 +187,20 @@ export function DashboardShell({
               className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5"
               style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.08)" }}
             >
-              <svg viewBox="0 0 24 24" className="w-7 h-7" style={{ color: "#9A9A9A" }} fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101M14.828 14.828a4 4 0 015.656 0" strokeLinecap="round" strokeLinejoin="round" />
+              <svg
+                viewBox="0 0 24 24"
+                className="w-7 h-7"
+                style={{ color: "#9A9A9A" }}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
+                <path
+                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101M14.828 14.828a4 4 0 015.656 0"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
             <h2 className="text-lg font-semibold mb-2" style={{ color: "#ffffff" }}>
@@ -183,16 +223,11 @@ export function DashboardShell({
             pages={pages}
             siteUrl={siteUrl}
             linkCap={linkCap}
-            survivingPageId={lapsed ? survivingPageId ?? null : null}
+            survivingPageId={lapsed ? (survivingPageId ?? null) : null}
           />
         )}
 
-        {showCreate && (
-          <CreateLinkModal
-            initialSlug={initialSlug}
-            onClose={() => setShowCreate(false)}
-          />
-        )}
+        {showCreate && <CreateLinkModal initialSlug={initialSlug} onClose={() => setShowCreate(false)} />}
       </div>
     </div>
   );

@@ -11,8 +11,6 @@ import {
   PRESETS,
   PRESET_META,
   FONT_OPTIONS,
-  BUTTON_CORNERS,
-  ANIMATIONS,
   cornerRadius,
 } from "@/lib/config/theme";
 import { FieldRow } from "./panel-primitives";
@@ -89,8 +87,10 @@ export function ColorPickerField({
   const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties>({});
   const [mounted, setMounted] = useState(false);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- the portal target (document.body) only exists after mount
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the portal target (document.body) only exists after mount
+    setMounted(true);
+  }, []);
 
   const updatePosition = useCallback(() => {
     if (!triggerRef.current) return;
@@ -136,11 +136,7 @@ export function ColorPickerField({
   const pickerContent = (
     <>
       {/* Click-outside overlay */}
-      <div
-        className="fixed inset-0"
-        style={{ zIndex: 9998 }}
-        onClick={() => setOpen(false)}
-      />
+      <div className="fixed inset-0" style={{ zIndex: 9998 }} onClick={() => setOpen(false)} />
       {/* Picker popover — hardcoded dark bg; the page-builder editor stays dark
           even though --color-surface resolves to the light dashboard-chrome token */}
       <div
@@ -184,10 +180,7 @@ export function ColorPickerField({
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-strong rounded-[var(--radius-sm)] cursor-pointer hover:border-gold/40 transition-colors"
       >
-        <span
-          className="w-4 h-4 rounded-sm flex-shrink-0 border border-black/10"
-          style={{ background: value }}
-        />
+        <span className="w-4 h-4 rounded-sm flex-shrink-0 border border-black/10" style={{ background: value }} />
         <span className="text-xs text-text font-mono uppercase">{value}</span>
       </button>
       {open && mounted && createPortal(pickerContent, document.body)}
@@ -198,9 +191,9 @@ export function ColorPickerField({
 // ─── GRADIENT BUILDER ─────────────────────────────────────────────────────────
 
 const GRADIENT_DIRECTIONS = [
-  { angle: 0,   label: "↑" },
-  { angle: 45,  label: "↗" },
-  { angle: 90,  label: "→" },
+  { angle: 0, label: "↑" },
+  { angle: 45, label: "↗" },
+  { angle: 90, label: "→" },
   { angle: 135, label: "↘" },
 ];
 
@@ -215,13 +208,7 @@ function buildGradient(stop1: string, stop2: string, angle: number): string {
   return `linear-gradient(${angle}deg, ${stop1} 0%, ${stop2} 100%)`;
 }
 
-export function GradientBuilder({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
+export function GradientBuilder({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const parsed = parseGradient(value);
   const [stop1, setStop1] = useState(parsed.stop1);
   const [stop2, setStop2] = useState(parsed.stop2);
@@ -260,8 +247,12 @@ export function GradientBuilder({
               background: angle === d.angle ? "#ffffff" : "transparent",
               color: angle === d.angle ? "#000000" : "#9A9A9A",
             }}
-            onMouseEnter={(e) => { if (angle !== d.angle) e.currentTarget.style.color = "#ffffff"; }}
-            onMouseLeave={(e) => { if (angle !== d.angle) e.currentTarget.style.color = "#9A9A9A"; }}
+            onMouseEnter={(e) => {
+              if (angle !== d.angle) e.currentTarget.style.color = "#ffffff";
+            }}
+            onMouseLeave={(e) => {
+              if (angle !== d.angle) e.currentTarget.style.color = "#9A9A9A";
+            }}
           >
             {d.label}
           </button>
@@ -289,7 +280,10 @@ function PresetThumb({ presetKey, active }: { presetKey: PresetKey; active: bool
       style={{ height: 90, background: bg }}
     >
       <div className="absolute top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-black/10 border border-black/10" />
-      <div className="absolute top-7 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full" style={{ background: nameColor, opacity: 0.8 }} />
+      <div
+        className="absolute top-7 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full"
+        style={{ background: nameColor, opacity: 0.8 }}
+      />
       <div className="absolute bottom-2 left-2 right-2 space-y-1">
         {[1, 2].map((i) => (
           <div
@@ -323,7 +317,7 @@ function hasCustomWork(theme: Theme, links: PageLink[]): boolean {
       l.fill_value !== activeStyle.fillValue ||
       l.text_color !== activeStyle.textColor ||
       l.corner !== activeStyle.corner ||
-      l.animation !== activeStyle.animation
+      l.animation !== activeStyle.animation,
   );
 }
 
@@ -372,15 +366,17 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
 
     const newOverlay = type === "image" && theme.pageBg.overlay === 0 ? 0.4 : theme.pageBg.overlay;
 
-    onChange(patchTheme(theme, {
-      pageBg: {
-        ...theme.pageBg,
-        ...cached,
-        type,
-        value: defaults[type],
-        overlay: newOverlay,
-      },
-    }));
+    onChange(
+      patchTheme(theme, {
+        pageBg: {
+          ...theme.pageBg,
+          ...cached,
+          type,
+          value: defaults[type],
+          overlay: newOverlay,
+        },
+      }),
+    );
   }
 
   async function handleBgImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -388,18 +384,35 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
     e.target.value = "";
     if (!file) return;
     const allowed = ["image/jpeg", "image/png", "image/webp"];
-    if (!allowed.includes(file.type)) { setBgUploadError("JPEG, PNG, or WebP only."); return; }
-    if (file.size > 8 * 1024 * 1024) { setBgUploadError("Image must be under 8 MB."); return; }
+    if (!allowed.includes(file.type)) {
+      setBgUploadError("JPEG, PNG, or WebP only.");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setBgUploadError("Image must be under 8 MB.");
+      return;
+    }
 
     setBgUploadError(null);
     setBgUploading(true);
     try {
       const supabase = createClient();
       const filename = `${userId}/backgrounds/${Date.now()}.jpg`;
-      const { error } = await supabase.storage.from("media").upload(filename, file, { contentType: file.type, upsert: true });
-      if (error) { setBgUploadError(error.message); return; }
-      const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(filename);
-      onChange(patchTheme(theme, { pageBg: { type: "image", value: publicUrl, overlay: theme.pageBg.overlay > 0 ? theme.pageBg.overlay : 0.4 } }));
+      const { error } = await supabase.storage
+        .from("media")
+        .upload(filename, file, { contentType: file.type, upsert: true });
+      if (error) {
+        setBgUploadError(error.message);
+        return;
+      }
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("media").getPublicUrl(filename);
+      onChange(
+        patchTheme(theme, {
+          pageBg: { type: "image", value: publicUrl, overlay: theme.pageBg.overlay > 0 ? theme.pageBg.overlay : 0.4 },
+        }),
+      );
     } finally {
       setBgUploading(false);
     }
@@ -417,7 +430,9 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
             className="flex flex-col gap-1 cursor-pointer group text-left"
           >
             <PresetThumb presetKey={key} active={theme.preset === key} />
-            <p className={`text-[11px] font-medium ${theme.preset === key ? "text-gold" : "text-text-muted group-hover:text-text"} transition-colors`}>
+            <p
+              className={`text-[11px] font-medium ${theme.preset === key ? "text-gold" : "text-text-muted group-hover:text-text"} transition-colors`}
+            >
               {PRESET_META[key].label}
             </p>
           </button>
@@ -429,9 +444,9 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
         <p className="text-xs text-text-subtle mb-2 pt-3">Background</p>
         <SegmentedControl
           options={[
-            { id: "color" as const,    label: "Color" },
+            { id: "color" as const, label: "Color" },
             { id: "gradient" as const, label: "Gradient" },
-            { id: "image" as const,    label: "Image" },
+            { id: "image" as const, label: "Image" },
           ]}
           value={theme.pageBg.type}
           onChange={setPageBgType}
@@ -461,7 +476,7 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
               />
               <div className="flex items-center gap-3">
                 {theme.pageBg.value && (
-                  // eslint-disable-next-line @next/next/no-img-element
+                  // eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer
                   <img
                     src={theme.pageBg.value}
                     alt="Background"
@@ -489,7 +504,11 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
                   max={1}
                   step={0.05}
                   value={1 - theme.pageBg.overlay}
-                  onChange={(e) => onChange(patchTheme(theme, { pageBg: { ...theme.pageBg, overlay: 1 - parseFloat(e.target.value) } }))}
+                  onChange={(e) =>
+                    onChange(
+                      patchTheme(theme, { pageBg: { ...theme.pageBg, overlay: 1 - parseFloat(e.target.value) } }),
+                    )
+                  }
                   className="w-full accent-gold h-1.5 cursor-pointer"
                 />
               </div>
@@ -504,7 +523,9 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
                   max={40}
                   step={1}
                   value={theme.pageBg.blur ?? 0}
-                  onChange={(e) => onChange(patchTheme(theme, { pageBg: { ...theme.pageBg, blur: parseInt(e.target.value, 10) } }))}
+                  onChange={(e) =>
+                    onChange(patchTheme(theme, { pageBg: { ...theme.pageBg, blur: parseInt(e.target.value, 10) } }))
+                  }
                   className="w-full accent-gold h-1.5 cursor-pointer"
                 />
               </div>
@@ -516,7 +537,9 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
       {pendingPreset && (
         <div
           className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
-          onClick={(e) => { if (e.target === e.currentTarget) setPendingPreset(null); }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setPendingPreset(null);
+          }}
         >
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div
@@ -563,7 +586,7 @@ interface TypographyProps {
 
 export function TypographyContent({ theme, onChange }: TypographyProps) {
   const titleFont = FONT_OPTIONS.find((f) => f.id === theme.fonts.title);
-  const bodyFont  = FONT_OPTIONS.find((f) => f.id === theme.fonts.body);
+  const bodyFont = FONT_OPTIONS.find((f) => f.id === theme.fonts.body);
 
   return (
     <div>
@@ -576,10 +599,19 @@ export function TypographyContent({ theme, onChange }: TypographyProps) {
             style={{ fontFamily: titleFont ? `var(${titleFont.variable}), system-ui, sans-serif` : undefined }}
           >
             {FONT_OPTIONS.map((f) => (
-              <option key={f.id} value={f.id}>{f.label}</option>
+              <option key={f.id} value={f.id}>
+                {f.label}
+              </option>
             ))}
           </select>
-          <svg className="pointer-events-none absolute right-2 w-3.5 h-3.5 text-text-muted shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+          <svg
+            className="pointer-events-none absolute right-2 w-3.5 h-3.5 text-text-muted shrink-0"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            aria-hidden="true"
+          >
             <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
@@ -593,10 +625,19 @@ export function TypographyContent({ theme, onChange }: TypographyProps) {
             style={{ fontFamily: bodyFont ? `var(${bodyFont.variable}), system-ui, sans-serif` : undefined }}
           >
             {FONT_OPTIONS.map((f) => (
-              <option key={f.id} value={f.id}>{f.label}</option>
+              <option key={f.id} value={f.id}>
+                {f.label}
+              </option>
             ))}
           </select>
-          <svg className="pointer-events-none absolute right-2 w-3.5 h-3.5 text-text-muted shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+          <svg
+            className="pointer-events-none absolute right-2 w-3.5 h-3.5 text-text-muted shrink-0"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            aria-hidden="true"
+          >
             <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
@@ -634,4 +675,3 @@ export function ColorsContent({ theme, onChange }: ColorsProps) {
 }
 
 // ─── RE-EXPORT helpers used in links-tab ─────────────────────────────────────
-export { BUTTON_CORNERS, ANIMATIONS };

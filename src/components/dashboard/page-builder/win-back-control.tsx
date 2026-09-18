@@ -40,9 +40,7 @@ function Toggle({ checked, onToggle }: { checked: boolean; onToggle: () => void 
 function rowSummary(value: WinBack): string {
   if (!value.enabled) return "Off";
   if (value.headline) {
-    return value.headline.length > 32
-      ? value.headline.slice(0, 32) + "…"
-      : value.headline;
+    return value.headline.length > 32 ? value.headline.slice(0, 32) + "…" : value.headline;
   }
   return "On";
 }
@@ -96,7 +94,9 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
           <p className="text-xs text-text-muted mt-0.5">Recover visitors who try to leave.</p>
         </div>
         <div className="flex items-center gap-1.5 ml-3 flex-shrink-0 mt-0.5">
-          <span className="text-xs" style={{ color: "#9A9A9A" }}>{rowSummary(value)}</span>
+          <span className="text-xs" style={{ color: "#9A9A9A" }}>
+            {rowSummary(value)}
+          </span>
           <svg
             viewBox="0 0 12 12"
             fill="none"
@@ -115,10 +115,7 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
           {/* Enable toggle */}
           <div className="flex items-center justify-between">
             <span className="text-xs text-text">Enable Win-Back</span>
-            <Toggle
-              checked={value.enabled}
-              onToggle={() => onChange({ ...value, enabled: !value.enabled })}
-            />
+            <Toggle checked={value.enabled} onToggle={() => onChange({ ...value, enabled: !value.enabled })} />
           </div>
 
           {/* Headline */}
@@ -127,9 +124,7 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
               <input
                 type="text"
                 value={value.headline}
-                onChange={(e) =>
-                  onChange({ ...value, headline: e.target.value.slice(0, 80) })
-                }
+                onChange={(e) => onChange({ ...value, headline: e.target.value.slice(0, 80) })}
                 placeholder="Wait! Check out my newest video first."
                 disabled={!value.enabled}
                 maxLength={80}
@@ -164,10 +159,7 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
               <p className="text-xs text-text">Show 18+ confirmation before opening</p>
               <p className="text-xs text-text-subtle mt-0.5">Visitor must confirm age before the Win-Back link opens</p>
             </div>
-            <Toggle
-              checked={!!value.age_gate}
-              onToggle={() => onChange({ ...value, age_gate: !value.age_gate })}
-            />
+            <Toggle checked={!!value.age_gate} onToggle={() => onChange({ ...value, age_gate: !value.age_gate })} />
           </div>
 
           {/* Preview — opens the exact popup visitors see */}
@@ -178,7 +170,14 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
               disabled={!canPreview}
               className="w-full flex items-center justify-center gap-1.5 bg-surface-2 border border-border-strong text-text rounded-[var(--radius)] px-3 py-2 text-xs font-medium cursor-pointer transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-2"
             >
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5" aria-hidden>
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                className="w-3.5 h-3.5"
+                aria-hidden
+              >
                 <path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" strokeLinejoin="round" />
                 <circle cx="8" cy="8" r="2" />
               </svg>

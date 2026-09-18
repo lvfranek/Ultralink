@@ -105,9 +105,7 @@ export default async function BioPage({ params, searchParams }: Props) {
   // In development, ?fake_country=XX overrides the header for local testing.
   // REMOVE the dev bypass before deploying to production.
   const effectiveCountry =
-    process.env.NODE_ENV === "development"
-      ? (sp.fake_country as string | undefined) ?? country
-      : country;
+    process.env.NODE_ENV === "development" ? ((sp.fake_country as string | undefined) ?? country) : country;
 
   const blockedCountries = (page.blocked_countries ?? []) as string[];
   if (effectiveCountry && blockedCountries.includes(effectiveCountry)) {
@@ -127,9 +125,7 @@ export default async function BioPage({ params, searchParams }: Props) {
 
   const typedPage = page as Page & { page_links: PageLink[]; page_socials: PageSocial[] };
 
-  const activeLinks = (typedPage.page_links ?? [])
-    .filter((l) => l.is_active)
-    .sort((a, b) => a.position - b.position);
+  const activeLinks = (typedPage.page_links ?? []).filter((l) => l.is_active).sort((a, b) => a.position - b.position);
 
   const firstButtonLink = activeLinks.find((l) => l.item_type === "button") ?? null;
 

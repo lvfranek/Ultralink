@@ -8,10 +8,7 @@ import { getLinkCap } from "@/lib/config/pricing";
 import { getActiveOwnerId } from "@/lib/team";
 import type { Theme } from "@/lib/config/theme";
 
-export type ActionResult =
-  | { error: string }
-  | { ok: true }
-  | { ok: true; pageId: string };
+export type ActionResult = { error: string } | { ok: true } | { ok: true; pageId: string };
 
 // Starting point for every newly created page — modeled on a hand-designed
 // reference page so a fresh page looks intentional instead of a blank slate.
@@ -33,10 +30,7 @@ const NEW_PAGE_LINK = {
   animation: "none",
 };
 
-export async function createPage(
-  _prev: ActionResult | null,
-  formData: FormData
-): Promise<ActionResult> {
+export async function createPage(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -58,9 +52,7 @@ export async function createPage(
     .eq("id", activeOwnerId)
     .single();
 
-  const cap = getLinkCap(
-    profile ?? { subscription_status: "none", grace_period_ends_at: null, plan_tier: null }
-  );
+  const cap = getLinkCap(profile ?? { subscription_status: "none", grace_period_ends_at: null, plan_tier: null });
 
   const { count } = await supabase
     .from("pages")
@@ -107,11 +99,7 @@ export async function createPage(
   return { ok: true, pageId: page.id };
 }
 
-export async function updatePage(
-  id: string,
-  _prev: ActionResult | null,
-  formData: FormData
-): Promise<ActionResult> {
+export async function updatePage(id: string, _prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -133,9 +121,7 @@ export async function updatePage(
     try {
       const parsed = JSON.parse(blockedCountriesStr);
       if (Array.isArray(parsed)) {
-        blocked_countries = parsed.filter(
-          (c: unknown) => typeof c === "string" && /^[A-Z]{2}$/.test(c)
-        );
+        blocked_countries = parsed.filter((c: unknown) => typeof c === "string" && /^[A-Z]{2}$/.test(c));
       }
     } catch {
       // ignore invalid JSON
@@ -143,8 +129,12 @@ export async function updatePage(
   }
 
   const winBackStr = formData.get("win_back") as string | null;
-  let win_back: { enabled: boolean; headline: string; url: string; age_gate: boolean } =
-    { enabled: false, headline: "", url: "", age_gate: false };
+  let win_back: { enabled: boolean; headline: string; url: string; age_gate: boolean } = {
+    enabled: false,
+    headline: "",
+    url: "",
+    age_gate: false,
+  };
   if (winBackStr) {
     try {
       const parsed = JSON.parse(winBackStr);
@@ -237,11 +227,7 @@ export async function deletePage(id: string): Promise<ActionResult> {
 
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
 
-  const { error } = await supabase
-    .from("pages")
-    .delete()
-    .eq("id", id)
-    .eq("owner_id", activeOwnerId);
+  const { error } = await supabase.from("pages").delete().eq("id", id).eq("owner_id", activeOwnerId);
 
   if (error) return { error: error.message };
 
@@ -249,34 +235,7 @@ export async function deletePage(id: string): Promise<ActionResult> {
   return { ok: true };
 }
 
-export async function togglePageActive(
-  id: string,
-  isActive: boolean
-): Promise<ActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const activeOwnerId = await getActiveOwnerId(user.id, supabase);
-
-  const { error } = await supabase
-    .from("pages")
-    .update({ is_active: isActive, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .eq("owner_id", activeOwnerId);
-
-  if (error) return { error: error.message };
-
-  revalidatePath("/dashboard");
-  return { ok: true };
-}
-
-export async function duplicatePage(
-  sourcePageId: string,
-  newSlug: string
-): Promise<ActionResult> {
+export async function duplicatePage(sourcePageId: string, newSlug: string): Promise<ActionResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -304,9 +263,7 @@ export async function duplicatePage(
     .eq("id", activeOwnerId)
     .single();
 
-  const cap = getLinkCap(
-    profile ?? { subscription_status: "none", grace_period_ends_at: null, plan_tier: null }
-  );
+  const cap = getLinkCap(profile ?? { subscription_status: "none", grace_period_ends_at: null, plan_tier: null });
 
   const { count } = await supabase
     .from("pages")
@@ -388,22 +345,18 @@ export async function duplicatePage(
 
 export async function checkSlugAvailable(
   slug: string,
-  excludeId?: string
+  excludeId?: string,
 ): Promise<{ available: boolean; error?: string }> {
   const validationError = validateSlug(slug);
   if (validationError) return { available: false, error: validationError };
 
   const supabase = await createClient();
-  let query = supabase
-    .from("pages")
-    .select("id", { count: "exact", head: true })
-    .eq("slug", slug);
+  let query = supabase.from("pages").select("id", { count: "exact", head: true }).eq("slug", slug);
 
   if (excludeId) query = query.neq("id", excludeId);
 
   const { count } = await query;
-  if ((count ?? 0) > 0)
-    return { available: false, error: "That username is already taken." };
+  if ((count ?? 0) > 0) return { available: false, error: "That username is already taken." };
 
   return { available: true };
 }

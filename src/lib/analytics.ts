@@ -5,8 +5,7 @@ const BOT_RE =
   /bot|crawler|spider|preview|facebookexternalhit|twitterbot|googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|ia_archiver|whatsapp|telegrambot|discordbot|linkedinbot|slackbot|vkshare|embedly|outbrain|pinterest\/|bufferbot|rogerbot/i;
 
 const TABLET_RE = /tablet|ipad|playbook|silk|(android(?!.*mobile))/i;
-const MOBILE_RE =
-  /mobile|android.*mobile|iphone|ipod|opera mini|iemobile|wpdesktop|blackberry|windows phone/i;
+const MOBILE_RE = /mobile|android.*mobile|iphone|ipod|opera mini|iemobile|wpdesktop|blackberry|windows phone/i;
 
 export function parseDevice(ua: string | null): DeviceType {
   if (!ua) return "unknown";
@@ -21,9 +20,7 @@ export function parseDevice(ua: string | null): DeviceType {
 export function parseReferrer(referrer: string | null): string | null {
   if (!referrer) return null;
   try {
-    const host = new URL(referrer).hostname
-      .replace(/^www\./, "")
-      .toLowerCase();
+    const host = new URL(referrer).hostname.replace(/^www\./, "").toLowerCase();
     if (!host || host === "ultralink.bio") return null;
     return host;
   } catch {

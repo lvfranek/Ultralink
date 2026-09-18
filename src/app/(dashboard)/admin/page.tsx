@@ -55,11 +55,7 @@ function PlanBadge({ tier, status }: { tier: number | null; status: string }) {
   );
 }
 
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ revalidate?: string }>;
-}) {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ revalidate?: string }> }) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -101,10 +97,7 @@ export default async function AdminPage({
             <p className="text-xs mb-1" style={{ color: "#6B6B6B" }}>
               {tile.label}
             </p>
-            <p
-              className={tile.small ? "text-sm font-medium" : "text-2xl font-bold"}
-              style={{ color: "#ffffff" }}
-            >
+            <p className={tile.small ? "text-sm font-medium" : "text-2xl font-bold"} style={{ color: "#ffffff" }}>
               {tile.value}
             </p>
             {tile.sub && (
@@ -160,7 +153,9 @@ export default async function AdminPage({
       <Card>
         <CardTitle>Recent signups (last 7 days)</CardTitle>
         {stats.recentSignups.length === 0 ? (
-          <p className="text-sm" style={{ color: "#6B6B6B" }}>No signups in the last 7 days.</p>
+          <p className="text-sm" style={{ color: "#6B6B6B" }}>
+            No signups in the last 7 days.
+          </p>
         ) : (
           <div className="flex flex-col gap-2">
             {stats.recentSignups.map((s) => (

@@ -5,10 +5,7 @@ import { captureEvent } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ link_id: string }> },
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ link_id: string }> }) {
   const { link_id } = await params;
 
   const supabase = createServiceClient();
@@ -25,11 +22,7 @@ export async function GET(
   }
 
   // Verify the page is active
-  const { data: page } = await supabase
-    .from("pages")
-    .select("is_active")
-    .eq("id", link.page_id)
-    .single();
+  const { data: page } = await supabase.from("pages").select("is_active").eq("id", link.page_id).single();
 
   if (!page || !page.is_active) {
     return new NextResponse(null, { status: 404 });

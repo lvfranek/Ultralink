@@ -68,9 +68,7 @@ export function DashboardChrome({
             teamMemberships={teamMemberships}
             activeOwnerSubscriptionStatus={activeOwnerSubscriptionStatus}
           />
-          <main className="flex-1 overflow-y-auto pt-14 lg:pt-0">
-            {children}
-          </main>
+          <main className="flex-1 overflow-y-auto pt-14 lg:pt-0">{children}</main>
           <WelcomeModal open={open} onClose={handleClose} displayName={displayName} />
           <FeedbackModal
             open={feedbackOpen}

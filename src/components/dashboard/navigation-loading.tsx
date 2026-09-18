@@ -71,7 +71,11 @@ export function NavigationLoadingProvider({ children }: { children: React.ReactN
     const t = setTimeout(() => {
       clear();
       setProgress(100);
-      setTimeout(() => { setVisible(false); setLoading(false); setProgress(0); }, 350);
+      setTimeout(() => {
+        setVisible(false);
+        setLoading(false);
+        setProgress(0);
+      }, 350);
     }, 8000);
     return () => clearTimeout(t);
   }, [loading, clear]);
@@ -131,12 +135,7 @@ export function SpinnerRing({
       style={{ animation: "ul-spin 0.75s linear infinite", display: "block", flexShrink: 0 }}
     >
       <circle cx="12" cy="12" r="10" stroke={color} strokeWidth={strokeWidth} strokeOpacity="0.25" />
-      <path
-        d="M12 2a10 10 0 0 1 10 10"
-        stroke={color}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-      />
+      <path d="M12 2a10 10 0 0 1 10 10" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
     </svg>
   );
 }

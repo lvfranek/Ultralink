@@ -13,7 +13,9 @@ export const metadata: Metadata = {
 
 export default async function AccountSettingsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
@@ -22,7 +24,9 @@ export default async function AccountSettingsPage() {
   const [profileResult, pagesResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("username, subscription_status, grace_period_ends_at, plan_tier, plan_interval, current_period_end, cancel_at_period_end, stripe_customer_id")
+      .select(
+        "username, subscription_status, grace_period_ends_at, plan_tier, plan_interval, current_period_end, cancel_at_period_end, stripe_customer_id",
+      )
       .eq("id", user.id)
       .single(),
     supabase.from("pages").select("id", { count: "exact", head: true }).eq("owner_id", user.id),
@@ -72,7 +76,7 @@ export default async function AccountSettingsPage() {
         .in("id", editorIds);
 
       const profileMap = new Map(
-        (editorProfiles ?? []).map((ep: { id: string; username: string; display_name: string | null }) => [ep.id, ep])
+        (editorProfiles ?? []).map((ep: { id: string; username: string; display_name: string | null }) => [ep.id, ep]),
       );
 
       teamMembers = rawMembers.map((m: TeamMember) => ({

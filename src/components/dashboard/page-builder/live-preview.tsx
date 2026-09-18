@@ -16,14 +16,11 @@ export function LivePreview({ page, links, socials, theme, isPro }: LivePreviewP
   const pageBgIsImage = theme.pageBg.type === "image" && !!theme.pageBg.value;
 
   return (
-    <div
-      className="absolute inset-0 flex items-center justify-center overflow-hidden"
-      aria-label="Page preview"
-    >
+    <div className="absolute inset-0 flex items-center justify-center overflow-hidden" aria-label="Page preview">
       {/* Canvas background — mirrors the desktop public page backdrop */}
       <div className="absolute inset-0" aria-hidden>
         {page.avatar_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
+          // eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer
           <img
             src={page.avatar_url}
             alt=""
@@ -34,7 +31,7 @@ export function LivePreview({ page, links, socials, theme, isPro }: LivePreviewP
             }}
           />
         ) : pageBgIsImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
+          // eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer
           <img
             src={theme.pageBg.value}
             alt=""
@@ -45,10 +42,7 @@ export function LivePreview({ page, links, socials, theme, isPro }: LivePreviewP
             }}
           />
         ) : (
-          <div
-            className="absolute inset-0"
-            style={{ background: theme.pageBg.value || "#0D0D0D" }}
-          />
+          <div className="absolute inset-0" style={{ background: theme.pageBg.value || "#0D0D0D" }} />
         )}
       </div>
 
@@ -60,10 +54,7 @@ export function LivePreview({ page, links, socials, theme, isPro }: LivePreviewP
         }}
       >
         {/* Scrollable content — no scrollbar chrome */}
-        <div
-          className="absolute inset-0 overflow-y-auto no-scrollbar"
-          style={{ scrollbarWidth: "none" }}
-        >
+        <div className="absolute inset-0 overflow-y-auto no-scrollbar" style={{ scrollbarWidth: "none" }}>
           <ProfilePageView
             page={page}
             links={links.filter((l) => l.is_active)}

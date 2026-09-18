@@ -47,8 +47,8 @@ function NavItem({
     active
       ? "text-white"
       : disabled
-      ? "text-[#9A9A9A] cursor-not-allowed opacity-50"
-      : "text-[#9A9A9A] hover:text-white cursor-pointer",
+        ? "text-[#9A9A9A] cursor-not-allowed opacity-50"
+        : "text-[#9A9A9A] hover:text-white cursor-pointer",
   ].join(" ");
 
   const activeStyle = active ? { background: "rgba(255,255,255,.10)" } : undefined;
@@ -138,7 +138,10 @@ function AccountMenu({
   };
 
   const handleSwitchOwner = async (ownerId: string) => {
-    if (ownerId === activeOwnerId) { setOpen(false); return; }
+    if (ownerId === activeOwnerId) {
+      setOpen(false);
+      return;
+    }
     setSwitching(ownerId);
     await setActiveOwner(ownerId);
     setSwitching(null);
@@ -151,9 +154,7 @@ function AccountMenu({
 
   const isEditor = activeOwnerId !== user.id;
   const activeTeam = teamMemberships.find((m) => m.ownerId === activeOwnerId);
-  const activeName = isEditor
-    ? (activeTeam?.ownerDisplayName || activeTeam?.ownerUsername || selfName)
-    : selfName;
+  const activeName = isEditor ? activeTeam?.ownerDisplayName || activeTeam?.ownerUsername || selfName : selfName;
 
   const hasMemberships = teamMemberships.length > 0;
 
@@ -194,13 +195,8 @@ function AccountMenu({
 
       {open && (
         <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setOpen(false)}
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} aria-hidden="true" />
           <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 px-1 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-
             {hasMemberships && (
               <>
                 {/* Switching as header */}
@@ -235,7 +231,14 @@ function AccountMenu({
                       {isLoading ? (
                         <SpinnerRing size={14} strokeWidth={2.5} />
                       ) : isActive ? (
-                        <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="#C9A86A" strokeWidth="2" aria-hidden="true">
+                        <svg
+                          viewBox="0 0 16 16"
+                          className="w-3.5 h-3.5 shrink-0"
+                          fill="none"
+                          stroke="#C9A86A"
+                          strokeWidth="2"
+                          aria-hidden="true"
+                        >
                           <path d="M3 8l3.5 3.5L13 4.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       ) : null}
@@ -248,10 +251,21 @@ function AccountMenu({
 
             <button
               type="button"
-              onClick={() => { setOpen(false); startLoading(); router.push("/dashboard/account"); }}
+              onClick={() => {
+                setOpen(false);
+                startLoading();
+                router.push("/dashboard/account");
+              }}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface rounded-[var(--radius-sm)] transition-colors cursor-pointer"
             >
-              <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <svg
+                viewBox="0 0 16 16"
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
                 <circle cx="8" cy="5" r="2.5" strokeLinecap="round" />
                 <path d="M2.5 13.5c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -260,10 +274,20 @@ function AccountMenu({
             <div className="border-t border-border mx-1 my-1" />
             <button
               type="button"
-              onClick={() => { setOpen(false); handleSignOut(); }}
+              onClick={() => {
+                setOpen(false);
+                handleSignOut();
+              }}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-surface rounded-[var(--radius-sm)] transition-colors cursor-pointer"
             >
-              <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <svg
+                viewBox="0 0 16 16"
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
                 <path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3" strokeLinecap="round" />
                 <path d="M10 11l3-3-3-3M13 8H6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -300,7 +324,9 @@ export function Sidebar({
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileOpen]);
 
   // Close the mobile drawer after navigating to another page
@@ -334,7 +360,14 @@ export function Sidebar({
       label: "Domains",
       disabled: true,
       icon: (
-        <svg viewBox="0 0 16 16" className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+        <svg
+          viewBox="0 0 16 16"
+          className="w-[18px] h-[18px]"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          aria-hidden="true"
+        >
           <circle cx="8" cy="8" r="6" />
           <path d="M8 2c-1.5 2-2 3.5-2 6s.5 4 2 6M8 2c1.5 2 2 3.5 2 6s-.5 4-2 6M2 8h12" strokeLinecap="round" />
         </svg>
@@ -342,9 +375,7 @@ export function Sidebar({
     },
   ];
 
-  const bottomItems = [
-    { href: "/help", label: "Help" },
-  ];
+  const bottomItems = [{ href: "/help", label: "Help" }];
 
   // A render function, not a component: defining a component inside Sidebar
   // would remount it (and reset AccountMenu's state) on every render.
@@ -361,11 +392,12 @@ export function Sidebar({
             href={item.href}
             icon={item.icon}
             label={item.label}
-            active={!item.disabled && (
-              item.href === "/dashboard"
+            active={
+              !item.disabled &&
+              (item.href === "/dashboard"
                 ? pathname === "/dashboard" || pathname.startsWith("/dashboard/links")
-                : pathname.startsWith(item.href)
-            )}
+                : pathname.startsWith(item.href))
+            }
             disabled={item.disabled}
             onClick={onClose}
           />
@@ -375,22 +407,40 @@ export function Sidebar({
       <div className="p-3 space-y-0.5 mt-3">
         <button
           type="button"
-          onClick={() => { openWelcomeModal(); onClose?.(); }}
+          onClick={() => {
+            openWelcomeModal();
+            onClose?.();
+          }}
           className="w-full flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm transition-colors cursor-pointer"
           style={{ color: "#9A9A9A" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#ffffff";
+            e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "#9A9A9A";
+            e.currentTarget.style.background = "";
+          }}
         >
           <PlayCircle size={18} strokeWidth={1.75} aria-hidden="true" />
           Watch intro
         </button>
         <button
           type="button"
-          onClick={() => { openFeedbackModal(); onClose?.(); }}
+          onClick={() => {
+            openFeedbackModal();
+            onClose?.();
+          }}
           className="w-full flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm transition-colors cursor-pointer"
           style={{ color: "#9A9A9A" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#ffffff";
+            e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "#9A9A9A";
+            e.currentTarget.style.background = "";
+          }}
         >
           <MessageSquareWarning size={18} strokeWidth={1.75} aria-hidden="true" />
           Report a bug
@@ -403,8 +453,14 @@ export function Sidebar({
             rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
             className="flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm transition-colors"
             style={{ color: "#9A9A9A" }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#ffffff";
+              e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#9A9A9A";
+              e.currentTarget.style.background = "";
+            }}
           >
             {item.label}
           </a>
@@ -416,11 +472,18 @@ export function Sidebar({
           {needsAttention ? (
             <button
               type="button"
-              onClick={() => { router.push("/dashboard/account"); onClose?.(); }}
+              onClick={() => {
+                router.push("/dashboard/account");
+                onClose?.();
+              }}
               className="w-full flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm font-medium transition-colors cursor-pointer"
               style={{ color: "#F87171", background: "rgba(248,113,113,0.08)" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(248,113,113,0.14)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(248,113,113,0.08)"; }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(248,113,113,0.14)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(248,113,113,0.08)";
+              }}
             >
               <Crown size={18} strokeWidth={1.75} aria-hidden="true" />
               Manage plan
@@ -428,7 +491,10 @@ export function Sidebar({
           ) : (
             <button
               type="button"
-              onClick={() => { setUpgradeOpen(true); onClose?.(); }}
+              onClick={() => {
+                setUpgradeOpen(true);
+                onClose?.();
+              }}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px] text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(255,255,255,0.15)]"
               style={{ background: "#FFFFFF", color: "#0A0A0A" }}
             >
@@ -472,9 +538,15 @@ export function Sidebar({
           aria-expanded={mobileOpen}
         >
           <span className="flex flex-col gap-[5px] w-5" aria-hidden="true">
-            <span className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
-            <span className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "opacity-0 scale-x-0" : ""}`} />
-            <span className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+            <span
+              className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "rotate-45 translate-y-[7px]" : ""}`}
+            />
+            <span
+              className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "opacity-0 scale-x-0" : ""}`}
+            />
+            <span
+              className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "-rotate-45 -translate-y-[7px]" : ""}`}
+            />
           </span>
         </button>
       </div>
@@ -487,7 +559,10 @@ export function Sidebar({
             onClick={() => setMobileOpen(false)}
             aria-hidden="true"
           />
-          <div className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 overflow-y-auto" style={{ background: "#131313" }}>
+          <div
+            className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 overflow-y-auto"
+            style={{ background: "#131313" }}
+          >
             {renderSidebarContent(() => setMobileOpen(false))}
           </div>
         </>

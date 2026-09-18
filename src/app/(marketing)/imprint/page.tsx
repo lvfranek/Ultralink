@@ -78,8 +78,8 @@ export default function ImprintPage() {
             <section>
               <h2 className="text-xl font-semibold text-text mb-4">Consumer dispute resolution</h2>
               <p>
-                We are neither willing nor obliged to participate in dispute resolution proceedings
-                before a consumer arbitration board.
+                We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer
+                arbitration board.
               </p>
             </section>
           </div>
@@ -87,8 +87,8 @@ export default function ImprintPage() {
           <div className="p-4 rounded-[var(--radius)] border border-amber-700/40 bg-amber-950/20">
             <p className="text-sm text-amber-400 font-medium">Imprint not configured</p>
             <p className="text-xs text-amber-400/80 mt-1">
-              Set <code>IMPRINT_NAME</code>, <code>IMPRINT_STREET</code> and <code>IMPRINT_CITY</code> in
-              your environment (see <code>.env.example</code>) to show the operator&apos;s details here.
+              Set <code>IMPRINT_NAME</code>, <code>IMPRINT_STREET</code> and <code>IMPRINT_CITY</code> in your
+              environment (see <code>.env.example</code>) to show the operator&apos;s details here.
             </p>
           </div>
         )}
@@ -99,9 +99,15 @@ export default function ImprintPage() {
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-muted">
           <Logo iconSize={20} onDark />
           <div className="flex gap-6">
-            <Link href="/terms" className="hover:text-text transition-colors">Terms of Service</Link>
-            <Link href="/privacy" className="hover:text-text transition-colors">Privacy Policy</Link>
-            <Link href="/imprint" className="hover:text-text transition-colors">Imprint</Link>
+            <Link href="/terms" className="hover:text-text transition-colors">
+              Terms of Service
+            </Link>
+            <Link href="/privacy" className="hover:text-text transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/imprint" className="hover:text-text transition-colors">
+              Imprint
+            </Link>
           </div>
         </div>
       </footer>

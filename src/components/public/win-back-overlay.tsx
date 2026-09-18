@@ -230,7 +230,7 @@ export function WinBackDialog({
         {/* Avatar */}
         <div className="mb-4">
           {avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
+            // eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer
             <img
               src={avatarUrl}
               alt={title}

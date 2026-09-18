@@ -11,9 +11,19 @@ export default function DomainsPage() {
       <h1 className="text-2xl font-bold text-text mb-2">Domains</h1>
       <div className="mt-12 flex flex-col items-center text-center">
         <div className="w-16 h-16 rounded-[var(--radius-lg)] flex items-center justify-center mb-5 bg-surface-2 border border-border">
-          <svg viewBox="0 0 24 24" className="w-7 h-7 text-text-muted" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            className="w-7 h-7 text-text-muted"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
             <circle cx="12" cy="12" r="9" />
-            <path d="M12 3c-2.5 3-3.5 5.5-3.5 9s1 6 3.5 9M12 3c2.5 3 3.5 5.5 3.5 9s-1 6-3.5 9M3 12h18" strokeLinecap="round" />
+            <path
+              d="M12 3c-2.5 3-3.5 5.5-3.5 9s1 6 3.5 9M12 3c2.5 3 3.5 5.5 3.5 9s-1 6-3.5 9M3 12h18"
+              strokeLinecap="round"
+            />
           </svg>
         </div>
         <span className="inline-flex items-center gap-1.5 mb-3 px-2.5 py-1 rounded-full border border-border-strong bg-surface-2 text-xs font-medium tracking-widest uppercase text-text-muted">

@@ -50,7 +50,7 @@ function BgLayer({ pageBgIsImage, value, overlay, blur = 0, className = "absolut
   if (pageBgIsImage) {
     return (
       <>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer */}
         <img
           src={value}
           alt=""
@@ -135,7 +135,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
       {/* Hero — full-bleed: no side padding, flush to the very top */}
       {heroActive && (
         <div className="relative z-[1] w-full flex-shrink-0 overflow-hidden" style={{ height: 220 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer */}
           <img
             src={page.avatar_url!}
             alt={page.title || page.slug}
@@ -156,7 +156,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
       {(!isHero || !page.avatar_url) && (
         <div className="mb-5">
           {page.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
+            // eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer
             <img
               src={page.avatar_url}
               alt={page.title || page.slug}
@@ -305,7 +305,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
           aria-hidden
         >
           {page.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
+            // eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer
             <img
               src={page.avatar_url}
               alt=""
@@ -437,7 +437,7 @@ function LinkButton({ link, index, isPreview }: { link: PageLink; index: number;
           label below always centers on the full button width. */}
       {iconUrl && (
         <span className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-2" aria-hidden="true">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer */}
           <img src={iconUrl} alt="" className="flex-shrink-0 w-5 h-5 object-contain rounded-sm" />
         </span>
       )}

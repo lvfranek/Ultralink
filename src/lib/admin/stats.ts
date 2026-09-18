@@ -6,13 +6,11 @@ const ACTIVE_STATUSES: SubscriptionStatus[] = ["active", "trialing", "grace"];
 
 export async function getUserCount(): Promise<number> {
   const service = createServiceClient();
-  const { count } = await service
-    .from("profiles")
-    .select("*", { count: "exact", head: true });
+  const { count } = await service.from("profiles").select("*", { count: "exact", head: true });
   return count ?? 0;
 }
 
-export interface TierBreakdownRow {
+interface TierBreakdownRow {
   tier: Tier;
   monthlyCustomers: number;
   annualCustomers: number;

@@ -1,9 +1,6 @@
 export function BlockedPage() {
   return (
-    <div
-      className="min-h-dvh flex flex-col items-center justify-center p-6"
-      style={{ background: "#0E0E0E" }}
-    >
+    <div className="min-h-dvh flex flex-col items-center justify-center p-6" style={{ background: "#0E0E0E" }}>
       <div
         className="w-full max-w-sm rounded-[20px] p-8 text-center"
         style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.08)" }}

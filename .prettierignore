@@ -1,0 +1,15 @@
+# Build output and reports
+.next/
+out/
+coverage/
+.lighthouseci/
+playwright-report/
+test-results/
+
+# Generated / third-party
+package-lock.json
+next-env.d.ts
+.agents/
+.claude/
+memory/
+public/

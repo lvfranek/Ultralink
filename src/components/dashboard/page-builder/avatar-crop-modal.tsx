@@ -33,14 +33,18 @@ async function getCroppedBlob(imageSrc: string, pixelCrop: Area): Promise<Blob> 
     0,
     0,
     pixelCrop.width,
-    pixelCrop.height
+    pixelCrop.height,
   );
 
   return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error("Canvas to Blob failed"));
-    }, "image/jpeg", 0.9);
+    canvas.toBlob(
+      (blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error("Canvas to Blob failed"));
+      },
+      "image/jpeg",
+      0.9,
+    );
   });
 }
 

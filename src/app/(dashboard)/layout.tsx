@@ -4,11 +4,7 @@ import { DashboardChrome } from "@/components/dashboard/dashboard-chrome";
 import { getActiveOwnerId, getTeamMemberships } from "@/lib/team";
 import type { SubscriptionStatus } from "@/lib/supabase/types";
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -17,11 +13,7 @@ export default async function DashboardLayout({
   if (!user) redirect("/login");
 
   const [profileResult, memberships] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("display_name, username, has_seen_welcome")
-      .eq("id", user.id)
-      .single(),
+    supabase.from("profiles").select("display_name, username, has_seen_welcome").eq("id", user.id).single(),
     getTeamMemberships(user.id, supabase),
   ]);
 
@@ -45,9 +37,7 @@ export default async function DashboardLayout({
           selfUsername={profileResult.data?.username ?? ""}
           teamMemberships={memberships}
           hasSeenWelcome={profileResult.data?.has_seen_welcome ?? false}
-          activeOwnerSubscriptionStatus={
-            (activeOwnerProfile?.subscription_status as SubscriptionStatus) ?? "none"
-          }
+          activeOwnerSubscriptionStatus={(activeOwnerProfile?.subscription_status as SubscriptionStatus) ?? "none"}
         >
           {children}
         </DashboardChrome>

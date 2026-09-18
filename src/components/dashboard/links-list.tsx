@@ -17,15 +17,7 @@ interface LinksListProps {
 
 type SortKey = "manual" | "name-az" | "newest" | "oldest";
 
-function PageRow({
-  page,
-  siteUrl,
-  isHidden,
-}: {
-  page: Page;
-  siteUrl: string;
-  isHidden: boolean;
-}) {
+function PageRow({ page, siteUrl, isHidden }: { page: Page; siteUrl: string; isHidden: boolean }) {
   const [copied, setCopied] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -66,16 +58,21 @@ function PageRow({
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p
-            className="text-sm font-medium truncate"
-            style={{ color: "#ffffff" }}
-          >
-            {page.title || <span className="italic" style={{ color: "#9A9A9A" }}>Untitled</span>}
+          <p className="text-sm font-medium truncate" style={{ color: "#ffffff" }}>
+            {page.title || (
+              <span className="italic" style={{ color: "#9A9A9A" }}>
+                Untitled
+              </span>
+            )}
           </p>
           {isHidden && (
             <span
               className="shrink-0 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
-              style={{ background: "rgba(255,255,255,.06)", color: "#6B6B6B", border: "1px solid rgba(255,255,255,.08)" }}
+              style={{
+                background: "rgba(255,255,255,.06)",
+                color: "#6B6B6B",
+                border: "1px solid rgba(255,255,255,.08)",
+              }}
             >
               Hidden
             </span>
@@ -99,11 +96,25 @@ function PageRow({
             aria-label="Copy link"
           >
             {copied ? (
-              <svg viewBox="0 0 14 14" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <svg
+                viewBox="0 0 14 14"
+                className="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden="true"
+              >
                 <path d="M2 7l3.5 3.5L12 3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             ) : (
-              <svg viewBox="0 0 14 14" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <svg
+                viewBox="0 0 14 14"
+                className="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
                 <rect x="5" y="5" width="8" height="8" rx="1" />
                 <path d="M9 5V2a1 1 0 00-1-1H2a1 1 0 00-1 1v6a1 1 0 001 1h3" strokeLinecap="round" />
               </svg>
@@ -126,12 +137,25 @@ function PageRow({
           href={`/dashboard/links/${page.id}`}
           className="p-1.5 rounded-lg transition-colors cursor-pointer"
           style={{ color: "#9A9A9A" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,.08)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#ffffff";
+            e.currentTarget.style.background = "rgba(255,255,255,.08)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "#9A9A9A";
+            e.currentTarget.style.background = "";
+          }}
           onClick={startLoading}
           aria-label="Edit"
         >
-          <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+          <svg
+            viewBox="0 0 16 16"
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
             <path d="M11 2l3 3-8 8H3v-3L11 2z" strokeLinejoin="round" />
           </svg>
         </Link>
@@ -142,11 +166,24 @@ function PageRow({
           onClick={() => setShowDuplicate(true)}
           className="p-1.5 rounded-lg transition-colors cursor-pointer"
           style={{ color: "#9A9A9A" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.background = "rgba(255,255,255,.08)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#ffffff";
+            e.currentTarget.style.background = "rgba(255,255,255,.08)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "#9A9A9A";
+            e.currentTarget.style.background = "";
+          }}
           aria-label="Duplicate"
         >
-          <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+          <svg
+            viewBox="0 0 16 16"
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
             <rect x="6" y="6" width="8" height="8" rx="1.5" />
             <path d="M10 6V4a1.5 1.5 0 00-1.5-1.5H4A1.5 1.5 0 002.5 4v4.5A1.5 1.5 0 004 10h2" strokeLinecap="round" />
           </svg>
@@ -159,11 +196,24 @@ function PageRow({
             onClick={() => setShowConfirm(true)}
             className="p-1.5 rounded-lg transition-colors cursor-pointer"
             style={{ color: "#9A9A9A" }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "#ef4444"; e.currentTarget.style.background = "rgba(239,68,68,.08)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "#9A9A9A"; e.currentTarget.style.background = ""; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#ef4444";
+              e.currentTarget.style.background = "rgba(239,68,68,.08)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#9A9A9A";
+              e.currentTarget.style.background = "";
+            }}
             aria-label="Delete"
           >
-            <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            <svg
+              viewBox="0 0 16 16"
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              aria-hidden="true"
+            >
               <path d="M2 4h12M5 4V2h6v2M13 4l-1 10H4L3 4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
@@ -194,19 +244,17 @@ function PageRow({
           sourcePageId={page.id}
           sourceSlug={page.slug}
           onClose={() => setShowDuplicate(false)}
-          onDuplicated={(newPageId) => { startLoading(); router.push(`/dashboard/links/${newPageId}`); }}
+          onDuplicated={(newPageId) => {
+            startLoading();
+            router.push(`/dashboard/links/${newPageId}`);
+          }}
         />
       )}
     </div>
   );
 }
 
-export function LinksList({
-  pages,
-  siteUrl,
-  linkCap: _linkCap = 1,
-  survivingPageId = null,
-}: LinksListProps) {
+export function LinksList({ pages, siteUrl, linkCap: _linkCap = 1, survivingPageId = null }: LinksListProps) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortKey>("manual");
 

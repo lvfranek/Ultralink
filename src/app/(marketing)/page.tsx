@@ -9,12 +9,10 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Ultralink — One link. Your entire world.",
-  description:
-    "The premium link-in-bio for creators and agencies. Fast pages and real analytics.",
+  description: "The premium link-in-bio for creators and agencies. Fast pages and real analytics.",
   openGraph: {
     title: "Ultralink — One link. Your entire world.",
-    description:
-      "The premium link-in-bio for creators and agencies. Fast pages and real analytics.",
+    description: "The premium link-in-bio for creators and agencies. Fast pages and real analytics.",
     type: "website",
     url: "https://ultralink.bio",
   },
@@ -22,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div style={{background:'#0A0A0A', minHeight:'100dvh'}}>
+    <div style={{ background: "#0A0A0A", minHeight: "100dvh" }}>
       {/* Invisible until focused with Tab — lets keyboard users jump past the menu */}
       <a
         href="#main"

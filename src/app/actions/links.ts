@@ -9,7 +9,11 @@ import type { PageLink } from "@/lib/supabase/types";
 
 export type LinkActionResult = { error: string } | { ok: true; link?: PageLink };
 
-async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createClient>>, pageId: string, activeOwnerId: string): Promise<boolean> {
+async function verifyPageOwnership(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  pageId: string,
+  activeOwnerId: string,
+): Promise<boolean> {
   const { count } = await supabase
     .from("pages")
     .select("*", { count: "exact", head: true })
@@ -21,13 +25,22 @@ async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createCli
 export async function addLink(
   pageId: string,
   data: {
-    label: string; url: string; icon?: string; is_adult?: boolean;
-    fill_type?: string; fill_value?: string; text_color?: string; corner?: string; animation?: string;
+    label: string;
+    url: string;
+    icon?: string;
+    is_adult?: boolean;
+    fill_type?: string;
+    fill_value?: string;
+    text_color?: string;
+    corner?: string;
+    animation?: string;
     item_type?: "button" | "heading";
-  }
+  },
 ): Promise<LinkActionResult> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const isHeading = data.item_type === "heading";
@@ -44,12 +57,9 @@ export async function addLink(
   const owns = await verifyPageOwnership(supabase, pageId, activeOwnerId);
   if (!owns) return { error: "Page not found." };
 
-  const { count } = await supabase
-    .from("page_links")
-    .select("*", { count: "exact", head: true })
-    .eq("page_id", pageId);
+  const { count } = await supabase.from("page_links").select("*", { count: "exact", head: true }).eq("page_id", pageId);
 
-  const nextPos = (count ?? 0);
+  const nextPos = count ?? 0;
 
   const { data: link, error } = await supabase
     .from("page_links")
@@ -59,12 +69,12 @@ export async function addLink(
       url: normalizedUrl,
       icon: data.icon ?? null,
       is_adult: data.is_adult ?? false,
-      fill_type: data.fill_type ?? 'color',
-      fill_value: data.fill_value ?? '#06AEEF',
-      text_color: data.text_color ?? '#FFFFFF',
-      corner: data.corner ?? 'pill',
-      animation: data.animation ?? 'none',
-      item_type: data.item_type ?? 'button',
+      fill_type: data.fill_type ?? "color",
+      fill_value: data.fill_value ?? "#06AEEF",
+      text_color: data.text_color ?? "#FFFFFF",
+      corner: data.corner ?? "pill",
+      animation: data.animation ?? "none",
+      item_type: data.item_type ?? "button",
       position: nextPos,
     })
     .select()
@@ -79,20 +89,25 @@ export async function addLink(
 export async function updateLink(
   id: string,
   data: {
-    label?: string; url?: string; icon?: string | null;
-    is_adult?: boolean; is_active?: boolean;
-    fill_type?: string; fill_value?: string; text_color?: string; corner?: string; animation?: string;
-  }
+    label?: string;
+    url?: string;
+    icon?: string | null;
+    is_adult?: boolean;
+    is_active?: boolean;
+    fill_type?: string;
+    fill_value?: string;
+    text_color?: string;
+    corner?: string;
+    animation?: string;
+  },
 ): Promise<LinkActionResult> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: existing } = await supabase
-    .from("page_links")
-    .select("page_id, item_type")
-    .eq("id", id)
-    .single();
+  const { data: existing } = await supabase.from("page_links").select("page_id, item_type").eq("id", id).single();
 
   if (!existing) return { error: "Link not found." };
 
@@ -132,14 +147,12 @@ export async function updateLink(
 
 export async function deleteLink(id: string): Promise<LinkActionResult> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: existing } = await supabase
-    .from("page_links")
-    .select("page_id")
-    .eq("id", id)
-    .single();
+  const { data: existing } = await supabase.from("page_links").select("page_id").eq("id", id).single();
 
   if (!existing) return { error: "Link not found." };
 
@@ -154,12 +167,11 @@ export async function deleteLink(id: string): Promise<LinkActionResult> {
   return { ok: true };
 }
 
-export async function reorderLinks(
-  pageId: string,
-  orderedIds: string[]
-): Promise<LinkActionResult> {
+export async function reorderLinks(pageId: string, orderedIds: string[]): Promise<LinkActionResult> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
@@ -167,7 +179,7 @@ export async function reorderLinks(
   if (!owns) return { error: "Page not found." };
 
   const updates = orderedIds.map((id, position) =>
-    supabase.from("page_links").update({ position }).eq("id", id).eq("page_id", pageId)
+    supabase.from("page_links").update({ position }).eq("id", id).eq("page_id", pageId),
   );
 
   const results = await Promise.all(updates);
@@ -181,10 +193,12 @@ export async function reorderLinks(
 /** Apply a preset's default link style to all links on a page at once. */
 export async function applyPresetToLinks(
   pageId: string,
-  style: { fill_type: string; fill_value: string; text_color: string; corner: string; animation: string }
+  style: { fill_type: string; fill_value: string; text_color: string; corner: string; animation: string },
 ): Promise<LinkActionResult> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);

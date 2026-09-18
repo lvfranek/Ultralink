@@ -1,4 +1,4 @@
-export const RESERVED_SLUGS = new Set([
+const RESERVED_SLUGS = new Set([
   "login",
   "register",
   "signup",

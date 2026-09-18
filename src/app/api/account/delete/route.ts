@@ -5,7 +5,9 @@ import { stripe } from "@/lib/stripe/server";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
@@ -28,11 +30,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Service not configured." }, { status: 500 });
   }
 
-  const admin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    serviceRoleKey,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
+  const admin = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
 
   // Stop billing before the account disappears. Deleting the Stripe customer
   // cancels all of its subscriptions immediately and removes the stored
@@ -46,8 +46,11 @@ export async function POST(request: Request) {
       if (!alreadyGone) {
         console.error("[account/delete] Stripe customer deletion failed", err);
         return NextResponse.json(
-          { error: "We couldn't cancel your subscription, so your account was not deleted. Please try again or contact support." },
-          { status: 500 }
+          {
+            error:
+              "We couldn't cancel your subscription, so your account was not deleted. Please try again or contact support.",
+          },
+          { status: 500 },
         );
       }
     }
@@ -57,10 +60,7 @@ export async function POST(request: Request) {
   if (error) {
     // Billing is already gone — don't leave a pointer to the deleted customer
     if (profile.stripe_customer_id) {
-      await admin
-        .from("profiles")
-        .update({ stripe_customer_id: null, stripe_subscription_id: null })
-        .eq("id", user.id);
+      await admin.from("profiles").update({ stripe_customer_id: null, stripe_subscription_id: null }).eq("id", user.id);
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

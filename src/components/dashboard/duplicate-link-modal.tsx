@@ -20,7 +20,9 @@ export function DuplicateLinkModal({ sourcePageId, sourceSlug, onClose, onDuplic
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, []);
 
   useEffect(() => {
@@ -46,7 +48,9 @@ export function DuplicateLinkModal({ sourcePageId, sourceSlug, onClose, onDuplic
   return (
     <div
       className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
@@ -65,7 +69,14 @@ export function DuplicateLinkModal({ sourcePageId, sourceSlug, onClose, onDuplic
               style={{ color: "#9A9A9A" }}
               aria-label="Close"
             >
-              <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <svg
+                viewBox="0 0 16 16"
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
                 <path d="M3 3l10 10M13 3L3 13" strokeLinecap="round" />
               </svg>
             </button>
@@ -89,17 +100,35 @@ export function DuplicateLinkModal({ sourcePageId, sourceSlug, onClose, onDuplic
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2">
               {checking && (
-                <span className="inline-block w-3.5 h-3.5 border border-current border-t-transparent rounded-full animate-spin" style={{ color: "#9A9A9A" }} />
+                <span
+                  className="inline-block w-3.5 h-3.5 border border-current border-t-transparent rounded-full animate-spin"
+                  style={{ color: "#9A9A9A" }}
+                />
               )}
               {!checking && slugOk && (
-                <svg viewBox="0 0 14 14" className="w-3.5 h-3.5" style={{ color: "#34d399" }} fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  viewBox="0 0 14 14"
+                  className="w-3.5 h-3.5"
+                  style={{ color: "#34d399" }}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M2 7l3.5 3.5L12 3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </span>
           </div>
-          {slugError && <p className="mt-1.5 text-xs" style={{ color: "#f87171" }}>{slugError}</p>}
-          {submitError && <p className="mt-1.5 text-xs" style={{ color: "#f87171" }}>{submitError}</p>}
+          {slugError && (
+            <p className="mt-1.5 text-xs" style={{ color: "#f87171" }}>
+              {slugError}
+            </p>
+          )}
+          {submitError && (
+            <p className="mt-1.5 text-xs" style={{ color: "#f87171" }}>
+              {submitError}
+            </p>
+          )}
 
           <div className="flex gap-2 mt-5">
             <button

@@ -22,7 +22,9 @@ export function WelcomeModal({ open, onClose, displayName }: WelcomeModalProps) 
     if (!open) return;
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   const handleClose = useCallback(() => {
@@ -33,10 +35,13 @@ export function WelcomeModal({ open, onClose, displayName }: WelcomeModalProps) 
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { handleClose(); return; }
+      if (e.key === "Escape") {
+        handleClose();
+        return;
+      }
       if (e.key !== "Tab" || !cardRef.current) return;
       const focusable = cardRef.current.querySelectorAll<HTMLElement>(
-        'button, a[href], input, [tabindex]:not([tabindex="-1"])'
+        'button, a[href], input, [tabindex]:not([tabindex="-1"])',
       );
       if (focusable.length === 0) return;
       const first = focusable[0];
@@ -67,7 +72,9 @@ export function WelcomeModal({ open, onClose, displayName }: WelcomeModalProps) 
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,.7)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
-      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleClose();
+      }}
     >
       <div
         ref={cardRef}
@@ -75,7 +82,11 @@ export function WelcomeModal({ open, onClose, displayName }: WelcomeModalProps) 
         aria-modal="true"
         aria-label="Welcome to Ultralink"
         className="w-full max-w-[560px] rounded-[20px] p-6 sm:p-8 relative"
-        style={{ background: "#141414", border: "1px solid rgba(255,255,255,.08)", animation: "welcome-modal-in 0.18s ease-out" }}
+        style={{
+          background: "#141414",
+          border: "1px solid rgba(255,255,255,.08)",
+          animation: "welcome-modal-in 0.18s ease-out",
+        }}
       >
         <style>{`
           @keyframes welcome-modal-in {
@@ -92,7 +103,14 @@ export function WelcomeModal({ open, onClose, displayName }: WelcomeModalProps) 
           className="absolute top-4 right-4 p-1.5 rounded-lg cursor-pointer"
           style={{ color: "#6B6B6B" }}
         >
-          <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+          <svg
+            viewBox="0 0 16 16"
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
             <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
           </svg>
         </button>
@@ -108,8 +126,13 @@ export function WelcomeModal({ open, onClose, displayName }: WelcomeModalProps) 
 
         <div className="mt-5 w-full aspect-video rounded-[14px] overflow-hidden" style={{ background: "#000" }}>
           {comingSoon ? (
-            <div className="w-full h-full flex flex-col items-center justify-center text-center px-6" style={{ background: "#1E1E1E" }}>
-              <p className="text-sm font-medium" style={{ color: "#fff" }}>Video coming soon.</p>
+            <div
+              className="w-full h-full flex flex-col items-center justify-center text-center px-6"
+              style={{ background: "#1E1E1E" }}
+            >
+              <p className="text-sm font-medium" style={{ color: "#fff" }}>
+                Video coming soon.
+              </p>
               <p className="text-xs mt-1" style={{ color: "#6B6B6B" }}>
                 In the meantime, check out our Help Center.
               </p>

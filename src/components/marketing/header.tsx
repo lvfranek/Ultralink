@@ -59,10 +59,10 @@ export function Header() {
           <div
             style={{
               ...pillStyle,
-              display: 'flex',
-              alignItems: 'center',
+              display: "flex",
+              alignItems: "center",
               borderRadius: 999,
-              padding: '8px 14px',
+              padding: "8px 14px",
             }}
           >
             <Logo onDark />
@@ -127,8 +127,14 @@ export function Header() {
                 whiteSpace: "nowrap",
                 transition: "opacity 0.15s, transform 0.15s",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.82"; e.currentTarget.style.transform = "scale(0.97)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "scale(1)"; }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = "0.82";
+                e.currentTarget.style.transform = "scale(0.97)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = "1";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
             >
               Sign up for free
             </Link>
@@ -207,7 +213,16 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-          <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 10, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.10)" }}>
+          <div
+            style={{
+              marginTop: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+              paddingTop: 16,
+              borderTop: "1px solid rgba(255,255,255,.10)",
+            }}
+          >
             <Link
               href="/login"
               onClick={() => setMobileOpen(false)}

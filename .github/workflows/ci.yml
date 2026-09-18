@@ -27,7 +27,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
@@ -36,15 +36,23 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Run unit tests
         run: npm test
 
-      - name: Build (includes type checking)
+      - name: Build
         run: npm run build
 
-  # Audits the public pages with Lighthouse and fails if a score drops below
-  # the limits in lighthouserc.json. Runs in parallel with the job above.
-  lighthouse:
+  # Browser checks against the production build, in parallel with the job
+  # above: Playwright E2E tests, then a Lighthouse audit that fails if a score
+  # drops below the limits in lighthouserc.json.
+  browser-tests:
+    name: E2E + Lighthouse
     runs-on: ubuntu-latest
     env:
       # Placeholders, not secrets: the app needs *some* Supabase URL/key to
@@ -59,7 +67,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
@@ -67,6 +75,12 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npm run test:e2e
 
       - name: Run Lighthouse CI
         run: npx -y @lhci/cli@0.15.1 autorun
@@ -77,3 +91,10 @@ jobs:
         with:
           name: lighthouse-reports
           path: .lighthouseci/reports
+
+      - name: Save Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report

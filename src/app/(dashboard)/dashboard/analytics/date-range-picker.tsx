@@ -31,8 +31,10 @@ export function CustomRangePopover({ value, onApply, defaultOpen = false, onClos
   const [mounted, setMounted] = useState(false);
   const [narrow, setNarrow] = useState(false);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- the portal target (document.body) only exists after mount
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the portal target (document.body) only exists after mount
+    setMounted(true);
+  }, []);
 
   // Follow the parent when it opens/closes the popover
   const [prevDefaultOpen, setPrevDefaultOpen] = useState(defaultOpen);
@@ -113,59 +115,61 @@ export function CustomRangePopover({ value, onApply, defaultOpen = false, onClos
         </button>
       )}
 
-      {open && mounted && createPortal(
-        <>
-          <div
-            className="fixed inset-0"
-            style={{
-              zIndex: 9998,
-              background: narrow ? "rgba(0,0,0,0.6)" : "transparent",
-              backdropFilter: narrow ? "blur(4px)" : "none",
-              transition: "all 0.2s"
-            }}
-            onClick={handleClose}
-          />
-          <div
-            style={{
-              ...popoverStyle,
-              background: "#141414",
-              border: "1px solid rgba(255,255,255,.12)",
-              borderRadius: 14,
-              padding: narrow ? "0.75rem" : "1rem",
-              boxShadow: "0 12px 40px rgba(0,0,0,.6)",
-            }}
-            className="ul-daypicker"
-          >
-            <DayPicker
-              mode="range"
-              numberOfMonths={narrow ? 1 : 2}
-              selected={draft}
-              onSelect={setDraft}
-              defaultMonth={draft?.from ?? new Date()}
+      {open &&
+        mounted &&
+        createPortal(
+          <>
+            <div
+              className="fixed inset-0"
+              style={{
+                zIndex: 9998,
+                background: narrow ? "rgba(0,0,0,0.6)" : "transparent",
+                backdropFilter: narrow ? "blur(4px)" : "none",
+                transition: "all 0.2s",
+              }}
+              onClick={handleClose}
             />
-            <div className="flex justify-end gap-2 mt-2">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="px-3 py-1.5 text-xs font-medium border rounded-full transition-colors cursor-pointer"
-                style={{ color: "#9A9A9A", borderColor: "rgba(255,255,255,.14)" }}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleApply}
-                disabled={!draft?.from || !draft?.to}
-                className="px-3 py-1.5 text-xs font-semibold rounded-full transition-all disabled:opacity-40 cursor-pointer"
-                style={{ background: "#ffffff", color: "#000000" }}
-              >
-                Apply
-              </button>
+            <div
+              style={{
+                ...popoverStyle,
+                background: "#141414",
+                border: "1px solid rgba(255,255,255,.12)",
+                borderRadius: 14,
+                padding: narrow ? "0.75rem" : "1rem",
+                boxShadow: "0 12px 40px rgba(0,0,0,.6)",
+              }}
+              className="ul-daypicker"
+            >
+              <DayPicker
+                mode="range"
+                numberOfMonths={narrow ? 1 : 2}
+                selected={draft}
+                onSelect={setDraft}
+                defaultMonth={draft?.from ?? new Date()}
+              />
+              <div className="flex justify-end gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="px-3 py-1.5 text-xs font-medium border rounded-full transition-colors cursor-pointer"
+                  style={{ color: "#9A9A9A", borderColor: "rgba(255,255,255,.14)" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApply}
+                  disabled={!draft?.from || !draft?.to}
+                  className="px-3 py-1.5 text-xs font-semibold rounded-full transition-all disabled:opacity-40 cursor-pointer"
+                  style={{ background: "#ffffff", color: "#000000" }}
+                >
+                  Apply
+                </button>
+              </div>
             </div>
-          </div>
-        </>,
-        document.body
-      )}
+          </>,
+          document.body,
+        )}
     </div>
   );
 }

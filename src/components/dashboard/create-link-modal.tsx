@@ -36,11 +36,15 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, []);
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
@@ -66,11 +70,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
       <div
         role="dialog"
         aria-modal="true"
@@ -92,7 +92,14 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
               className="p-1.5 rounded-[var(--radius-sm)] text-text-subtle hover:text-text hover:bg-surface-2 transition-colors cursor-pointer"
               aria-label="Close"
             >
-              <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <svg
+                viewBox="0 0 16 16"
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+              >
                 <path d="M3 3l10 10M13 3L3 13" strokeLinecap="round" />
               </svg>
             </button>
@@ -126,8 +133,8 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                     slugError
                       ? "border-red-400 focus:ring-red-400/30 focus:border-red-400"
                       : slugOk
-                      ? "border-emerald-400 focus:ring-emerald-400/20 focus:border-emerald-400"
-                      : "border-border-strong focus:ring-text/20 focus:border-text/30",
+                        ? "border-emerald-400 focus:ring-emerald-400/20 focus:border-emerald-400"
+                        : "border-border-strong focus:ring-text/20 focus:border-text/30",
                   ].join(" ")}
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm" aria-hidden="true">
@@ -135,12 +142,24 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                     <span className="inline-block w-3.5 h-3.5 border border-current border-t-transparent rounded-full animate-spin text-text-subtle" />
                   )}
                   {!checking && slugOk && (
-                    <svg viewBox="0 0 14 14" className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg
+                      viewBox="0 0 14 14"
+                      className="w-3.5 h-3.5 text-emerald-500"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
                       <path d="M2 7l3.5 3.5L12 3" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
                   {!checking && slugError && (
-                    <svg viewBox="0 0 14 14" className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg
+                      viewBox="0 0 14 14"
+                      className="w-3.5 h-3.5 text-red-500"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
                       <path d="M3 3l8 8M11 3L3 11" strokeLinecap="round" />
                     </svg>
                   )}
@@ -160,7 +179,10 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                 name="title"
                 type="text"
                 value={title}
-                onChange={(e) => { setTitle(e.target.value); setShowValidation(false); }}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setShowValidation(false);
+                }}
                 placeholder="e.g. John's links"
                 disabled={isPending}
               />
@@ -168,14 +190,20 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
 
             {/* Inline hint */}
             {showValidation && missingMessage() && (
-              <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-surface-2 border border-border-strong text-sm text-text-muted">
+              <div
+                role="alert"
+                className="p-3 rounded-[var(--radius-sm)] bg-surface-2 border border-border-strong text-sm text-text-muted"
+              >
                 {missingMessage()}
               </div>
             )}
 
             {/* Server error */}
             {state && "error" in state && (
-              <div role="alert" className="p-3 rounded-[var(--radius-sm)] bg-red-950/30 border border-red-800/40 text-sm text-red-400">
+              <div
+                role="alert"
+                className="p-3 rounded-[var(--radius-sm)] bg-red-950/30 border border-red-800/40 text-sm text-red-400"
+              >
                 {state.error}
               </div>
             )}
@@ -191,13 +219,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                 Cancel
               </button>
               {isFormValid ? (
-                <Button
-                  type="submit"
-                  variant="gold"
-                  size="md"
-                  loading={isPending}
-                  className="flex-1"
-                >
+                <Button type="submit" variant="gold" size="md" loading={isPending} className="flex-1">
                   {isPending ? "Creating…" : "Create link"}
                 </Button>
               ) : (

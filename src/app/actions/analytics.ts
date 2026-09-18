@@ -5,33 +5,33 @@ import { createClient } from "@/lib/supabase/server";
 import { getActiveOwnerId } from "@/lib/team";
 import { getReferrerLabel } from "@/lib/config/referrers";
 
-export interface TimeseriesPoint {
+interface TimeseriesPoint {
   date: string;
   views: number;
   clicks: number;
 }
 
-export interface CountryRow {
+interface CountryRow {
   code: string;
   count: number;
   pct: number;
 }
 
-export interface SourceRow {
+interface SourceRow {
   host: string | null;
   label: string;
   count: number;
   pct: number;
 }
 
-export interface DeviceCounts {
+interface DeviceCounts {
   mobile: number;
   desktop: number;
   tablet: number;
   total: number;
 }
 
-export interface LinkRow {
+interface LinkRow {
   link_id: string;
   label: string;
   url: string;
@@ -82,11 +82,7 @@ export async function getAnalyticsData(
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
 
   // Verify page belongs to active owner
-  const { data: pageCheck } = await supabase
-    .from("pages")
-    .select("owner_id")
-    .eq("id", pageId)
-    .single();
+  const { data: pageCheck } = await supabase.from("pages").select("owner_id").eq("id", pageId).single();
   if (!pageCheck || pageCheck.owner_id !== activeOwnerId) return null;
 
   const startDate = startOfDay(new Date(startStr));
@@ -111,10 +107,7 @@ export async function getAnalyticsData(
       .neq("device", "bot")
       .gte("created_at", prevStartDate.toISOString())
       .lte("created_at", prevEndDate.toISOString()),
-    supabase
-      .from("page_links")
-      .select("id, label, url, item_type")
-      .eq("page_id", pageId),
+    supabase.from("page_links").select("id, label, url, item_type").eq("page_id", pageId),
   ]);
 
   const events = eventsRes.data ?? [];
@@ -127,14 +120,12 @@ export async function getAnalyticsData(
 
   const prevViews = prevEvents.filter((e) => e.kind === "view").length;
   const prevClicks = prevEvents.filter((e) => e.kind === "click").length;
-  const prevCtr =
-    prevViews > 0 ? Math.round((prevClicks / prevViews) * 1000) / 10 : 0;
+  const prevCtr = prevViews > 0 ? Math.round((prevClicks / prevViews) * 1000) / 10 : 0;
 
   const winbackShown = events.filter((e) => e.kind === "winback_shown").length;
   const winbackClicks = events.filter((e) => e.kind === "winback_click").length;
 
-  const days =
-    Math.ceil((endDate.getTime() - startDate.getTime()) / 86_400_000) + 1;
+  const days = Math.ceil((endDate.getTime() - startDate.getTime()) / 86_400_000) + 1;
   const timeseries: TimeseriesPoint[] = Array.from({ length: days }, (_, i) => {
     const d = new Date(startDate);
     d.setDate(d.getDate() + i);
@@ -171,15 +162,12 @@ export async function getAnalyticsData(
   }
   const sourceEntries = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]);
   const top6 = sourceEntries.slice(0, 6);
-  const otherCount = sourceEntries
-    .slice(6)
-    .reduce((acc, [, c]) => acc + c, 0);
+  const otherCount = sourceEntries.slice(6).reduce((acc, [, c]) => acc + c, 0);
 
   const sources: SourceRow[] = [
     ...top6.map(([host, count]) => ({
       host: host === "__direct__" ? null : host,
-      label:
-        host === "__direct__" ? "Direct" : getReferrerLabel(host),
+      label: host === "__direct__" ? "Direct" : getReferrerLabel(host),
       count,
       pct: views > 0 ? Math.round((count / views) * 100) : 0,
     })),

@@ -44,11 +44,7 @@ export async function createCheckoutSession({
   if (!user) redirect("/login");
 
   // Ensure stripe customer exists
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("stripe_customer_id")
-    .eq("id", user.id)
-    .single();
+  const { data: profile } = await supabase.from("profiles").select("stripe_customer_id").eq("id", user.id).single();
 
   let customerId = profile?.stripe_customer_id;
 
@@ -59,10 +55,7 @@ export async function createCheckoutSession({
     });
     customerId = customer.id;
     // Billing columns aren't user-writable (see 20260911_lock_profile_columns.sql)
-    await createServiceClient()
-      .from("profiles")
-      .update({ stripe_customer_id: customerId })
-      .eq("id", user.id);
+    await createServiceClient().from("profiles").update({ stripe_customer_id: customerId }).eq("id", user.id);
   }
 
   let priceId: string;
@@ -95,11 +88,7 @@ export async function createPortalSession(): Promise<{ url: string } | { error: 
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("stripe_customer_id")
-    .eq("id", user.id)
-    .single();
+  const { data: profile } = await supabase.from("profiles").select("stripe_customer_id").eq("id", user.id).single();
 
   if (!profile?.stripe_customer_id) {
     return { error: "No active subscription." };

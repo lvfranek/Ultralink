@@ -31,35 +31,33 @@ export async function submitFeedback(formData: FormData): Promise<{ ok?: true; e
   const userAgent = (await headers()).get("user-agent") ?? "";
 
   const plan = profile ? getEffectivePlan(profile) : "free";
-  const planLine =
-    plan === "pro" ? `Pro · Tier ${profile?.plan_tier} · ${profile?.plan_interval}` : "Free";
+  const planLine = plan === "pro" ? `Pro · Tier ${profile?.plan_tier} · ${profile?.plan_interval}` : "Free";
 
-  const webhookUrl = type === "bug"
-    ? process.env.DISCORD_BUGS_WEBHOOK_URL
-    : process.env.DISCORD_FEATURES_WEBHOOK_URL;
+  const webhookUrl = type === "bug" ? process.env.DISCORD_BUGS_WEBHOOK_URL : process.env.DISCORD_FEATURES_WEBHOOK_URL;
 
   const emoji = type === "bug" ? "🐛" : "💡";
   const title = type === "bug" ? "Bug report" : "Feature request";
   const color = type === "bug" ? 0xf56565 : 0x63b3ed;
 
-  const truncatedMessage = message.length > 1024
-    ? `${message.slice(0, 1000)}… (truncated — see admin panel)`
-    : message;
+  const truncatedMessage = message.length > 1024 ? `${message.slice(0, 1000)}… (truncated — see admin panel)` : message;
 
   try {
-    await sendDiscordNotification({
-      title: `${emoji} ${title}`,
-      color,
-      fields: [
-        { name: "From", value: `${name} <${email}>`, inline: false },
-        { name: "Username", value: profile?.username ?? "(unknown)", inline: true },
-        { name: "User ID", value: user.id, inline: true },
-        { name: "Plan", value: planLine, inline: true },
-        { name: "Page", value: pageUrl || "(unknown)", inline: false },
-        { name: "User agent", value: userAgent.slice(0, 200) || "(unknown)", inline: false },
-        { name: "Message", value: truncatedMessage, inline: false },
-      ],
-    }, webhookUrl);
+    await sendDiscordNotification(
+      {
+        title: `${emoji} ${title}`,
+        color,
+        fields: [
+          { name: "From", value: `${name} <${email}>`, inline: false },
+          { name: "Username", value: profile?.username ?? "(unknown)", inline: true },
+          { name: "User ID", value: user.id, inline: true },
+          { name: "Plan", value: planLine, inline: true },
+          { name: "Page", value: pageUrl || "(unknown)", inline: false },
+          { name: "User agent", value: userAgent.slice(0, 200) || "(unknown)", inline: false },
+          { name: "Message", value: truncatedMessage, inline: false },
+        ],
+      },
+      webhookUrl,
+    );
   } catch (err) {
     console.error("Failed to send feedback notification:", err);
     return { error: "Something went wrong. Try again in a moment." };

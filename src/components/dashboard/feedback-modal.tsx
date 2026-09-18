@@ -42,7 +42,9 @@ export function FeedbackModal({ open, onClose, defaultName, defaultEmail }: Feed
     if (!open) return;
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   const handleClose = useCallback(() => {
@@ -56,10 +58,13 @@ export function FeedbackModal({ open, onClose, defaultName, defaultEmail }: Feed
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { handleClose(); return; }
+      if (e.key === "Escape") {
+        handleClose();
+        return;
+      }
       if (e.key !== "Tab" || !cardRef.current) return;
       const focusable = cardRef.current.querySelectorAll<HTMLElement>(
-        'button, a[href], input, textarea, [tabindex]:not([tabindex="-1"])'
+        'button, a[href], input, textarea, [tabindex]:not([tabindex="-1"])',
       );
       if (focusable.length === 0) return;
       const first = focusable[0];
@@ -115,7 +120,9 @@ export function FeedbackModal({ open, onClose, defaultName, defaultEmail }: Feed
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,.7)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
-      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleClose();
+      }}
     >
       <div
         ref={cardRef}
@@ -123,7 +130,11 @@ export function FeedbackModal({ open, onClose, defaultName, defaultEmail }: Feed
         aria-modal="true"
         aria-label="Send feedback"
         className="w-full max-w-[480px] rounded-[20px] p-6 sm:p-8 relative"
-        style={{ background: "#141414", border: "1px solid rgba(255,255,255,.08)", animation: "feedback-modal-in 0.18s ease-out" }}
+        style={{
+          background: "#141414",
+          border: "1px solid rgba(255,255,255,.08)",
+          animation: "feedback-modal-in 0.18s ease-out",
+        }}
       >
         <style>{`
           @keyframes feedback-modal-in {
@@ -140,14 +151,23 @@ export function FeedbackModal({ open, onClose, defaultName, defaultEmail }: Feed
           className="absolute top-4 right-4 p-1.5 rounded-lg cursor-pointer"
           style={{ color: "#6B6B6B" }}
         >
-          <svg viewBox="0 0 16 16" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+          <svg
+            viewBox="0 0 16 16"
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
             <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
           </svg>
         </button>
 
         {sent ? (
           <div className="py-6 text-center">
-            <h2 className="text-2xl font-bold" style={{ color: "#fff" }}>Thanks — we got it.</h2>
+            <h2 className="text-2xl font-bold" style={{ color: "#fff" }}>
+              Thanks — we got it.
+            </h2>
             <p className="mt-2 text-sm" style={{ color: "#9A9A9A" }}>
               We read every message and reply within a few days.
             </p>
@@ -162,7 +182,9 @@ export function FeedbackModal({ open, onClose, defaultName, defaultEmail }: Feed
           </div>
         ) : (
           <>
-            <h2 className="text-2xl font-bold" style={{ color: "#fff" }}>Send us feedback.</h2>
+            <h2 className="text-2xl font-bold" style={{ color: "#fff" }}>
+              Send us feedback.
+            </h2>
             <p className="mt-2 text-sm" style={{ color: "#9A9A9A" }}>
               Report a bug or request a feature. We read every message.
             </p>
@@ -190,7 +212,9 @@ export function FeedbackModal({ open, onClose, defaultName, defaultEmail }: Feed
               </div>
 
               <div>
-                <label className="text-xs font-medium" style={{ color: "#9A9A9A" }}>Name</label>
+                <label className="text-xs font-medium" style={{ color: "#9A9A9A" }}>
+                  Name
+                </label>
                 <input
                   type="text"
                   value={name}
@@ -202,7 +226,9 @@ export function FeedbackModal({ open, onClose, defaultName, defaultEmail }: Feed
               </div>
 
               <div>
-                <label className="text-xs font-medium" style={{ color: "#9A9A9A" }}>Email</label>
+                <label className="text-xs font-medium" style={{ color: "#9A9A9A" }}>
+                  Email
+                </label>
                 <input
                   type="email"
                   value={email}
@@ -212,27 +238,40 @@ export function FeedbackModal({ open, onClose, defaultName, defaultEmail }: Feed
                   style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.08)", color: "#fff" }}
                 />
                 {!emailValid && email.length > 0 && (
-                  <p className="mt-1 text-xs" style={{ color: "#EF4444" }}>Enter a valid email.</p>
+                  <p className="mt-1 text-xs" style={{ color: "#EF4444" }}>
+                    Enter a valid email.
+                  </p>
                 )}
               </div>
 
               <div>
-                <label className="text-xs font-medium" style={{ color: "#9A9A9A" }}>Message</label>
+                <label className="text-xs font-medium" style={{ color: "#9A9A9A" }}>
+                  Message
+                </label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder={PLACEHOLDERS[type]}
                   required
                   className="mt-1 w-full px-3.5 py-2.5 rounded-[10px] text-sm outline-none resize-none"
-                  style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.08)", color: "#fff", minHeight: 140 }}
+                  style={{
+                    background: "#1A1A1A",
+                    border: "1px solid rgba(255,255,255,.08)",
+                    color: "#fff",
+                    minHeight: 140,
+                  }}
                 />
                 {!messageValid && message.length > 0 && (
-                  <p className="mt-1 text-xs" style={{ color: "#EF4444" }}>Message must be at least 10 characters.</p>
+                  <p className="mt-1 text-xs" style={{ color: "#EF4444" }}>
+                    Message must be at least 10 characters.
+                  </p>
                 )}
               </div>
 
               {error && (
-                <p className="text-sm" style={{ color: "#EF4444" }}>{error}</p>
+                <p className="text-sm" style={{ color: "#EF4444" }}>
+                  {error}
+                </p>
               )}
 
               <div className="flex items-center gap-3 pt-1">

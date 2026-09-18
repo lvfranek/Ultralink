@@ -38,7 +38,8 @@ export function isProActive(profile: Pick<Profile, "subscription_status" | "grac
     profile.subscription_status === "grace" &&
     profile.grace_period_ends_at &&
     new Date(profile.grace_period_ends_at) > new Date()
-  ) return true;
+  )
+    return true;
   return false;
 }
 
@@ -89,28 +90,8 @@ export interface PageSocial {
   created_at: string;
 }
 
-export interface PageWithLinks extends Page {
-  page_links: PageLink[];
-}
-
-export interface PageWithData extends Page {
-  page_links: PageLink[];
-  page_socials: PageSocial[];
-}
-
 export type DeviceType = "mobile" | "tablet" | "desktop" | "bot" | "unknown";
 export type EventKind = "view" | "click" | "winback_shown" | "winback_click";
-
-export interface Event {
-  id: number;
-  page_id: string;
-  link_id: string | null;
-  kind: EventKind;
-  country: string | null;
-  device: DeviceType;
-  referrer_host: string | null;
-  created_at: string;
-}
 
 export interface TeamMember {
   id: string;

@@ -11,18 +11,19 @@ function VideoCard({ video, onPlay }: { video: HelpVideo; onPlay: () => void }) 
     <div
       className="rounded-[18px] p-3 transition-colors"
       style={{ background: "#141414", border: "1px solid rgba(255,255,255,.06)" }}
-      onMouseEnter={(e) => { if (!comingSoon) e.currentTarget.style.background = "#2A2A2A"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = "#141414"; }}
+      onMouseEnter={(e) => {
+        if (!comingSoon) e.currentTarget.style.background = "#2A2A2A";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "#141414";
+      }}
     >
-      <YouTubeThumbnail
-        youtubeId={video.youtubeId}
-        title={video.title}
-        onPlay={onPlay}
-        comingSoon={comingSoon}
-      />
+      <YouTubeThumbnail youtubeId={video.youtubeId} title={video.title} onPlay={onPlay} comingSoon={comingSoon} />
       <div className="mt-3 px-1 pb-1">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-medium" style={{ color: "#fff" }}>{video.title}</p>
+          <p className="text-sm font-medium" style={{ color: "#fff" }}>
+            {video.title}
+          </p>
           <span className="text-xs shrink-0" style={{ color: "#9A9A9A" }}>
             {comingSoon ? "Coming soon" : video.duration}
           </span>
@@ -63,8 +64,7 @@ export function HelpCenter() {
     const pickActive = () => {
       // Near the bottom of the page the last section may be too short to ever
       // enter the intersection band above, so fall back to it explicitly.
-      const atBottom =
-        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
       if (atBottom) {
         setActiveSection(HELP_SECTIONS[HELP_SECTIONS.length - 1].id);
         return;
@@ -87,7 +87,7 @@ export function HelpCenter() {
         }
         pickActive();
       },
-      { rootMargin: "-20% 0px -70% 0px" }
+      { rootMargin: "-20% 0px -70% 0px" },
     );
     for (const section of HELP_SECTIONS) {
       const el = sectionRefs.current[section.id];
@@ -174,7 +174,9 @@ export function HelpCenter() {
                   className="rounded-[18px] p-8 text-center"
                   style={{ background: "#141414", border: "1px solid rgba(255,255,255,.06)" }}
                 >
-                  <p className="text-sm" style={{ color: "#9A9A9A" }}>No videos match that search.</p>
+                  <p className="text-sm" style={{ color: "#9A9A9A" }}>
+                    No videos match that search.
+                  </p>
                   <button
                     type="button"
                     onClick={() => setSearch("")}
@@ -190,11 +192,17 @@ export function HelpCenter() {
                 <div
                   key={section.id}
                   id={section.id}
-                  ref={(el) => { sectionRefs.current[section.id] = el; }}
+                  ref={(el) => {
+                    sectionRefs.current[section.id] = el;
+                  }}
                   className="scroll-mt-24"
                 >
-                  <h2 className="text-xl font-bold" style={{ color: "#fff" }}>{section.title}</h2>
-                  <p className="mt-1.5 text-sm" style={{ color: "#9A9A9A" }}>{section.description}</p>
+                  <h2 className="text-xl font-bold" style={{ color: "#fff" }}>
+                    {section.title}
+                  </h2>
+                  <p className="mt-1.5 text-sm" style={{ color: "#9A9A9A" }}>
+                    {section.description}
+                  </p>
                   <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {section.videos.map((video) => (
                       <VideoCard key={video.id} video={video} onPlay={() => setPlaying(video)} />
@@ -208,11 +216,7 @@ export function HelpCenter() {
       </section>
 
       {playing && (
-        <VideoLightbox
-          youtubeId={playing.youtubeId}
-          title={playing.title}
-          onClose={() => setPlaying(null)}
-        />
+        <VideoLightbox youtubeId={playing.youtubeId} title={playing.title} onClose={() => setPlaying(null)} />
       )}
     </>
   );

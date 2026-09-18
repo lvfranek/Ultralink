@@ -65,11 +65,7 @@ function endOfMonthStr(monthsAgo = 0): string {
   return toStr(d);
 }
 
-function getDateRange(
-  range: RangeKey,
-  customStart: string,
-  customEnd: string,
-): { start: string; end: string } | null {
+function getDateRange(range: RangeKey, customStart: string, customEnd: string): { start: string; end: string } | null {
   switch (range) {
     case "7d":
       return { start: daysAgoStr(6), end: todayStr() };
@@ -162,7 +158,11 @@ function CardTitle({ children }: { children: React.ReactNode }) {
 function Delta({ current, prev, periodLabel }: { current: number; prev: number; periodLabel: string }) {
   const delta = calcDelta(current, prev);
   if (delta === null) {
-    return <span className="text-xs font-medium" style={{ color: "#9A9A9A" }}>New</span>;
+    return (
+      <span className="text-xs font-medium" style={{ color: "#9A9A9A" }}>
+        New
+      </span>
+    );
   }
   const positive = delta >= 0;
   return (
@@ -170,7 +170,9 @@ function Delta({ current, prev, periodLabel }: { current: number; prev: number; 
       <span className="text-xs font-medium" style={{ color: positive ? "#4ADE80" : "#F87171" }}>
         {fmtDelta(delta)}
       </span>
-      <p className="text-[10px] mt-0.5" style={{ color: "#9A9A9A" }}>{periodLabel}</p>
+      <p className="text-[10px] mt-0.5" style={{ color: "#9A9A9A" }}>
+        {periodLabel}
+      </p>
     </div>
   );
 }
@@ -197,22 +199,20 @@ function SegmentedPill<T extends string>({
     >
       {options.map((opt) =>
         opt.value === "custom" && customSlot ? (
-          <div key={opt.value} className="shrink-0">{customSlot}</div>
+          <div key={opt.value} className="shrink-0">
+            {customSlot}
+          </div>
         ) : (
           <button
             key={opt.value}
             type="button"
             onClick={() => onChange(opt.value)}
             className="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer shrink-0"
-            style={
-              value === opt.value
-                ? { background: "#ffffff", color: "#000000" }
-                : { color: "#9A9A9A" }
-            }
+            style={value === opt.value ? { background: "#ffffff", color: "#000000" } : { color: "#9A9A9A" }}
           >
             {opt.label}
           </button>
-        )
+        ),
       )}
     </div>
   );
@@ -249,9 +249,7 @@ function ActivityTooltip({
         fontSize: 12,
       }}
     >
-      <p style={{ color: "#ffffff", marginBottom: 6, fontWeight: 500 }}>
-        {shortDate(String(label))}
-      </p>
+      <p style={{ color: "#ffffff", marginBottom: 6, fontWeight: 500 }}>{shortDate(String(label))}</p>
       {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-1.5" style={{ marginTop: 2 }}>
           <span
@@ -271,7 +269,9 @@ function ActivityChart({ data, loading }: { data: AnalyticsData | null; loading:
   if (loading || !data) {
     return (
       <div className="h-[200px] flex items-center justify-center">
-        <span className="text-xs" style={{ color: "#6B6B6B" }}>Loading…</span>
+        <span className="text-xs" style={{ color: "#6B6B6B" }}>
+          Loading…
+        </span>
       </div>
     );
   }
@@ -279,9 +279,7 @@ function ActivityChart({ data, loading }: { data: AnalyticsData | null; loading:
   const showTicks = data.timeseries.length <= 14;
   const filteredTicks = showTicks
     ? data.timeseries.map((d) => d.date)
-    : data.timeseries
-        .filter((_, i) => i % Math.ceil(data.timeseries.length / 7) === 0)
-        .map((d) => d.date);
+    : data.timeseries.filter((_, i) => i % Math.ceil(data.timeseries.length / 7) === 0).map((d) => d.date);
 
   return (
     <ResponsiveContainer width="100%" height={200}>
@@ -301,23 +299,9 @@ function ActivityChart({ data, loading }: { data: AnalyticsData | null; loading:
           axisLine={false}
           tickLine={false}
         />
-        <YAxis
-          tick={{ fill: "#9A9A9A", fontSize: 11 }}
-          axisLine={false}
-          tickLine={false}
-          allowDecimals={false}
-        />
-        <Tooltip
-          content={<ActivityTooltip />}
-        />
-        <Area
-          type="monotone"
-          dataKey="views"
-          stroke="#A78BFA"
-          strokeWidth={2}
-          fill="url(#viewsGrad)"
-          dot={false}
-        />
+        <YAxis tick={{ fill: "#9A9A9A", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+        <Tooltip content={<ActivityTooltip />} />
+        <Area type="monotone" dataKey="views" stroke="#A78BFA" strokeWidth={2} fill="url(#viewsGrad)" dot={false} />
         <Line
           type="monotone"
           dataKey="clicks"
@@ -335,7 +319,9 @@ function SourcesDonut({ sources }: { sources: AnalyticsData["sources"] }) {
   if (!sources.length) {
     return (
       <div className="flex items-center justify-center h-[140px]">
-        <span className="text-xs" style={{ color: "#6B6B6B" }}>No data</span>
+        <span className="text-xs" style={{ color: "#6B6B6B" }}>
+          No data
+        </span>
       </div>
     );
   }
@@ -362,10 +348,7 @@ function SourcesDonut({ sources }: { sources: AnalyticsData["sources"] }) {
       <div className="space-y-1.5">
         {sources.map((s, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span
-              className="w-2 h-2 rounded-full shrink-0"
-              style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
-            />
+            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
             <span className="text-xs flex-1 truncate" style={{ color: "#9A9A9A" }}>
               {s.label}
             </span>
@@ -446,17 +429,14 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
       }
     }
     setHydrated(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- restore the saved page/range only once, on first load
   }, []);
 
   // Persist selected page + range, and sync URL.
   useEffect(() => {
     if (!hydrated || !selectedPageId) return;
     localStorage.setItem("ul_analytics_page", selectedPageId);
-    localStorage.setItem(
-      `ul_analytics_range_${selectedPageId}`,
-      JSON.stringify({ range, customStart, customEnd })
-    );
+    localStorage.setItem(`ul_analytics_range_${selectedPageId}`, JSON.stringify({ range, customStart, customEnd }));
 
     const params = new URLSearchParams(Array.from(searchParams.entries()));
     params.set("page", selectedPageId);
@@ -469,7 +449,7 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
       params.delete("to");
     }
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- router/pathname/searchParams are left out on purpose: router.replace() below changes them and would re-trigger this effect in a loop
   }, [hydrated, selectedPageId, range, customStart, customEnd]);
 
   // Fetch on change — skipped entirely in example mode, where the same static dataset is reused.
@@ -530,7 +510,11 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
             strokeWidth="1.75"
             aria-hidden="true"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18M10.584 10.587a2 2 0 002.829 2.83M9.363 5.365A9.466 9.466 0 0112 5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.61 6.61C4.507 8.005 2.9 10.07 1.935 12.5 3.226 16.836 7.244 20 12 20a9.46 9.46 0 004.635-1.225" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 3l18 18M10.584 10.587a2 2 0 002.829 2.83M9.363 5.365A9.466 9.466 0 0112 5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.61 6.61C4.507 8.005 2.9 10.07 1.935 12.5 3.226 16.836 7.244 20 12 20a9.46 9.46 0 004.635-1.225"
+            />
           </svg>
           <p className="text-xs sm:text-sm font-medium flex-1 min-w-0" style={{ color: "#ffffff" }}>
             This is example data. Upgrade to Pro to see your real analytics.
@@ -549,7 +533,6 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
       <UpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-
         {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <h1 className="text-2xl font-bold flex-1" style={{ color: "#ffffff" }}>
@@ -663,7 +646,9 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
               )}
             </div>
             {range === "custom" && customSummary && (
-              <p className="text-xs" style={{ color: "#6B6B6B" }}>{customSummary}</p>
+              <p className="text-xs" style={{ color: "#6B6B6B" }}>
+                {customSummary}
+              </p>
             )}
           </div>
         </div>
@@ -707,17 +692,19 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                   periodLabel={periodLabel}
                 />
               )}
-              {tile.label === "Clicks" && !loading && (data?.winbackShown ?? 0) > 0 && (() => {
-                const rate = data!.winbackShown > 0
-                  ? Math.round((data!.winbackClicks / data!.winbackShown) * 100)
-                  : 0;
-                return (
-                  <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: "#9A9A9A" }}>
-                    Win-Back: {fmt(data!.winbackShown)} shown · {fmt(data!.winbackClicks)} recovered (
-                    <span style={{ color: rate > 0 ? "#A78BFA" : "#9A9A9A" }}>{rate}%</span>)
-                  </p>
-                );
-              })()}
+              {tile.label === "Clicks" &&
+                !loading &&
+                (data?.winbackShown ?? 0) > 0 &&
+                (() => {
+                  const rate =
+                    data!.winbackShown > 0 ? Math.round((data!.winbackClicks / data!.winbackShown) * 100) : 0;
+                  return (
+                    <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: "#9A9A9A" }}>
+                      Win-Back: {fmt(data!.winbackShown)} shown · {fmt(data!.winbackClicks)} recovered (
+                      <span style={{ color: rate > 0 ? "#A78BFA" : "#9A9A9A" }}>{rate}%</span>)
+                    </p>
+                  );
+                })()}
             </Card>
           ))}
         </div>
@@ -729,11 +716,15 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#A78BFA" }} />
-                <span className="text-xs" style={{ color: "#6B6B6B" }}>Views</span>
+                <span className="text-xs" style={{ color: "#6B6B6B" }}>
+                  Views
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#ffffff" }} />
-                <span className="text-xs" style={{ color: "#6B6B6B" }}>Clicks</span>
+                <span className="text-xs" style={{ color: "#6B6B6B" }}>
+                  Clicks
+                </span>
               </div>
             </div>
           </div>
@@ -752,7 +743,9 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                 ))}
               </div>
             ) : data.countries.length === 0 ? (
-              <p className="text-xs" style={{ color: "#6B6B6B" }}>No data yet.</p>
+              <p className="text-xs" style={{ color: "#6B6B6B" }}>
+                No data yet.
+              </p>
             ) : (
               <div className="space-y-2">
                 {data.countries.map((c) => (
@@ -781,7 +774,9 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
             <CardTitle>Traffic Sources</CardTitle>
             {loading || !data ? (
               <div className="h-[200px] flex items-center justify-center">
-                <span className="text-xs" style={{ color: "#6B6B6B" }}>Loading…</span>
+                <span className="text-xs" style={{ color: "#6B6B6B" }}>
+                  Loading…
+                </span>
               </div>
             ) : (
               <SourcesDonut sources={data.sources} />
@@ -806,10 +801,7 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
                 ] as const
               ).map(({ key, label }) => {
                 const count = data.devices[key];
-                const pct =
-                  data.devices.total > 0
-                    ? Math.round((count / data.devices.total) * 100)
-                    : 0;
+                const pct = data.devices.total > 0 ? Math.round((count / data.devices.total) * 100) : 0;
                 const fill =
                   key === "mobile" ? "#A78BFA" : key === "desktop" ? "rgba(255,255,255,.5)" : "rgba(167,139,250,.25)";
                 return (
@@ -845,7 +837,9 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
               ))}
             </div>
           ) : data.topLinks.length === 0 ? (
-            <p className="text-xs" style={{ color: "#6B6B6B" }}>No clicks tracked yet.</p>
+            <p className="text-xs" style={{ color: "#6B6B6B" }}>
+              No clicks tracked yet.
+            </p>
           ) : (
             <div className="space-y-1">
               {data.topLinks.map((link, i) => (
@@ -876,7 +870,6 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
             </div>
           )}
         </Card>
-
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ export function YouTubeThumbnail({ youtubeId, title, onPlay, comingSoon }: YouTu
       className="relative w-full aspect-video rounded-[12px] overflow-hidden cursor-pointer group"
       style={{ background: "#000", border: "1px solid rgba(255,255,255,.06)" }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- external YouTube thumbnail; img.youtube.com isn't configured for next/image */}
       <img
         src={`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`}
         alt=""

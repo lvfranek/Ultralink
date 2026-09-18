@@ -10,9 +10,7 @@ interface CountryBlockingControlProps {
   isPro: boolean;
 }
 
-const SORTED_COUNTRIES = Object.entries(COUNTRY_NAMES).sort((a, b) =>
-  a[1].localeCompare(b[1])
-);
+const SORTED_COUNTRIES = Object.entries(COUNTRY_NAMES).sort((a, b) => a[1].localeCompare(b[1]));
 
 function countrySummary(codes: string[]): string {
   if (codes.length === 0) return "None";
@@ -28,9 +26,7 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     if (!q) return SORTED_COUNTRIES;
-    return SORTED_COUNTRIES.filter(
-      ([code, name]) => name.toLowerCase().includes(q) || code.toLowerCase().includes(q)
-    );
+    return SORTED_COUNTRIES.filter(([code, name]) => name.toLowerCase().includes(q) || code.toLowerCase().includes(q));
   }, [search]);
 
   const toggle = (code: string) => {
@@ -48,7 +44,9 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
           className="flex items-start justify-between py-2.5 cursor-pointer"
           style={{ borderBottom: "1px solid rgba(255,255,255,.06)" }}
           onClick={() => setUpgradeOpen(true)}
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setUpgradeOpen(true); }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") setUpgradeOpen(true);
+          }}
         >
           <div>
             <p className="text-sm font-medium text-text">Country blocking</p>
@@ -75,7 +73,9 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
           <p className="text-xs text-text-muted mt-0.5">Block visitors from selected countries.</p>
         </div>
         <div className="flex items-center gap-1.5 ml-3 flex-shrink-0 mt-0.5">
-          <span className="text-xs" style={{ color: "#9A9A9A" }}>{countrySummary(value)}</span>
+          <span className="text-xs" style={{ color: "#9A9A9A" }}>
+            {countrySummary(value)}
+          </span>
           <svg
             viewBox="0 0 12 12"
             fill="none"
@@ -129,7 +129,9 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
             style={{ maxHeight: 200, background: "#1E1E1E", border: "1px solid rgba(255,255,255,.06)" }}
           >
             {filtered.length === 0 ? (
-              <p className="px-3 py-4 text-xs text-center" style={{ color: "#6B6B6B" }}>No results</p>
+              <p className="px-3 py-4 text-xs text-center" style={{ color: "#6B6B6B" }}>
+                No results
+              </p>
             ) : (
               filtered.map(([code, name]) => (
                 <label
@@ -144,7 +146,9 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
                   />
                   <span className="text-xs flex-shrink-0">{flagEmoji(code)}</span>
                   <span className="text-xs text-text flex-1 min-w-0 truncate">{name}</span>
-                  <span className="text-xs flex-shrink-0" style={{ color: "#6B6B6B" }}>{code}</span>
+                  <span className="text-xs flex-shrink-0" style={{ color: "#6B6B6B" }}>
+                    {code}
+                  </span>
                 </label>
               ))
             )}

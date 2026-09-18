@@ -1,4 +1,4 @@
-export const REFERRER_LABELS: Record<string, string> = {
+const REFERRER_LABELS: Record<string, string> = {
   "instagram.com": "Instagram",
   "l.instagram.com": "Instagram",
   "t.co": "Twitter / X",

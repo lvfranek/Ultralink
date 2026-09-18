@@ -49,18 +49,13 @@ export default async function DashboardPage({
   const initialSlug = sp.username ?? "";
   const upgraded = sp.upgraded === "1";
 
-  const lapsed =
-    !isEditor &&
-    profile.subscription_status !== "none" &&
-    !isProActive(profile);
+  const lapsed = !isEditor && profile.subscription_status !== "none" && !isProActive(profile);
 
   let survivingPageId: string | null = null;
   if (lapsed) {
     const pages = (pagesResult.data ?? []) as Page[];
     if (pages.length > 0) {
-      const oldest = [...pages].sort(
-        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-      )[0];
+      const oldest = [...pages].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0];
       survivingPageId = oldest.id;
     }
   }

@@ -7,21 +7,13 @@ export interface TeamEntry {
   ownerDisplayName: string | null;
 }
 
-export async function getActiveOwnerId(
-  userId: string,
-  supabase: SupabaseClient
-): Promise<string> {
+export async function getActiveOwnerId(userId: string, supabase: SupabaseClient): Promise<string> {
   const cookieStore = await cookies();
   const cookieOwnerId = cookieStore.get("ultralink_active_owner")?.value;
 
-  const { data: memberships } = await supabase
-    .from("team_members")
-    .select("owner_id")
-    .eq("editor_id", userId);
+  const { data: memberships } = await supabase.from("team_members").select("owner_id").eq("editor_id", userId);
 
-  const memberOwnerIds: string[] = (memberships ?? []).map(
-    (m: { owner_id: string }) => m.owner_id
-  );
+  const memberOwnerIds: string[] = (memberships ?? []).map((m: { owner_id: string }) => m.owner_id);
 
   const validOwnerIds = new Set([userId, ...memberOwnerIds]);
 
@@ -29,18 +21,11 @@ export async function getActiveOwnerId(
     return cookieOwnerId;
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("subscription_status")
-    .eq("id", userId)
-    .single();
+  const { data: profile } = await supabase.from("profiles").select("subscription_status").eq("id", userId).single();
 
   if ((profile?.subscription_status ?? "none") !== "none") return userId;
 
-  const { count } = await supabase
-    .from("pages")
-    .select("*", { count: "exact", head: true })
-    .eq("owner_id", userId);
+  const { count } = await supabase.from("pages").select("*", { count: "exact", head: true }).eq("owner_id", userId);
 
   if ((count ?? 0) > 0) return userId;
 
@@ -49,10 +34,7 @@ export async function getActiveOwnerId(
   return userId;
 }
 
-export async function getTeamMemberships(
-  userId: string,
-  supabase: SupabaseClient
-): Promise<TeamEntry[]> {
+export async function getTeamMemberships(userId: string, supabase: SupabaseClient): Promise<TeamEntry[]> {
   const { data } = await supabase
     .from("team_members")
     .select("owner_id")
@@ -63,16 +45,10 @@ export async function getTeamMemberships(
 
   const ownerIds = data.map((m: { owner_id: string }) => m.owner_id);
 
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("id, username, display_name")
-    .in("id", ownerIds);
+  const { data: profiles } = await supabase.from("profiles").select("id, username, display_name").in("id", ownerIds);
 
   const profileMap = new Map(
-    (profiles ?? []).map((p: { id: string; username: string; display_name: string | null }) => [
-      p.id,
-      p,
-    ])
+    (profiles ?? []).map((p: { id: string; username: string; display_name: string | null }) => [p.id, p]),
   );
 
   return ownerIds

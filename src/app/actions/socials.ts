@@ -11,7 +11,11 @@ const MAX_SOCIALS = 20;
 
 export type SocialActionResult = { error: string } | { ok: true; social?: PageSocial };
 
-async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createClient>>, pageId: string, activeOwnerId: string): Promise<boolean> {
+async function verifyPageOwnership(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  pageId: string,
+  activeOwnerId: string,
+): Promise<boolean> {
   const { count } = await supabase
     .from("pages")
     .select("*", { count: "exact", head: true })
@@ -20,12 +24,11 @@ async function verifyPageOwnership(supabase: Awaited<ReturnType<typeof createCli
   return (count ?? 0) > 0;
 }
 
-export async function addSocial(
-  pageId: string,
-  data: { platform: string; url: string }
-): Promise<SocialActionResult> {
+export async function addSocial(pageId: string, data: { platform: string; url: string }): Promise<SocialActionResult> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   if (!data.url.trim()) return { error: "URL is required." };
@@ -64,19 +67,14 @@ export async function addSocial(
   return { ok: true, social: social as PageSocial };
 }
 
-export async function updateSocial(
-  id: string,
-  data: { platform?: string; url?: string }
-): Promise<SocialActionResult> {
+export async function updateSocial(id: string, data: { platform?: string; url?: string }): Promise<SocialActionResult> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: existing } = await supabase
-    .from("page_socials")
-    .select("page_id")
-    .eq("id", id)
-    .single();
+  const { data: existing } = await supabase.from("page_socials").select("page_id").eq("id", id).single();
 
   if (!existing) return { error: "Social link not found." };
 
@@ -107,14 +105,12 @@ export async function updateSocial(
 
 export async function deleteSocial(id: string): Promise<SocialActionResult> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: existing } = await supabase
-    .from("page_socials")
-    .select("page_id")
-    .eq("id", id)
-    .single();
+  const { data: existing } = await supabase.from("page_socials").select("page_id").eq("id", id).single();
 
   if (!existing) return { error: "Social link not found." };
 
@@ -129,12 +125,11 @@ export async function deleteSocial(id: string): Promise<SocialActionResult> {
   return { ok: true };
 }
 
-export async function reorderSocials(
-  pageId: string,
-  orderedIds: string[]
-): Promise<SocialActionResult> {
+export async function reorderSocials(pageId: string, orderedIds: string[]): Promise<SocialActionResult> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
@@ -142,7 +137,7 @@ export async function reorderSocials(
   if (!owns) return { error: "Page not found." };
 
   const updates = orderedIds.map((id, position) =>
-    supabase.from("page_socials").update({ position }).eq("id", id).eq("page_id", pageId)
+    supabase.from("page_socials").update({ position }).eq("id", id).eq("page_id", pageId),
   );
 
   const results = await Promise.all(updates);

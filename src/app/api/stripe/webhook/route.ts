@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 async function syncSubscription(
   supabase: ReturnType<typeof createServiceClient>,
   sub: Stripe.Subscription,
-  userId?: string
+  userId?: string,
 ) {
   // Resolve user_id from subscription metadata or provided argument
   const uid = userId ?? sub.metadata?.user_id;
@@ -29,10 +29,10 @@ async function syncSubscription(
     sub.status === "trialing"
       ? "trialing"
       : sub.status === "active"
-      ? "active"
-      : sub.status === "past_due"
-      ? "grace"
-      : "canceled";
+        ? "active"
+        : sub.status === "past_due"
+          ? "grace"
+          : "canceled";
 
   // current_period_end can live on the subscription root OR on items[0],
   // depending on Stripe API version. Read with fallback, guard against null.
@@ -56,20 +56,13 @@ async function syncSubscription(
   };
   if (currentPeriodEnd) updates.current_period_end = currentPeriodEnd;
 
-  const { error } = await supabase
-    .from("profiles")
-    .update(updates)
-    .eq("id", uid);
+  const { error } = await supabase.from("profiles").update(updates).eq("id", uid);
 
   if (error) console.error("[webhook] syncSubscription error", error);
-  else console.log("[webhook] synced subscription", sub.id, "→", status, "uid:", uid);
+  else console.info("[webhook] synced subscription", sub.id, "→", status, "uid:", uid);
 }
 
-function notifyNewPro(
-  supabase: ReturnType<typeof createServiceClient>,
-  sub: Stripe.Subscription,
-  userId?: string
-) {
+function notifyNewPro(supabase: ReturnType<typeof createServiceClient>, sub: Stripe.Subscription, userId?: string) {
   void (async () => {
     const uid = userId ?? sub.metadata?.user_id;
     const item = sub.items.data[0];
@@ -104,7 +97,7 @@ function notifyCanceled(
   supabase: ReturnType<typeof createServiceClient>,
   uid: string,
   oldTier: number | null,
-  oldInterval: BillingInterval | null
+  oldInterval: BillingInterval | null,
 ) {
   void (async () => {
     const { data: profile } = await supabase.from("profiles").select("username").eq("id", uid).single();
@@ -165,7 +158,10 @@ export async function POST(req: Request) {
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription;
         const uid = sub.metadata?.user_id;
-        if (!uid) { console.warn("[webhook] deleted sub has no user_id", sub.id); break; }
+        if (!uid) {
+          console.warn("[webhook] deleted sub has no user_id", sub.id);
+          break;
+        }
 
         const deletedItem = sub.items.data[0];
         const deletedPrice = deletedItem?.price as Stripe.Price | undefined;
@@ -185,7 +181,7 @@ export async function POST(req: Request) {
           .eq("id", uid);
 
         if (error) console.error("[webhook] delete sub error", error);
-        else console.log("[webhook] subscription deleted uid:", uid);
+        else console.info("[webhook] subscription deleted uid:", uid);
         notifyCanceled(supabase, uid, oldTier, oldInterval);
         break;
       }
@@ -206,7 +202,7 @@ export async function POST(req: Request) {
           .eq("id", uid);
 
         if (error) console.error("[webhook] payment_failed error", error);
-        else console.log("[webhook] entered grace period uid:", uid, "until", graceEnd);
+        else console.info("[webhook] entered grace period uid:", uid, "until", graceEnd);
         break;
       }
 
@@ -242,12 +238,12 @@ export async function POST(req: Request) {
           .in("subscription_status", ["grace", "active", "trialing"]);
 
         if (error) console.error("[webhook] payment_succeeded error", error);
-        else console.log("[webhook] payment succeeded uid:", uid);
+        else console.info("[webhook] payment succeeded uid:", uid);
         break;
       }
 
       default:
-        console.log("[webhook] unhandled event", event.type);
+        console.info("[webhook] unhandled event", event.type);
     }
   } catch (err) {
     console.error("[webhook] handler error", event.type, err);

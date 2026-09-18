@@ -41,9 +41,7 @@ export async function setActiveOwner(ownerId: string): Promise<void> {
   });
 }
 
-export async function inviteEditor(
-  email: string
-): Promise<{ error?: string }> {
+export async function inviteEditor(email: string): Promise<{ error?: string }> {
   const normalizedEmail = email.trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
     return { error: "Invalid email address." };
@@ -110,9 +108,7 @@ export async function inviteEditor(
   return {};
 }
 
-export async function resendInvite(
-  inviteId: string
-): Promise<{ error?: string }> {
+export async function resendInvite(inviteId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -129,11 +125,7 @@ export async function resendInvite(
 
   if (!invite) return { error: "Invite not found." };
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", user.id)
-    .single();
+  const { data: profile } = await supabase.from("profiles").select("username").eq("id", user.id).single();
 
   await resend.emails.send({
     from: "Ultralink <hello@ultralink.bio>",
@@ -150,20 +142,14 @@ export async function resendInvite(
   return {};
 }
 
-export async function revokeInvite(
-  inviteId: string
-): Promise<{ error?: string }> {
+export async function revokeInvite(inviteId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { error } = await supabase
-    .from("team_invites")
-    .delete()
-    .eq("id", inviteId)
-    .eq("owner_id", user.id);
+  const { error } = await supabase.from("team_invites").delete().eq("id", inviteId).eq("owner_id", user.id);
 
   if (error) return { error: error.message };
 
@@ -171,20 +157,14 @@ export async function revokeInvite(
   return {};
 }
 
-export async function removeEditor(
-  editorId: string
-): Promise<{ error?: string }> {
+export async function removeEditor(editorId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { error } = await supabase
-    .from("team_members")
-    .delete()
-    .eq("owner_id", user.id)
-    .eq("editor_id", editorId);
+  const { error } = await supabase.from("team_members").delete().eq("owner_id", user.id).eq("editor_id", editorId);
 
   if (error) return { error: error.message };
 
@@ -192,20 +172,14 @@ export async function removeEditor(
   const service = createServiceClient();
   const { data: editorAuth } = await service.auth.admin.getUserById(editorId);
   if (editorAuth.user?.email) {
-    await service
-      .from("team_invites")
-      .delete()
-      .eq("owner_id", user.id)
-      .ilike("email", editorAuth.user.email);
+    await service.from("team_invites").delete().eq("owner_id", user.id).ilike("email", editorAuth.user.email);
   }
 
   revalidatePath("/dashboard/account");
   return {};
 }
 
-export async function acceptInvite(
-  token: string
-): Promise<{ error?: string } | { ok: true }> {
+export async function acceptInvite(token: string): Promise<{ error?: string } | { ok: true }> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -245,10 +219,7 @@ export async function acceptInvite(
     return { error: memberError.message };
   }
 
-  await service
-    .from("team_invites")
-    .update({ accepted_at: now })
-    .eq("id", invite.id);
+  await service.from("team_invites").update({ accepted_at: now }).eq("id", invite.id);
 
   // Set active owner cookie to the new team
   const cookieStore = await cookies();

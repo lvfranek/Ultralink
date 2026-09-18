@@ -39,17 +39,17 @@ export function FAQ() {
     <section
       id="faq"
       aria-labelledby="faq-heading"
-      style={{ maxWidth: 1140, margin: '0 auto', padding: '72px 24px 80px' }}
+      style={{ maxWidth: 1140, margin: "0 auto", padding: "72px 24px 80px" }}
     >
       {/* Section header — floating on dark, like Features */}
-      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+      <div style={{ textAlign: "center", marginBottom: 40 }}>
         <h2
           id="faq-heading"
           style={{
             fontWeight: 500,
-            letterSpacing: '-0.02em',
-            fontSize: 'clamp(28px, 4vw, 40px)',
-            color: '#ffffff',
+            letterSpacing: "-0.02em",
+            fontSize: "clamp(28px, 4vw, 40px)",
+            color: "#ffffff",
             margin: 0,
           }}
         >
@@ -60,12 +60,12 @@ export function FAQ() {
       {/* White card accordion */}
       <div
         style={{
-          background: '#fff',
+          background: "#fff",
           borderRadius: 28,
-          border: '1px solid rgba(0,0,0,.06)',
+          border: "1px solid rgba(0,0,0,.06)",
           maxWidth: 760,
-          margin: '0 auto',
-          overflow: 'hidden',
+          margin: "0 auto",
+          overflow: "hidden",
         }}
       >
         <dl style={{ margin: 0 }}>
@@ -77,28 +77,32 @@ export function FAQ() {
               <div
                 key={faq.question}
                 style={{
-                  borderBottom: isLast ? 'none' : '1px solid rgba(0,0,0,.06)',
+                  borderBottom: isLast ? "none" : "1px solid rgba(0,0,0,.06)",
                 }}
               >
                 <dt>
                   <button
                     onClick={() => toggle(i)}
                     style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '20px 28px',
-                      textAlign: 'left',
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "20px 28px",
+                      textAlign: "left",
                       gap: 16,
-                      cursor: 'pointer',
-                      background: isOpen ? 'rgba(0,0,0,.03)' : 'transparent',
-                      border: 'none',
-                      fontFamily: 'inherit',
-                      transition: 'background 0.15s',
+                      cursor: "pointer",
+                      background: isOpen ? "rgba(0,0,0,.03)" : "transparent",
+                      border: "none",
+                      fontFamily: "inherit",
+                      transition: "background 0.15s",
                     }}
-                    onMouseEnter={(e) => { if (!isOpen) e.currentTarget.style.background = 'rgba(0,0,0,.03)'; }}
-                    onMouseLeave={(e) => { if (!isOpen) e.currentTarget.style.background = 'transparent'; }}
+                    onMouseEnter={(e) => {
+                      if (!isOpen) e.currentTarget.style.background = "rgba(0,0,0,.03)";
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isOpen) e.currentTarget.style.background = "transparent";
+                    }}
                     aria-expanded={isOpen}
                     aria-controls={`faq-answer-${i}`}
                     id={`faq-question-${i}`}
@@ -107,7 +111,7 @@ export function FAQ() {
                       style={{
                         fontSize: 15,
                         fontWeight: 500,
-                        color: '#0A0A0A',
+                        color: "#0A0A0A",
                         flex: 1,
                         lineHeight: 1.4,
                       }}
@@ -119,11 +123,11 @@ export function FAQ() {
                         flexShrink: 0,
                         width: 28,
                         height: 28,
-                        borderRadius: '50%',
-                        background: 'rgba(0,0,0,.05)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        borderRadius: "50%",
+                        background: "rgba(0,0,0,.05)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
                       <svg
@@ -134,9 +138,9 @@ export function FAQ() {
                         style={{
                           width: 14,
                           height: 14,
-                          color: '#6B6B6B',
-                          transition: 'transform 0.22s cubic-bezier(0.32,0.72,0,1)',
-                          transform: isOpen ? 'rotate(180deg)' : 'none',
+                          color: "#6B6B6B",
+                          transition: "transform 0.22s cubic-bezier(0.32,0.72,0,1)",
+                          transform: isOpen ? "rotate(180deg)" : "none",
                         }}
                         aria-hidden="true"
                       >
@@ -152,17 +156,17 @@ export function FAQ() {
                   inert={!isOpen}
                   style={{
                     margin: 0,
-                    overflow: 'hidden',
+                    overflow: "hidden",
                     maxHeight: isOpen ? 500 : 0,
-                    transition: 'max-height 0.28s cubic-bezier(0.32,0.72,0,1)',
+                    transition: "max-height 0.28s cubic-bezier(0.32,0.72,0,1)",
                   }}
                 >
                   <div id={`faq-answer-${i}`} role="region" aria-labelledby={`faq-question-${i}`}>
                     <p
                       style={{
-                        padding: '0 28px 22px',
+                        padding: "0 28px 22px",
                         fontSize: 14,
-                        color: '#5a5a5a',
+                        color: "#5a5a5a",
                         lineHeight: 1.72,
                         margin: 0,
                       }}

@@ -6,7 +6,7 @@ export type BillingInterval = "monthly" | "annual";
 export const TIERS = [1, 3, 10, 25, 50, 100, 200, 400] as const;
 export type Tier = (typeof TIERS)[number];
 
-export interface PlanFeature {
+interface PlanFeature {
   text: string;
   included: boolean;
 }
@@ -69,11 +69,11 @@ export const PRO_PLAN: ProPlan = {
   users: "unlimited",
   badge: "Recommended",
   tiers: [
-    { links: 1,   monthlyPrice: 8,   annualMonthlyPrice: 6,   annualPrice: 72 },
-    { links: 3,   monthlyPrice: 14,  annualMonthlyPrice: 11,  annualPrice: 132 },
-    { links: 10,  monthlyPrice: 29,  annualMonthlyPrice: 22,  annualPrice: 264 },
-    { links: 25,  monthlyPrice: 49,  annualMonthlyPrice: 37,  annualPrice: 444 },
-    { links: 50,  monthlyPrice: 89,  annualMonthlyPrice: 67,  annualPrice: 804 },
+    { links: 1, monthlyPrice: 8, annualMonthlyPrice: 6, annualPrice: 72 },
+    { links: 3, monthlyPrice: 14, annualMonthlyPrice: 11, annualPrice: 132 },
+    { links: 10, monthlyPrice: 29, annualMonthlyPrice: 22, annualPrice: 264 },
+    { links: 25, monthlyPrice: 49, annualMonthlyPrice: 37, annualPrice: 444 },
+    { links: 50, monthlyPrice: 89, annualMonthlyPrice: 67, annualPrice: 804 },
     { links: 100, monthlyPrice: 149, annualMonthlyPrice: 112, annualPrice: 1344 },
     { links: 200, monthlyPrice: 249, annualMonthlyPrice: 187, annualPrice: 2244 },
     { links: 400, monthlyPrice: 399, annualMonthlyPrice: 299, annualPrice: 3588 },
@@ -88,19 +88,6 @@ export const PRO_PLAN: ProPlan = {
     { text: "Win-Back", included: true },
     { text: "No Ultralink badge", included: true },
   ],
-};
-
-export const PLANS = [FREE_PLAN, PRO_PLAN] as const;
-
-export const FEATURE_PLAN: Record<string, "free" | "pro"> = {
-  age_gate:         "free",
-  active_badge:     "pro",
-  country_blocking: "pro",
-  analytics:        "pro",
-  custom_domains:   "pro",
-  team_access:      "pro",
-  win_back:         "pro",
-  badge_removal:    "pro",
 };
 
 type SubProfile = Pick<Profile, "subscription_status" | "grace_period_ends_at" | "plan_tier">;

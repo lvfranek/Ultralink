@@ -33,7 +33,7 @@
 }
 
 html {
-  background-color: #0A0A0A;
+  background-color: #0a0a0a;
   color: var(--text);
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
@@ -42,7 +42,7 @@ html {
 }
 
 body {
-  background-color: #0A0A0A;
+  background-color: #0a0a0a;
   color: var(--text);
   font-family: var(--font-geist), system-ui, sans-serif;
   min-height: 100dvh;
@@ -77,32 +77,34 @@ body {
 
 /* Dark theme token override — applied to dashboard and legal pages */
 .dark-theme {
-  --bg: #0A0A0A;
+  --bg: #0a0a0a;
   --surface: #111111;
-  --surface-2: #1A1A1A;
-  --border: rgba(255,255,255,.10);
-  --border-strong: rgba(255,255,255,.18);
-  --gold: #FFFFFF;
-  --gold-bright: #EEEEEE;
-  --gold-dim: rgba(255,255,255,0.08);
-  --text: #FFFFFF;
-  --text-muted: #9A9A9A;
-  --text-subtle: rgba(154,154,154,0.55);
+  --surface-2: #1a1a1a;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --gold: #ffffff;
+  --gold-bright: #eeeeee;
+  --gold-dim: rgba(255, 255, 255, 0.08);
+  --text: #ffffff;
+  --text-muted: #9a9a9a;
+  --text-subtle: rgba(154, 154, 154, 0.55);
 }
 
 /* Benefit cards — hover glow + lift (hover-capable pointers only, so taps on touch devices don't get stuck "hovered") */
 .benefit-card {
-  transition: transform .2s ease, box-shadow .25s ease;
-  box-shadow: 0 0 0 0 rgba(0,0,0,0);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
 }
 @media (hover: hover) and (pointer: fine) {
   .benefit-card:hover {
     transform: translateY(-3px);
     box-shadow:
-      -14px -14px 32px -10px rgba(251,194,164,.55),
-       14px -14px 32px -10px rgba(247,168,196,.5),
-      -14px  16px 32px -10px rgba(201,167,242,.5),
-       14px  16px 32px -10px rgba(167,199,247,.55);
+      -14px -14px 32px -10px rgba(251, 194, 164, 0.55),
+      14px -14px 32px -10px rgba(247, 168, 196, 0.5),
+      -14px 16px 32px -10px rgba(201, 167, 242, 0.5),
+      14px 16px 32px -10px rgba(167, 199, 247, 0.55);
   }
 }
 
@@ -111,14 +113,14 @@ body {
   position: relative;
   border-radius: 16px;
   padding: 1.5px;
-  background: linear-gradient(110deg, #FBC2A4 0%, #F7A8C4 33%, #C9A7F2 66%, #A7C7F7 100%);
+  background: linear-gradient(110deg, #fbc2a4 0%, #f7a8c4 33%, #c9a7f2 66%, #a7c7f7 100%);
 }
 
 .claim-gradient-glow {
   position: absolute;
   inset: -12px;
   border-radius: 26px;
-  background: linear-gradient(110deg, #FBC2A4 0%, #F7A8C4 33%, #C9A7F2 66%, #A7C7F7 100%);
+  background: linear-gradient(110deg, #fbc2a4 0%, #f7a8c4 33%, #c9a7f2 66%, #a7c7f7 100%);
   filter: blur(22px);
   opacity: 0.55;
   pointer-events: none;
@@ -126,53 +128,78 @@ body {
 
 /* Theme animations — permanent loops on link buttons; respects reduced-motion */
 @keyframes theme-bounce {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 @keyframes theme-shake {
-  0%, 100% { transform: rotate(-2.5deg); }
-  50%       { transform: rotate(2.5deg); }
+  0%,
+  100% {
+    transform: rotate(-2.5deg);
+  }
+  50% {
+    transform: rotate(2.5deg);
+  }
 }
 @keyframes theme-pulse {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.06); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
 }
 
-.theme-anim-bounce { animation: theme-bounce 1.4s ease-in-out infinite; }
-.theme-anim-shake  { animation: theme-shake  1.6s ease-in-out infinite; }
-.theme-anim-pulse  { animation: theme-pulse  1.4s ease-in-out infinite; }
+.theme-anim-bounce {
+  animation: theme-bounce 1.4s ease-in-out infinite;
+}
+.theme-anim-shake {
+  animation: theme-shake 1.6s ease-in-out infinite;
+}
+.theme-anim-pulse {
+  animation: theme-pulse 1.4s ease-in-out infinite;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .theme-anim-bounce,
   .theme-anim-shake,
-  .theme-anim-pulse { animation: none; }
+  .theme-anim-pulse {
+    animation: none;
+  }
 }
 
 /* Analytics headline tiles — subtle lavender glow on hover */
 .ul-analytics-tile:hover {
-  border-color: rgba(167,139,250,.35) !important;
-  box-shadow: 0 0 0 1px rgba(167,139,250,.12), 0 0 24px rgba(167,139,250,.12);
+  border-color: rgba(167, 139, 250, 0.35) !important;
+  box-shadow:
+    0 0 0 1px rgba(167, 139, 250, 0.12),
+    0 0 24px rgba(167, 139, 250, 0.12);
 }
 
 /* Analytics custom date-range popover — dark theme for react-day-picker */
 .ul-daypicker .rdp-root {
-  --rdp-accent-color: #A78BFA;
-  --rdp-accent-background-color: rgba(167,139,250,.12);
+  --rdp-accent-color: #a78bfa;
+  --rdp-accent-background-color: rgba(167, 139, 250, 0.12);
   --rdp-today-color: #ffffff;
   --rdp-range_start-color: #ffffff;
   --rdp-range_end-color: #ffffff;
-  --rdp-range_start-date-background-color: #A78BFA;
-  --rdp-range_end-date-background-color: #A78BFA;
+  --rdp-range_start-date-background-color: #a78bfa;
+  --rdp-range_end-date-background-color: #a78bfa;
   --rdp-disabled-opacity: 0.35;
   --rdp-outside-opacity: 0.4;
   color: #ffffff;
 }
 .ul-daypicker .rdp-day_button:hover:not([disabled]) {
-  background-color: rgba(255,255,255,.08);
+  background-color: rgba(255, 255, 255, 0.08);
   border-radius: 100%;
 }
 .ul-daypicker .rdp-weekday {
-  color: #6B6B6B;
+  color: #6b6b6b;
 }
 .ul-daypicker .rdp-caption_label,
 .ul-daypicker .rdp-nav button {
@@ -185,13 +212,16 @@ body {
 }
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Navigation loading spinner */
 @keyframes ul-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
-
