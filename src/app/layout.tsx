@@ -22,11 +22,15 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
+  // Not preloaded, like the other theme fonts below: Inter is only used on
+  // bio pages that pick it (the default), never on marketing/auth/legal
+  // pages — preloading it there only slowed down their LCP for nothing.
+  preload: false,
 });
 
 // Theme fonts below are only used on bio pages that pick them in the Design
-// tab, so they aren't preloaded on every page. Geist (UI) and Inter (default
-// page font) stay preloaded.
+// tab, so they aren't preloaded on every page. Geist (UI chrome, used
+// everywhere) is the only font that stays preloaded.
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
