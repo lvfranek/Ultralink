@@ -1,5 +1,7 @@
 # 🔗 Ultralink
 
+[![CI](https://github.com/lvfranek/Ultralink/actions/workflows/ci.yml/badge.svg)](https://github.com/lvfranek/Ultralink/actions/workflows/ci.yml)
+
 Ultralink is a website builder for creators and agencies —
 build a fast, branded link page and see real analytics behind every click.
 
@@ -24,11 +26,11 @@ build a fast, branded link page and see real analytics behind every click.
 ## 🚀 Features
 
 **On your page**
-- **Conversion-ready designs** — pages tuned to convert, or styled to match your brand.
-- **Deep linking** — your links open in the real browser, not a broken in-app one.
-- **Blazing fast** — pages load instantly, even on slow connections.
 - **Unlimited links** — create as many link pages as your plan allows.
-- **Simple or advanced** — easy for your first link, deep when you need it.
+- **Simple or advanced** — easy for your first link, complex when you need it.
+- **Conversion-ready designs** — pages tuned to convert, or styled to match your brand.
+- **Quick pages** — pages load instantly, even on slow connections.
+- **Deep linking** — your links open in the real browser, not a broken in-app one.
 
 **Growth & control**
 - **Real analytics** — clicks, CTR, countries, devices, time on page, and top links.
@@ -42,11 +44,7 @@ build a fast, branded link page and see real analytics behind every click.
 - Link page builder with live preview (profile, links, socials, design, advanced tabs)
 - Analytics with a date-range picker
 - Revenue tracking and account/billing settings
-- Admin view gated to a single `ADMIN_USER_ID`
-
-**Coming soon**
-- **Custom domains** — put your own domain on your page: your brand, your URL. Not built yet; the
-  dashboard route and the homepage feature card are both marked "coming soon".
+- Admin panel for the site owner — see [Admin Panel](#%EF%B8%8F-admin-panel)
 
 ## 🎞️ Live Demo
 
@@ -99,6 +97,28 @@ All variables are documented inline in [`.env.example`](.env.example). The group
 | Admin | `DISCORD_WEBHOOK_URL`, `DISCORD_BUGS_WEBHOOK_URL`, `DISCORD_FEATURES_WEBHOOK_URL`, `ADMIN_USER_ID` | All optional. Discord notifications silently no-op when unset, so signup and payment flows never fail. `/admin` 404s for everyone but `ADMIN_USER_ID`. |
 
 Never commit `.env.local`.
+
+## 🛡️ Admin Panel
+
+A private business overview at **`/admin`**, for the site owner only.
+
+**Access.** Only the account whose user ID matches `ADMIN_USER_ID` can open it. Everyone else —
+including signed-out visitors — gets a regular 404, so the page's existence isn't revealed. It isn't
+linked in the sidebar; open `/admin` directly. Find your user ID in Supabase under
+**Authentication → Users**.
+
+**What it shows**
+- **Key numbers** — total users, Pro users (with conversion rate), free users, MRR with estimated
+  ARR, and subscription health (accounts in the payment grace period and canceled accounts).
+- **Tier distribution** — for each plan tier: monthly vs. annual customers, total, and MRR.
+- **Recent signups** — the last 7 days, with each user's plan.
+
+The admin account is excluded from revenue and conversion numbers, so giving yourself Pro doesn't
+inflate MRR.
+
+**Discord notifications** complement the panel (all optional, see [Environment](#-environment)):
+new signups (email or Google), new Pro subscriptions with updated MRR, cancellations, and bug
+reports / feature requests from the in-app feedback form.
 
 ## 📁 Project Structure
 
@@ -162,6 +182,8 @@ The reference deployment runs on [Vercel](https://vercel.com), connected to this
 | `npm run build` | Production build                    |
 | `npm run start` | Serve the production build          |
 | `npm run lint`  | Run ESLint over the project         |
+| `npm test`      | Run the unit tests once (Vitest)    |
+| `npm run test:watch` | Re-run tests on every file change |
 
 ## 📚 Additional Resources
 

@@ -8,7 +8,7 @@ const TABLET_RE = /tablet|ipad|playbook|silk|(android(?!.*mobile))/i;
 const MOBILE_RE =
   /mobile|android.*mobile|iphone|ipod|opera mini|iemobile|wpdesktop|blackberry|windows phone/i;
 
-function parseDevice(ua: string | null): DeviceType {
+export function parseDevice(ua: string | null): DeviceType {
   if (!ua) return "unknown";
   if (BOT_RE.test(ua)) return "bot";
   if (TABLET_RE.test(ua)) return "tablet";
@@ -18,7 +18,7 @@ function parseDevice(ua: string | null): DeviceType {
   return "unknown";
 }
 
-function parseReferrer(referrer: string | null): string | null {
+export function parseReferrer(referrer: string | null): string | null {
   if (!referrer) return null;
   try {
     const host = new URL(referrer).hostname
