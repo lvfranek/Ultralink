@@ -156,27 +156,30 @@ export function FAQ() {
                   </button>
                 </dt>
 
+                {/* `inert` hides a collapsed answer from screen readers and Tab,
+                    not just visually, while keeping the height animation */}
                 <dd
-                  id={`faq-answer-${i}`}
-                  role="region"
-                  aria-labelledby={`faq-question-${i}`}
+                  inert={!isOpen}
                   style={{
+                    margin: 0,
                     overflow: 'hidden',
                     maxHeight: isOpen ? 500 : 0,
                     transition: 'max-height 0.28s cubic-bezier(0.32,0.72,0,1)',
                   }}
                 >
-                  <p
-                    style={{
-                      padding: '0 28px 22px',
-                      fontSize: 14,
-                      color: '#5a5a5a',
-                      lineHeight: 1.72,
-                      margin: 0,
-                    }}
-                  >
-                    {faq.answer}
-                  </p>
+                  <div id={`faq-answer-${i}`} role="region" aria-labelledby={`faq-question-${i}`}>
+                    <p
+                      style={{
+                        padding: '0 28px 22px',
+                        fontSize: 14,
+                        color: '#5a5a5a',
+                        lineHeight: 1.72,
+                        margin: 0,
+                      }}
+                    >
+                      {faq.answer}
+                    </p>
+                  </div>
                 </dd>
               </div>
             );

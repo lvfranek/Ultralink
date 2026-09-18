@@ -13,6 +13,7 @@ export function AgeGate({ slug }: AgeGateProps) {
 
   useEffect(() => {
     const stored = sessionStorage.getItem(`${SESSION_KEY}_${slug}`);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage is browser-only; null until checked avoids a flash of the gate
     setConfirmed(stored === "yes");
   }, [slug]);
 

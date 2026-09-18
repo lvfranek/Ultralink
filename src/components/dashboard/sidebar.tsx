@@ -116,7 +116,6 @@ function AccountMenu({
   displayName,
   username,
   activeOwnerId,
-  selfUsername,
   teamMemberships,
 }: {
   user: User;
@@ -304,7 +303,12 @@ export function Sidebar({
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  useEffect(() => { setMobileOpen(false); }, [pathname]);
+  // Close the mobile drawer after navigating to another page
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setMobileOpen(false);
+  }
 
   const navItems = [
     {
@@ -342,7 +346,9 @@ export function Sidebar({
     { href: "/help", label: "Help" },
   ];
 
-  const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
+  // A render function, not a component: defining a component inside Sidebar
+  // would remount it (and reset AccountMenu's state) on every render.
+  const renderSidebarContent = (onClose?: () => void) => (
     <div className="flex flex-col h-full">
       <div className="h-14 flex items-center px-6 shrink-0">
         <Logo href="/dashboard" iconSize={18} onDark />
@@ -452,7 +458,7 @@ export function Sidebar({
     <>
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-60 shrink-0 h-full" style={{ background: "#131313" }}>
-        <SidebarContent />
+        {renderSidebarContent()}
       </aside>
 
       {/* Mobile top bar */}
@@ -482,7 +488,7 @@ export function Sidebar({
             aria-hidden="true"
           />
           <div className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 overflow-y-auto" style={{ background: "#131313" }}>
-            <SidebarContent onClose={() => setMobileOpen(false)} />
+            {renderSidebarContent(() => setMobileOpen(false))}
           </div>
         </>
       )}

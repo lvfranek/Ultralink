@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { CreateLinkModal } from "@/components/dashboard/create-link-modal";
 import { LinksList } from "@/components/dashboard/links-list";
 import type { Page, SubscriptionStatus } from "@/lib/supabase/types";
+import Link from "next/link";
 
 interface DashboardShellProps {
   pages: Page[];
@@ -80,13 +81,13 @@ export function DashboardShell({
                 <strong>{formatDate(gracePeriodEndsAt)}</strong> or your pages will go offline.
               </p>
             </div>
-            <a
+            <Link
               href="/dashboard/account"
               className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg"
               style={{ background: "rgba(220,38,38,0.15)", color: "#ef4444", textDecoration: "none", border: "1px solid rgba(220,38,38,0.3)", whiteSpace: "nowrap" }}
             >
               Manage billing
-            </a>
+            </Link>
           </div>
         )}
 
@@ -101,13 +102,13 @@ export function DashboardShell({
               <strong style={{ color: "#ffffff" }}>{hiddenCount} {hiddenCount === 1 ? "page is" : "pages are"} hidden</strong>.
               Resubscribe to restore them.
             </p>
-            <a
+            <Link
               href="/#pricing"
               className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg"
               style={{ background: "#ffffff", color: "#000000", textDecoration: "none", whiteSpace: "nowrap" }}
             >
               Upgrade
-            </a>
+            </Link>
           </div>
         )}
 

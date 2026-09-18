@@ -49,7 +49,7 @@ export interface LinkItemHandle {
   flush: () => Promise<{ ok: true } | { ok: false; error: string }>;
 }
 
-const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ link, pageId, userId, onUpdate, onPreview, onDelete, onDirtyChange }, ref) {
+const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ link, userId, onUpdate, onPreview, onDelete, onDirtyChange }, ref) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: link.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
 
@@ -63,8 +63,8 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
 
   // Locked at mount and updated only after a successful DB save, so dirty check
   // stays correct even when the link prop updates due to live preview propagation.
-  const savedStyleRef = useRef<LinkStyle>(resolveLinkStyle(link));
-  const [linkStyle, setLinkStyle] = useState<LinkStyle>(savedStyleRef.current);
+  const [savedStyle, setSavedStyle] = useState<LinkStyle>(() => resolveLinkStyle(link));
+  const [linkStyle, setLinkStyle] = useState<LinkStyle>(savedStyle);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +72,7 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
   const iconFileRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
 
-  const saved = savedStyleRef.current;
+  const saved = savedStyle;
   const dirty =
     label !== link.label ||
     url !== link.url ||
@@ -127,7 +127,7 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
       setError(result.error);
       return { ok: false, error: result.error };
     }
-    savedStyleRef.current = linkStyle;
+    setSavedStyle(linkStyle);
     onUpdate({
       ...link,
       label, url, is_adult: isAdult, icon: selectedIcon,
@@ -138,14 +138,13 @@ const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkItem({ l
   }
 
   // `save` intentionally isn't memoized — it closes over this render's field state,
-  // so the handle must be rebuilt every render to always flush the latest edits.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // so the handle is rebuilt every render (no deps list) to always flush the latest edits.
   useImperativeHandle(ref, () => ({
     flush: async () => {
       if (!dirty) return { ok: true };
       return save();
     },
-  }), [dirty, save]);
+  }));
 
   function handleToggleExpanded() {
     // Collapsing/expanding never persists — edits are only ever written on the

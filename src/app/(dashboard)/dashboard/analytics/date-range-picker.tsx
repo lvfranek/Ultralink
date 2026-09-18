@@ -31,11 +31,15 @@ export function CustomRangePopover({ value, onApply, defaultOpen = false, onClos
   const [mounted, setMounted] = useState(false);
   const [narrow, setNarrow] = useState(false);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- the portal target (document.body) only exists after mount
   useEffect(() => { setMounted(true); }, []);
 
-  useEffect(() => {
+  // Follow the parent when it opens/closes the popover
+  const [prevDefaultOpen, setPrevDefaultOpen] = useState(defaultOpen);
+  if (defaultOpen !== prevDefaultOpen) {
+    setPrevDefaultOpen(defaultOpen);
     setOpen(defaultOpen);
-  }, [defaultOpen]);
+  }
 
   const handleClose = useCallback(() => {
     setOpen(false);
@@ -82,6 +86,7 @@ export function CustomRangePopover({ value, onApply, defaultOpen = false, onClos
 
   useLayoutEffect(() => {
     if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- measures the trigger's on-screen position when the popover opens
       setDraft(value);
       updatePosition();
     }

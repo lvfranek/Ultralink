@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect, useTransition } from "react";
-import { sanitizeSlug, validateSlug } from "@/lib/slug";
-import { checkSlugAvailable, duplicatePage } from "@/app/actions/pages";
+import { useState, useEffect, useTransition } from "react";
+import { sanitizeSlug } from "@/lib/slug";
+import { duplicatePage } from "@/app/actions/pages";
+import { useSlugAvailability } from "./use-slug-availability";
 
 interface DuplicateLinkModalProps {
   sourcePageId: string;
@@ -13,12 +14,9 @@ interface DuplicateLinkModalProps {
 
 export function DuplicateLinkModal({ sourcePageId, sourceSlug, onClose, onDuplicated }: DuplicateLinkModalProps) {
   const [slug, setSlug] = useState(() => sanitizeSlug(`${sourceSlug}-copy`));
-  const [slugError, setSlugError] = useState<string | null>(null);
-  const [slugOk, setSlugOk] = useState(false);
-  const [checking, setChecking] = useState(false);
+  const { slugOk, slugError, checking } = useSlugAvailability(slug);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isDuplicating, startDuplicating] = useTransition();
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -32,26 +30,6 @@ export function DuplicateLinkModal({ sourcePageId, sourceSlug, onClose, onDuplic
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
-
-  useEffect(() => {
-    setSlugOk(false);
-    setSlugError(null);
-    if (!slug) return;
-
-    const clientError = validateSlug(slug);
-    if (clientError) { setSlugError(clientError); return; }
-
-    setChecking(true);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      const result = await checkSlugAvailable(slug);
-      setChecking(false);
-      if (result.available) { setSlugOk(true); setSlugError(null); }
-      else setSlugError(result.error ?? "Not available.");
-    }, 400);
-
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [slug]);
 
   function handleConfirm() {
     setSubmitError(null);

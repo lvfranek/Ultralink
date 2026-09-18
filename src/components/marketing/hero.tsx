@@ -253,7 +253,7 @@ export function Hero() {
           </div>
 
           {/* Micro-copy */}
-          <p style={{ color: slugState === "taken" ? '#dc2626' : '#9a9a9a', fontSize: 13, marginTop: 14 }}>
+          <p style={{ color: slugState === "taken" ? '#dc2626' : '#6B6B6B', fontSize: 13, marginTop: 14 }}>
             {slugState === "taken"
               ? "That username is already taken."
               : slugState === "invalid" && username.length > 0
@@ -297,6 +297,11 @@ export function Hero() {
                 padding: 12px 18px !important;
               }
             }
+            /* The input hides its own outline, so ring the whole pill for keyboard users */
+            .hero-claim-form:has(input:focus-visible) {
+              outline: 2px solid #0A0A0A;
+              outline-offset: 3px;
+            }
           `}</style>
 
           {/* Trust indicators */}
@@ -308,7 +313,7 @@ export function Hero() {
               justifyContent: 'center',
               gap: 24,
               marginTop: 30,
-              color: '#8a8a8a',
+              color: '#6B6B6B',
               fontSize: 13,
             }}
           >

@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, useActionState } from "react";
 import { useRouter } from "next/navigation";
-import { createPage, checkSlugAvailable } from "@/app/actions/pages";
-import { sanitizeSlug, validateSlug } from "@/lib/slug";
+import { createPage } from "@/app/actions/pages";
+import { sanitizeSlug } from "@/lib/slug";
+import { useSlugAvailability } from "./use-slug-availability";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -16,15 +17,12 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
   const router = useRouter();
   const [slug, setSlug] = useState(sanitizeSlug(initialSlug));
   const [title, setTitle] = useState("");
-  const [slugError, setSlugError] = useState<string | null>(null);
-  const [slugOk, setSlugOk] = useState(false);
-  const [checking, setChecking] = useState(false);
+  const { slugOk, slugError, checking } = useSlugAvailability(slug);
   const [showValidation, setShowValidation] = useState(false);
 
   const [state, formAction, isPending] = useActionState(createPage, null);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (state && "pageId" in state) {
@@ -46,27 +44,6 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
-
-  useEffect(() => {
-    setSlugOk(false);
-    setSlugError(null);
-    if (!slug) return;
-
-    const clientError = validateSlug(slug);
-    if (clientError) { setSlugError(clientError); return; }
-
-    setChecking(true);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    debounceRef.current = setTimeout(async () => {
-      const result = await checkSlugAvailable(slug);
-      setChecking(false);
-      if (result.available) { setSlugOk(true); setSlugError(null); }
-      else { setSlugError(result.error ?? "Not available."); setSlugOk(false); }
-    }, 400);
-
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [slug]);
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSlug(sanitizeSlug(e.target.value));

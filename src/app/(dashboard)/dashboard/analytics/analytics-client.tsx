@@ -391,7 +391,9 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
   const [range, setRange] = useState<RangeKey>("7d");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
-  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [fetchedData, setFetchedData] = useState<AnalyticsData | null>(null);
+  // Example mode shows the same static dataset instead of fetching
+  const data = exampleData ?? fetchedData;
   const [isPending, startTransition] = useTransition();
   const [hydrated, setHydrated] = useState(false);
 
@@ -421,6 +423,7 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
       const stored = localStorage.getItem("ul_analytics_page");
       if (stored && pages.some((p) => p.id === stored)) pageId = stored;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- restores filters from localStorage, which only exists in the browser
     setSelectedPageId(pageId);
 
     if (urlRange && RANGE_OPTIONS.some((o) => o.value === urlRange)) {
@@ -471,17 +474,14 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
 
   // Fetch on change — skipped entirely in example mode, where the same static dataset is reused.
   useEffect(() => {
-    if (exampleData) {
-      setData(exampleData);
-      return;
-    }
+    if (exampleData) return;
     if (!hydrated || !selectedPageId) return;
     const dates = getDateRange(range, customStart, customEnd);
     if (!dates) return;
 
     startTransition(async () => {
       const result = await getAnalyticsData(selectedPageId, dates.start, dates.end);
-      setData(result);
+      setFetchedData(result);
     });
   }, [exampleData, hydrated, selectedPageId, range, customStart, customEnd]);
 

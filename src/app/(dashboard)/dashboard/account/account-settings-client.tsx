@@ -9,6 +9,7 @@ import { createPortalSession } from "@/app/actions/billing";
 import { inviteEditor, removeEditor, revokeInvite, resendInvite } from "@/app/actions/team";
 import type { SubscriptionStatus, PlanInterval, TeamMember, TeamInvite } from "@/lib/supabase/types";
 import { getEffectivePlan, isProActive } from "@/lib/supabase/types";
+import Link from "next/link";
 
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
 type UsernameState = "idle" | "checking" | "available" | "taken" | "invalid" | "unchanged";
@@ -244,9 +245,9 @@ function PlanCard({
         {atLimit && effectivePlan === "free" && (
           <div style={{ marginTop: 4, padding: "10px 14px", borderRadius: 8, background: "rgba(196,122,58,0.08)", border: "1px solid rgba(196,122,58,0.25)", fontSize: 13, color: "#C47A3A" }}>
             You&apos;ve reached your plan limit.{" "}
-            <a href="/#pricing" style={{ color: "#C47A3A", textDecoration: "underline", textUnderlineOffset: 2 }}>
+            <Link href="/#pricing" style={{ color: "#C47A3A", textDecoration: "underline", textUnderlineOffset: 2 }}>
               Upgrade to add more
-            </a>
+            </Link>
           </div>
         )}
 
@@ -262,20 +263,20 @@ function PlanCard({
             </button>
           )}
           {effectivePlan === "free" && (
-            <a
+            <Link
               href="/#pricing"
               style={{ display: "inline-flex", alignItems: "center", padding: "9px 18px", fontSize: 13, fontWeight: 600, borderRadius: 8, border: "none", background: "#ffffff", color: "#000000", textDecoration: "none", cursor: "pointer" }}
             >
               Upgrade
-            </a>
+            </Link>
           )}
           {(isFullyCanceled || isPastDue) && (
-            <a
+            <Link
               href="/#pricing"
               style={{ display: "inline-flex", alignItems: "center", padding: "9px 18px", fontSize: 13, fontWeight: 600, borderRadius: 8, border: "none", background: "#ffffff", color: "#000000", textDecoration: "none", cursor: "pointer" }}
             >
               Resubscribe
-            </a>
+            </Link>
           )}
         </div>
       </div>
@@ -365,12 +366,12 @@ function TeamCard({
           <p style={{ fontSize: 14, color: "#6B6B6B", margin: "0 0 16px" }}>
             Inviting team members is a Pro feature.
           </p>
-          <a
+          <Link
             href="/#pricing"
             style={{ display: "inline-flex", alignItems: "center", padding: "9px 18px", fontSize: 13, fontWeight: 600, borderRadius: 8, background: "#ffffff", color: "#000000", textDecoration: "none" }}
           >
             Upgrade to Pro
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -778,6 +779,7 @@ function PreferencesCard() {
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage and the browser's timezone are only available after hydration
       setTimezone(stored);
     } else {
       try {

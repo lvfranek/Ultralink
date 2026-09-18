@@ -89,6 +89,7 @@ export function ColorPickerField({
   const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties>({});
   const [mounted, setMounted] = useState(false);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- the portal target (document.body) only exists after mount
   useEffect(() => { setMounted(true); }, []);
 
   const updatePosition = useCallback(() => {
@@ -232,8 +233,6 @@ export function GradientBuilder({
     setAngle(a);
     onChange(buildGradient(s1, s2, a));
   }
-
-  const angleOptions = GRADIENT_DIRECTIONS.map((d) => ({ id: String(d.angle) as string, label: d.label }));
 
   return (
     <div className="space-y-3">

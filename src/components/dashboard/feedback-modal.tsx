@@ -28,12 +28,15 @@ export function FeedbackModal({ open, onClose, defaultName, defaultEmail }: Feed
   const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    setName(defaultName);
-    setEmail(defaultEmail);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  // Refill name/email with the defaults each time the modal opens
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) {
+      setName(defaultName);
+      setEmail(defaultEmail);
+    }
+  }
 
   useEffect(() => {
     if (!open) return;

@@ -3,8 +3,7 @@
 import { useState, useCallback, useEffect, useRef, startTransition } from "react";
 import { useActionState } from "react";
 import { updatePage } from "@/app/actions/pages";
-import { sanitizeSlug, validateSlug } from "@/lib/slug";
-import { checkSlugAvailable } from "@/app/actions/pages";
+import { sanitizeSlug } from "@/lib/slug";
 import { applyPresetToLinks } from "@/app/actions/links";
 import { ProfileTab } from "./profile-tab";
 import { PresetsContent, TypographyContent, ColorsContent, patchTheme } from "./design-tab";
@@ -13,8 +12,10 @@ import { LivePreview } from "./live-preview";
 import { SettingsCard } from "./panel-primitives";
 import { CountryBlockingControl } from "./country-blocking-control";
 import { WinBackControl } from "./win-back-control";
+import { useSlugAvailability } from "../use-slug-availability";
 import type { Page, PageLink, PageSocial, WinBack } from "@/lib/supabase/types";
 import { type Theme, type LinkStyle, type PresetKey, resolveTheme, PRESET_META, FONT_OPTIONS } from "@/lib/config/theme";
+import Link from "next/link";
 
 interface PageBuilderProps {
   page: Page;
@@ -56,10 +57,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
 
   const [isDirty, setIsDirty] = useState(false);
   const [hasLinksDirty, setHasLinksDirty] = useState(false);
-  const [slugError, setSlugError] = useState<string | null>(null);
-  const [slugOk, setSlugOk] = useState(true);
-  const [checking, setChecking] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { slugOk, slugError, checking } = useSlugAvailability(local.slug, { currentSlug: page.slug, excludePageId: page.id });
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
   const linksTabRef = useRef<LinksTabHandle>(null);
@@ -96,39 +94,22 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
     });
   }, [formAction]);
 
-  useEffect(() => {
+  // React to each new save result during render (not in an effect)
+  const [handledState, setHandledState] = useState(state);
+  if (state !== handledState) {
+    setHandledState(state);
     if (state && "ok" in state) {
       setSaveSuccess(true);
       setIsDirty(false);
-      const t = setTimeout(() => setSaveSuccess(false), 3000);
-      return () => clearTimeout(t);
     }
-  }, [state]);
+  }
 
+  // Hide the success flash 3s after the latest save
   useEffect(() => {
-    if (local.slug === page.slug) {
-      setSlugOk(true);
-      setSlugError(null);
-      return;
-    }
-    setSlugOk(false);
-    setSlugError(null);
-    if (!local.slug) return;
-
-    const clientError = validateSlug(local.slug);
-    if (clientError) { setSlugError(clientError); return; }
-
-    setChecking(true);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      const result = await checkSlugAvailable(local.slug, page.id);
-      setChecking(false);
-      if (result.available) { setSlugOk(true); setSlugError(null); }
-      else setSlugError(result.error ?? "Not available.");
-    }, 400);
-
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [local.slug, page.slug, page.id]);
+    if (!saveSuccess) return;
+    const t = setTimeout(() => setSaveSuccess(false), 3000);
+    return () => clearTimeout(t);
+  }, [saveSuccess, handledState]);
 
   const handleLocalChange = useCallback((patch: Partial<LocalPageState>) => {
     setLocal((prev) => ({ ...prev, ...patch }));
@@ -433,7 +414,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                         )}
                       </p>
                       <p className="text-xs text-text-muted mt-0.5">
-                        Shows a green "Active now" indicator on your page
+                        Shows a green &quot;Active now&quot; indicator on your page
                       </p>
                     </div>
                     {canUseBadge ? (
@@ -452,12 +433,12 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                         />
                       </button>
                     ) : (
-                      <a
+                      <Link
                         href="/#pricing"
                         className="text-xs text-gold hover:text-gold-bright transition-colors flex-shrink-0 ml-3"
                       >
                         Upgrade →
-                      </a>
+                      </Link>
                     )}
                   </div>
                   {/* Geo-blocking + remaining stubs */}

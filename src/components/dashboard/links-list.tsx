@@ -113,9 +113,9 @@ function PageRow({
         {isHidden && (
           <p className="text-xs mt-1" style={{ color: "#6B6B6B" }}>
             Publicly hidden.{" "}
-            <a href="/#pricing" style={{ color: "#9A9A9A", textDecoration: "underline", textUnderlineOffset: 2 }}>
+            <Link href="/#pricing" style={{ color: "#9A9A9A", textDecoration: "underline", textUnderlineOffset: 2 }}>
               Upgrade to restore
-            </a>
+            </Link>
           </p>
         )}
       </div>

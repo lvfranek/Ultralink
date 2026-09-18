@@ -99,7 +99,7 @@ export function TrafficRecovery() {
                 fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.08em',
-                color: '#8a8a8a',
+                color: '#5a5a5a',
                 marginBottom: 16,
               }}
             >

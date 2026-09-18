@@ -14,6 +14,7 @@ import {
 } from "@/lib/config/theme";
 import { SocialIcon } from "./social-icon";
 import { isAdultConfirmed, showAdultGate } from "./adult-gate";
+import Link from "next/link";
 
 interface ProfilePageViewProps {
   page: Pick<Page, "slug" | "title" | "bio" | "avatar_url" | "avatar_style" | "active_badge">;
@@ -358,13 +359,13 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
             {ctaCard}
 
             <div className="flex items-center gap-4" style={{ opacity: 0.65 }}>
-              <a href="/privacy" className="text-xs hover:opacity-70 transition-opacity" style={{ color: panelText }}>
+              <Link href="/privacy" className="text-xs hover:opacity-70 transition-opacity" style={{ color: panelText }}>
                 Privacy
-              </a>
+              </Link>
               <span className="text-xs" style={{ color: panelText }}>·</span>
-              <a href="/terms" className="text-xs hover:opacity-70 transition-opacity" style={{ color: panelText }}>
+              <Link href="/terms" className="text-xs hover:opacity-70 transition-opacity" style={{ color: panelText }}>
                 Terms
-              </a>
+              </Link>
               <span className="text-xs" style={{ color: panelText }}>·</span>
               <a
                 href={`mailto:report@ultralink.bio?subject=Report: ${encodeURIComponent(page.slug)}`}

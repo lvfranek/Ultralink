@@ -9,6 +9,7 @@ import {
   type Tier,
 } from "@/lib/config/pricing";
 import { startCheckout } from "@/app/actions/billing";
+import Link from "next/link";
 
 const GRADIENT = 'linear-gradient(110deg,#FBC2A4 0%,#F7A8C4 33%,#C9A7F2 66%,#A7C7F7 100%)';
 
@@ -121,7 +122,7 @@ export function Pricing() {
             >
               {i === "monthly" ? "Monthly" : "Annual"}
               {i === "annual" && (
-                <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.75 }}>
+                <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   -25%
                 </span>
               )}
@@ -154,14 +155,14 @@ export function Pricing() {
             border: '1px solid rgba(0,0,0,.08)',
           }}
         >
-          <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(10,10,10,.4)', margin: '0 0 10px' }}>
+          <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(10,10,10,.6)', margin: '0 0 10px' }}>
             {FREE_PLAN.name}
           </p>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, marginBottom: 4 }}>
             <span style={{ fontSize: 48, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em', lineHeight: 1 }}>$0</span>
-            <span style={{ color: 'rgba(10,10,10,.35)', fontSize: 14, marginBottom: 6 }}>/mo</span>
+            <span style={{ color: 'rgba(10,10,10,.6)', fontSize: 14, marginBottom: 6 }}>/mo</span>
           </div>
-          <p style={{ fontSize: 12, color: 'rgba(10,10,10,.35)', margin: '0 0 24px' }}>Free forever</p>
+          <p style={{ fontSize: 12, color: 'rgba(10,10,10,.6)', margin: '0 0 24px' }}>Free forever</p>
 
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: 9, flex: 1 }}>
             {FREE_PLAN.features.map((f) => (
@@ -172,18 +173,21 @@ export function Pricing() {
                   alignItems: 'center',
                   gap: 10,
                   fontSize: 14,
-                  color: f.included ? '#0A0A0A' : 'rgba(10,10,10,.25)',
+                  color: f.included ? '#0A0A0A' : '#6B6B6B',
                 }}
               >
-                <span style={{ color: f.included ? '#10b981' : 'rgba(10,10,10,.18)' }}>
+                <span style={{ color: f.included ? '#10b981' : 'rgba(10,10,10,.35)' }}>
                   {f.included ? <CheckIcon /> : <XIcon />}
                 </span>
-                {f.text}
+                <span style={f.included ? undefined : { textDecoration: 'line-through' }}>
+                  <span className="sr-only">{f.included ? 'Included: ' : 'Not included: '}</span>
+                  {f.text}
+                </span>
               </li>
             ))}
           </ul>
 
-          <a
+          <Link
             href="/login?mode=signup"
             style={{
               display: 'inline-flex',
@@ -206,7 +210,7 @@ export function Pricing() {
             onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)'; }}
           >
             Get started free
-          </a>
+          </Link>
         </div>
 
         {/* Pro — gradient border */}
@@ -278,16 +282,16 @@ export function Pricing() {
                 background: '#ffffff',
               }}
             >
-              <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(10,10,10,.4)', margin: '0 0 10px' }}>
+              <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(10,10,10,.6)', margin: '0 0 10px' }}>
                 {PRO_PLAN.name}
               </p>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, marginBottom: 4 }}>
                 <span style={{ fontSize: 48, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em', lineHeight: 1 }}>
                   ${proPrice}
                 </span>
-                <span style={{ color: 'rgba(10,10,10,.35)', fontSize: 14, marginBottom: 6 }}>/mo</span>
+                <span style={{ color: 'rgba(10,10,10,.6)', fontSize: 14, marginBottom: 6 }}>/mo</span>
               </div>
-              <p style={{ fontSize: 12, color: 'rgba(10,10,10,.35)', margin: '0 0 16px' }}>
+              <p style={{ fontSize: 12, color: 'rgba(10,10,10,.6)', margin: '0 0 16px' }}>
                 {interval === "annual"
                   ? `Billed $${selectedTier.annualPrice}/yr`
                   : "Billed monthly"}
@@ -297,7 +301,7 @@ export function Pricing() {
               <div style={{ marginBottom: 20 }}>
                 <label
                   htmlFor="pro-links"
-                  style={{ display: 'block', fontSize: 12, color: 'rgba(10,10,10,.4)', marginBottom: 6, fontWeight: 500 }}
+                  style={{ display: 'block', fontSize: 12, color: 'rgba(10,10,10,.6)', marginBottom: 6, fontWeight: 500 }}
                 >
                   Number of link pages
                 </label>

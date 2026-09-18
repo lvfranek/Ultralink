@@ -131,6 +131,7 @@ export function WinBackDialog({
   const nameColor = theme.colors.name;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- matchMedia is browser-only
     setPrefersReducedMotion(
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     );

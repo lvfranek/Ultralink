@@ -133,9 +133,12 @@ export function LoginForm() {
   const resendButtonRef = useRef<HTMLButtonElement>(null);
   const resetStatusRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  // A plan in the URL means the visitor came from pricing — show sign-up
+  const [prevPlan, setPrevPlan] = useState(prefilledPlan);
+  if (prefilledPlan !== prevPlan) {
+    setPrevPlan(prefilledPlan);
     if (prefilledPlan) setMode("signup");
-  }, [prefilledPlan]);
+  }
 
   // Resend cooldown ticker
   useEffect(() => {
@@ -166,6 +169,7 @@ export function LoginForm() {
     const hash = window.location.hash;
     const fragmentParams = hash ? new URLSearchParams(hash.slice(1)) : null;
     const code = fragmentParams?.get("error_code") ?? searchParams.get("error");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the URL #fragment only exists in the browser, not during server render
     if (code) setBannerCode(code);
     const detail = fragmentParams?.get("error_description") ?? searchParams.get("error_description");
     // Comes from the URL, so keep it short — it's shown as plain text

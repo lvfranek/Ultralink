@@ -94,7 +94,7 @@ export function Footer() {
                     fontWeight: 600,
                     textTransform: 'uppercase',
                     letterSpacing: '0.1em',
-                    color: 'rgba(10,10,10,0.35)',
+                    color: 'rgba(10,10,10,0.6)',
                     marginBottom: 16,
                   }}
                 >
@@ -133,10 +133,10 @@ export function Footer() {
               gap: 16,
             }}
           >
-            <p style={{ fontSize: 12, color: 'rgba(10,10,10,0.4)', margin: 0 }}>
+            <p style={{ fontSize: 12, color: 'rgba(10,10,10,0.6)', margin: 0 }}>
               &copy; {year} Ultralink. All rights reserved.
             </p>
-            <p style={{ fontSize: 12, color: 'rgba(10,10,10,0.4)', margin: 0 }}>
+            <p style={{ fontSize: 12, color: 'rgba(10,10,10,0.6)', margin: 0 }}>
               Built for influencer agencies.
             </p>
           </div>

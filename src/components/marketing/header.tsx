@@ -175,7 +175,8 @@ export function Header() {
           pointerEvents: mobileOpen ? "auto" : "none",
         }}
         className="md:hidden"
-        aria-hidden={!mobileOpen}
+        // inert (not just transparent) so Tab and screen readers skip the closed menu
+        inert={!mobileOpen}
       >
         <nav
           style={{
