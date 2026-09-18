@@ -23,12 +23,12 @@ function VideoCard({ video, onPlay }: { video: HelpVideo; onPlay: () => void }) 
       <div className="mt-3 px-1 pb-1">
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm font-medium" style={{ color: "#fff" }}>{video.title}</p>
-          <span className="text-xs shrink-0" style={{ color: comingSoon ? "#6B6B6B" : "#9A9A9A" }}>
+          <span className="text-xs shrink-0" style={{ color: "#9A9A9A" }}>
             {comingSoon ? "Coming soon" : video.duration}
           </span>
         </div>
         {video.description && (
-          <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "#6B6B6B" }}>
+          <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "#9A9A9A" }}>
             {video.description}
           </p>
         )}

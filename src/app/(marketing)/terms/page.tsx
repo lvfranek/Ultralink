@@ -156,7 +156,7 @@ export default function TermsPage() {
               the service shall not exceed the amount you paid us in the 12 months preceding the
               claim.
             </p>
-            <p className="mt-3 text-sm text-text-subtle">
+            <p className="mt-3 text-sm text-text-muted">
               Note: Certain consumer protection laws in Germany and the EU may limit our ability to
               exclude or restrict liability. The exclusions above apply to the fullest extent
               permitted by law.
@@ -214,7 +214,7 @@ export default function TermsPage() {
             <h2 className="text-xl font-semibold text-text mb-4">10. Contact</h2>
             <p>
               Questions about these Terms? Email us at{" "}
-              <a href="mailto:support@ultralink.bio" className="text-gold hover:text-gold-bright transition-colors">
+              <a href="mailto:support@ultralink.bio" className="text-gold underline underline-offset-2 hover:text-gold-bright transition-colors">
                 support@ultralink.bio
               </a>
             </p>
@@ -224,7 +224,7 @@ export default function TermsPage() {
 
       {/* Simple footer */}
       <footer className="border-t border-border px-4 sm:px-6 py-6 mt-12">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-subtle">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-muted">
           <Logo iconSize={20} onDark />
           <div className="flex gap-6">
             <Link href="/terms" className="hover:text-text transition-colors text-text-muted">Terms of Service</Link>

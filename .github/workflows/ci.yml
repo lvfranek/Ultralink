@@ -41,3 +41,39 @@ jobs:
 
       - name: Build (includes type checking)
         run: npm run build
+
+  # Audits the public pages with Lighthouse and fails if a score drops below
+  # the limits in lighthouserc.json. Runs in parallel with the job above.
+  lighthouse:
+    runs-on: ubuntu-latest
+    env:
+      # Placeholders, not secrets: the app needs *some* Supabase URL/key to
+      # start, but public pages never contact Supabase for signed-out visitors.
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run Lighthouse CI
+        run: npx -y @lhci/cli@0.15.1 autorun
+
+      - name: Save Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/reports

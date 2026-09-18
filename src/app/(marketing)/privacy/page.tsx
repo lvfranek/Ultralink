@@ -55,7 +55,7 @@ export default function PrivacyPage() {
               Franciszek Kaminski<br />
               Sole proprietor (Einzelunternehmer)<br />
               Germany<br />
-              Email: <a href="mailto:support@ultralink.bio" className="text-gold hover:text-gold-bright transition-colors">support@ultralink.bio</a>
+              Email: <a href="mailto:support@ultralink.bio" className="text-gold underline underline-offset-2 hover:text-gold-bright transition-colors">support@ultralink.bio</a>
             </address>
             <p className="mt-4">
               For all data protection enquiries, including the exercise of your data subject rights,
@@ -132,7 +132,7 @@ export default function PrivacyPage() {
                     <tr key={name as string}>
                       <td className="py-2 pr-4 font-medium text-text">{name}</td>
                       <td className="py-2 pr-4">{purpose}</td>
-                      <td className="py-2 text-text-subtle">{loc}</td>
+                      <td className="py-2 text-text-muted">{loc}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -178,7 +178,7 @@ export default function PrivacyPage() {
             </ul>
             <p className="mt-4">
               To exercise any of these rights, email us at{" "}
-              <a href="mailto:support@ultralink.bio" className="text-gold hover:text-gold-bright transition-colors">
+              <a href="mailto:support@ultralink.bio" className="text-gold underline underline-offset-2 hover:text-gold-bright transition-colors">
                 support@ultralink.bio
               </a>
               . We will respond within 30 days.
@@ -236,7 +236,7 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold text-text mb-4">11. Contact</h2>
             <p>
               For any data protection questions, requests, or complaints, contact us at:{" "}
-              <a href="mailto:support@ultralink.bio" className="text-gold hover:text-gold-bright transition-colors">
+              <a href="mailto:support@ultralink.bio" className="text-gold underline underline-offset-2 hover:text-gold-bright transition-colors">
                 support@ultralink.bio
               </a>
             </p>
@@ -246,7 +246,7 @@ export default function PrivacyPage() {
 
       {/* Simple footer */}
       <footer className="border-t border-border px-4 sm:px-6 py-6 mt-12">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-subtle">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-muted">
           <Logo iconSize={20} onDark />
           <div className="flex gap-6">
             <Link href="/terms" className="hover:text-text transition-colors">Terms of Service</Link>

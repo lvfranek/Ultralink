@@ -33,7 +33,7 @@ export function AuthShell({ children, footer }: { children: React.ReactNode; foo
         overflow: 'hidden',
       }}
     >
-      <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: 400 }}>
+      <main style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: 400 }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
           <Logo href="/" iconSize={32} onDark />
         </div>
@@ -50,7 +50,7 @@ export function AuthShell({ children, footer }: { children: React.ReactNode; foo
         </div>
 
         {footer}
-      </div>
+      </main>
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>

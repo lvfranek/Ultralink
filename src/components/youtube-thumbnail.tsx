@@ -14,7 +14,7 @@ export function YouTubeThumbnail({ youtubeId, title, onPlay, comingSoon }: YouTu
         className="relative w-full aspect-video rounded-[12px] flex items-center justify-center overflow-hidden"
         style={{ background: "#1E1E1E", border: "1px solid rgba(255,255,255,.06)" }}
       >
-        <span className="text-xs font-medium" style={{ color: "#6B6B6B" }}>
+        <span className="text-xs font-medium" style={{ color: "#9A9A9A" }}>
           Coming soon
         </span>
       </div>

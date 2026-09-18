@@ -11,17 +11,7 @@ const FAQS = [
   {
     question: "Do I need a credit card for the free plan?",
     answer:
-      "No. The Free plan is genuinely free — no credit card required, no trial period, no automatic upgrade. Use it as long as you like. When you're ready for analytics, custom domains, or other premium features, upgrade to Pro at any time.",
-  },
-  {
-    question: "Can I use my own domain?",
-    answer:
-      "Yes. The Pro plan includes custom domain support. Instead of ultralink.bio/yourname, you can use something like links.yourbrand.com. We provide simple DNS setup instructions and the domain propagates within minutes.",
-  },
-  {
-    question: "Will using Ultralink get my Instagram or TikTok banned?",
-    answer:
-      "No — and this is something we take seriously. Many link-in-bio tools use link cloaking, which means they show Instagram or TikTok's crawlers a different URL than your real visitors see. This violates platform terms of service and leads to permanent bans. Ultralink explicitly does not cloak. Crawlers and users always see the same destination. Your account is safe.",
+      "No. The Free plan is genuinely free — no credit card required, no trial period, no automatic upgrade. Use it as long as you like. When you're ready for analytics or other premium features, upgrade to Pro at any time.",
   },
   {
     question: "What is Win-Back?",

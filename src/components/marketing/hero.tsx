@@ -318,10 +318,9 @@ export function Hero() {
             }}
           >
             {[
-              "No link cloaking",
-              "Platform-safe by default",
-              "Built-in age gate",
+              "Social media safe by default",
               "Real analytics",
+              "Built-in age gate",
             ].map((item) => (
               <span key={item} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <svg viewBox="0 0 12 12" fill="none" style={{ width: 12, height: 12, flexShrink: 0 }} aria-hidden="true">

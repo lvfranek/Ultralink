@@ -86,7 +86,7 @@ export const metadata: Metadata = {
     template: "%s | Ultralink",
   },
   description:
-    "The premium link-in-bio platform for creators and agencies. Fast pages, real analytics, no cloaking, no bans.",
+    "The premium link-in-bio platform for creators and agencies. Fast pages and real analytics.",
   metadataBase: new URL("https://ultralink.bio"),
   icons: {
     icon: "/favicon/favicon.png",

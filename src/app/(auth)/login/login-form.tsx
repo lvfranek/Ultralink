@@ -496,7 +496,7 @@ export function LoginForm() {
   };
 
   const footer = (
-    <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: '#6B6B6B' }}>
+    <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: '#9A9A9A' }}>
       By continuing, you agree to our{" "}
       <Link href="/terms" style={{ color: '#9a9a9a', textDecoration: 'underline', textUnderlineOffset: 2 }}>
         Terms of Service
@@ -521,7 +521,7 @@ export function LoginForm() {
             We just sent a confirmation link to{" "}
             <strong style={{ color: '#0A0A0A' }}>{confirmedEmail}</strong>. Click it to activate your account.
           </p>
-          <p style={{ fontSize: 12, color: '#9a9a9a', margin: '0 0 24px' }}>
+          <p style={{ fontSize: 12, color: '#6B6B6B', margin: '0 0 24px' }}>
             Didn&apos;t get it? Check your spam folder, or check that the address is right.
           </p>
 
@@ -595,7 +595,7 @@ export function LoginForm() {
                 <p style={{ fontSize: 13, color: '#6B6B6B', margin: '4px 0 0', lineHeight: 1.5 }}>
                   {banner.body}
                 </p>
-                <p style={{ fontSize: 12, color: '#9a9a9a', margin: '6px 0 0', lineHeight: 1.5, wordBreak: 'break-word' }}>
+                <p style={{ fontSize: 12, color: '#6B6B6B', margin: '6px 0 0', lineHeight: 1.5, wordBreak: 'break-word' }}>
                   Details: {bannerDetail ? `${bannerDetail} (${bannerCode})` : bannerCode}
                 </p>
                 {bannerNeedsEmail && (
@@ -695,13 +695,13 @@ export function LoginForm() {
                       borderRadius: 7,
                       border: 'none',
                       background: mode === m ? '#0A0A0A' : 'transparent',
-                      color: mode === m ? '#ffffff' : '#9a9a9a',
+                      color: mode === m ? '#ffffff' : '#6B6B6B',
                       cursor: 'pointer',
                       fontFamily: 'inherit',
                       transition: 'all 0.15s',
                     }}
                     onMouseEnter={(e) => { if (mode !== m) { e.currentTarget.style.color = '#0A0A0A'; e.currentTarget.style.background = 'rgba(0,0,0,.06)'; } }}
-                    onMouseLeave={(e) => { if (mode !== m) { e.currentTarget.style.color = '#9a9a9a'; e.currentTarget.style.background = 'transparent'; } }}
+                    onMouseLeave={(e) => { if (mode !== m) { e.currentTarget.style.color = '#6B6B6B'; e.currentTarget.style.background = 'transparent'; } }}
                   >
                     {m === "signup" ? "Create account" : "Sign in"}
                   </button>
@@ -847,7 +847,7 @@ export function LoginForm() {
                 <div style={{ width: '100%', borderTop: '1px solid rgba(0,0,0,.08)' }} />
               </div>
               <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
-                <span style={{ padding: '0 12px', background: '#fff', fontSize: 12, color: '#9a9a9a' }}>
+                <span style={{ padding: '0 12px', background: '#fff', fontSize: 12, color: '#6B6B6B' }}>
                   or continue with email
                 </span>
               </div>
@@ -970,7 +970,7 @@ export function LoginForm() {
                   ) : usernameState === "available" ? (
                     <p style={{ marginTop: 6, fontSize: 12, color: '#059669' }}>Username is available.</p>
                   ) : (
-                    <p style={{ marginTop: 6, fontSize: 12, color: '#9a9a9a' }}>3–20 characters, lowercase letters, numbers, underscores.</p>
+                    <p style={{ marginTop: 6, fontSize: 12, color: '#6B6B6B' }}>3–20 characters, lowercase letters, numbers, underscores.</p>
                   )}
                 </div>
               )}
@@ -979,7 +979,7 @@ export function LoginForm() {
                 <label htmlFor="password" style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6B6B6B', marginBottom: 6 }}>
                   Password
                   {mode === "signup" && (
-                    <span style={{ fontWeight: 400, color: '#9a9a9a', marginLeft: 4 }}>(min. 8 characters)</span>
+                    <span style={{ fontWeight: 400, color: '#6B6B6B', marginLeft: 4 }}>(min. 8 characters)</span>
                   )}
                 </label>
                 <PasswordInput

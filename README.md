@@ -23,7 +23,7 @@ build a fast, branded link page and see real analytics behind every click.
 | Icons       | Lucide                                                        |
 | Hosting     | Vercel                                                        |
 | Testing     | [Vitest](https://vitest.dev) — unit tests                     |
-| CI          | GitHub Actions — lint, tests and build on every push          |
+| CI          | GitHub Actions — lint, tests, build + Lighthouse on every push |
 
 ## 🚀 Features
 
@@ -143,16 +143,22 @@ npm run test:watch    # re-run on every save
 
 **Continuous integration.** Every push to `main` and every pull request runs
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml): **lint → unit tests → production build**
-(which includes type checking). It needs no secrets. The badge at the top of this README shows the
+(which includes type checking), plus the Lighthouse audit described below. It needs no secrets. The badge at the top of this README shows the
 current status.
 
 **Linting.** ESLint with the Next.js and React Hooks rules, at zero errors and warnings. The few
 intentional exceptions (code that must read browser-only APIs like `localStorage` after the page
 loads) are disabled line by line, each with a comment explaining why.
 
-**Accessibility.** The homepage scores 100 for accessibility in Lighthouse: sufficient color
-contrast, labeled controls, a "Skip to main content" link, visible focus rings, and a logical
-Tab order on desktop and mobile.
+**Accessibility & Lighthouse.** All public pages (home, login, help, privacy, terms) score 100 for
+accessibility in Lighthouse: sufficient color contrast, labeled controls, a "Skip to main content"
+link, visible focus rings, and a logical Tab order on desktop and mobile.
+
+[Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) enforces this on every push: a second
+CI job builds the app, audits those pages and fails if accessibility drops below 100, or best
+practices / SEO below 90 ([`lighthouserc.json`](lighthouserc.json)). Performance is reported as a
+warning only, since shared CI machines give noisy timings. The full reports are attached to each CI
+run as a downloadable artifact.
 
 ## 📁 Project Structure
 
@@ -187,7 +193,8 @@ src/
 supabase/
   migrations/             Schema migrations (run in filename order)
   storage-policies.sql    Policies for the public `media` bucket
-.github/workflows/ci.yml  CI: lint, tests, build
+.github/workflows/ci.yml  CI: lint, tests, build + Lighthouse audit
+lighthouserc.json         Lighthouse CI pages and score limits
 ```
 
 ## ☁️ Deployment
