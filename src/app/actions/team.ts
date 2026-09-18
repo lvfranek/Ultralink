@@ -9,6 +9,7 @@ import { createServiceClient } from "@/lib/supabase/service";
 import { resend, inviteEmail } from "@/lib/resend";
 import { isProActive } from "@/lib/supabase/types";
 import { getSiteUrl } from "@/lib/site-url";
+import { genericDbError } from "@/lib/db-error";
 
 const ACTIVE_OWNER_COOKIE = "ultralink_active_owner";
 
@@ -90,7 +91,7 @@ export async function inviteEditor(email: string): Promise<{ error?: string }> {
     token,
   });
 
-  if (insertError) return { error: insertError.message };
+  if (insertError) return genericDbError("team.inviteEditor", insertError);
 
   await resend.emails.send({
     from: "Ultralink <hello@ultralink.bio>",
@@ -151,7 +152,7 @@ export async function revokeInvite(inviteId: string): Promise<{ error?: string }
 
   const { error } = await supabase.from("team_invites").delete().eq("id", inviteId).eq("owner_id", user.id);
 
-  if (error) return { error: error.message };
+  if (error) return genericDbError("team.revokeInvite", error);
 
   revalidatePath("/dashboard/account");
   return {};
@@ -166,7 +167,7 @@ export async function removeEditor(editorId: string): Promise<{ error?: string }
 
   const { error } = await supabase.from("team_members").delete().eq("owner_id", user.id).eq("editor_id", editorId);
 
-  if (error) return { error: error.message };
+  if (error) return genericDbError("team.removeEditor", error);
 
   // Clean up the accepted invite so the owner can re-invite the same email
   const service = createServiceClient();
@@ -216,7 +217,7 @@ export async function acceptInvite(token: string): Promise<{ error?: string } | 
 
   // Ignore duplicate (already a member)
   if (memberError && memberError.code !== "23505") {
-    return { error: memberError.message };
+    return genericDbError("team.acceptInvite", memberError);
   }
 
   await service.from("team_invites").update({ accepted_at: now }).eq("id", invite.id);

@@ -110,7 +110,11 @@ export default function PrivacyPage() {
                 ],
                 [
                   "Support communications",
-                  "If you contact us by email, we retain those communications to resolve your request.",
+                  "If you contact us by email or through the in-app feedback form, we retain those communications — including your name, email, username, plan, and message — to resolve your request. Feedback submissions are relayed to our internal Discord workspace for triage.",
+                ],
+                [
+                  "Signup notifications",
+                  "When you create an account, your username, email address, and signup method (email or Google) are sent to our internal Discord workspace so we're notified of new users.",
                 ],
               ].map(([title, desc]) => (
                 <li key={title as string} className="pl-4 border-l-2 border-border">
@@ -166,9 +170,10 @@ export default function PrivacyPage() {
                   {[
                     ["Supabase, Inc.", "Database storage and authentication", "USA (SCCs)"],
                     ["Stripe, Inc.", "Payment processing and subscription management", "USA (SCCs)"],
-                    ["Resend, Inc.", "Transactional email delivery", "USA (SCCs)"],
+                    ["Resend, Inc.", "Team invitation emails", "USA (SCCs)"],
                     ["Vercel, Inc.", "Cloud hosting and infrastructure", "USA (SCCs)"],
                     ["Google LLC", "OAuth authentication (sign-in with Google)", "USA (SCCs)"],
+                    ["Discord Inc.", "Internal notifications (new signups, feedback submissions)", "USA (SCCs)"],
                   ].map(([name, purpose, loc]) => (
                     <tr key={name as string}>
                       <td className="py-2 pr-4 font-medium text-text">{name}</td>
@@ -259,13 +264,21 @@ export default function PrivacyPage() {
 
           {/* 8 */}
           <section>
-            <h2 className="text-xl font-semibold text-text mb-4">8. Cookies</h2>
-            <p>We use the following types of cookies:</p>
+            <h2 className="text-xl font-semibold text-text mb-4">8. Cookies and Local Storage</h2>
+            <p>
+              We use the following types of cookies and browser storage — all strictly necessary for the service to
+              function, so no consent banner is required under GDPR:
+            </p>
             <ul className="mt-3 space-y-2 list-disc list-inside">
               <li>
-                <span className="font-medium text-text">Strictly necessary cookies:</span> Session and authentication
-                tokens issued by Supabase to keep you logged in. These cannot be disabled without breaking the service.
-                No consent is required under GDPR for strictly necessary cookies.
+                <span className="font-medium text-text">Authentication cookies:</span> Session tokens issued by Supabase
+                to keep you logged in, and a cookie recording which team you&apos;re currently managing if you have
+                editor access to more than one.
+              </li>
+              <li>
+                <span className="font-medium text-text">Local storage:</span> Used on your device (never sent to us) for
+                things like remembering that a visitor confirmed the 18+ age gate for a session, and your saved
+                dashboard filter preferences.
               </li>
               <li>
                 <span className="font-medium text-text">No tracking or advertising cookies:</span> We do not use

@@ -238,7 +238,48 @@ export default function TermsPage() {
 
           {/* 10 */}
           <section>
-            <h2 className="text-xl font-semibold text-text mb-4">10. Contact</h2>
+            <h2 className="text-xl font-semibold text-text mb-4">10. Right of Withdrawal (EU/EEA Consumers)</h2>
+            <p>
+              If you are a consumer resident in the EU/EEA, you have a statutory right to withdraw from a paid
+              subscription within 14 days without giving any reason.
+            </p>
+            <p className="mt-3 font-medium text-text">Right of withdrawal</p>
+            <p className="mt-1">
+              You have the right to withdraw from a paid subscription contract within 14 days without giving any reason.
+              The withdrawal period expires 14 days from the day the subscription contract was concluded.
+            </p>
+            <p className="mt-3 font-medium text-text">Exercising your right</p>
+            <p className="mt-1">
+              To exercise the right of withdrawal, you must inform us — Franciszek Kaminski, operating Ultralink — of
+              your decision by a clear statement (e.g. an email to{" "}
+              <a
+                href="mailto:support@ultralink.bio"
+                className="text-gold underline underline-offset-2 hover:text-gold-bright transition-colors"
+              >
+                support@ultralink.bio
+              </a>
+              ). Cancelling your subscription in account settings within the 14-day period also counts as exercising
+              this right. To meet the deadline, it is enough to send your withdrawal notice before the period expires.
+            </p>
+            <p className="mt-3 font-medium text-text">Effects of withdrawal</p>
+            <p className="mt-1">
+              If you withdraw, we will reimburse all payments received from you, without undue delay and at the latest
+              within 14 days of the day we are informed of your withdrawal, using the same payment method you used for
+              the original transaction, unless expressly agreed otherwise, and without any fees for the reimbursement.
+            </p>
+            <p className="mt-3 font-medium text-text">Early loss of the right of withdrawal</p>
+            <p className="mt-1">
+              If you expressly request that access to a paid plan begins immediately (rather than waiting out the 14-day
+              period) and acknowledge that your right of withdrawal ends once the service has been fully performed, that
+              right expires once we have fully provided the subscription. If we have only partially performed the
+              service at the time you withdraw, you must pay an amount proportionate to what was provided up to that
+              point compared to the full contract.
+            </p>
+          </section>
+
+          {/* 11 */}
+          <section>
+            <h2 className="text-xl font-semibold text-text mb-4">11. Contact</h2>
             <p>
               Questions about these Terms? Email us at{" "}
               <a

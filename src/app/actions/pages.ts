@@ -7,6 +7,8 @@ import { validateSlug } from "@/lib/slug";
 import { getLinkCap } from "@/lib/config/pricing";
 import { getActiveOwnerId } from "@/lib/team";
 import type { Theme } from "@/lib/config/theme";
+import { genericDbError } from "@/lib/db-error";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export type ActionResult = { error: string } | { ok: true } | { ok: true; pageId: string };
 
@@ -80,7 +82,7 @@ export async function createPage(_prev: ActionResult | null, formData: FormData)
 
   if (error) {
     if (error.code === "23505") return { error: "That username is already taken." };
-    return { error: error.message };
+    return genericDbError("pages.createPage", error);
   }
 
   const { error: linkError } = await supabase.from("page_links").insert({
@@ -210,7 +212,7 @@ export async function updatePage(id: string, _prev: ActionResult | null, formDat
 
   if (error) {
     if (error.code === "23505") return { error: "That username is already taken." };
-    return { error: error.message };
+    return genericDbError("pages.updatePage", error);
   }
 
   revalidatePath("/dashboard");
@@ -229,7 +231,7 @@ export async function deletePage(id: string): Promise<ActionResult> {
 
   const { error } = await supabase.from("pages").delete().eq("id", id).eq("owner_id", activeOwnerId);
 
-  if (error) return { error: error.message };
+  if (error) return genericDbError("pages.deletePage", error);
 
   revalidatePath("/dashboard");
   return { ok: true };
@@ -349,6 +351,14 @@ export async function checkSlugAvailable(
 ): Promise<{ available: boolean; error?: string }> {
   const validationError = validateSlug(slug);
   if (validationError) return { available: false, error: validationError };
+
+  // Called on every debounced keystroke while typing a username (hero +
+  // signup forms), so the limit stays generous — this is only meant to
+  // stop automated slug enumeration, not normal typing.
+  const ip = await getClientIp();
+  if (!rateLimit(`check-slug:${ip}`, 30, 60).allowed) {
+    return { available: false, error: "Too many checks. Please wait a moment." };
+  }
 
   const supabase = await createClient();
   let query = supabase.from("pages").select("id", { count: "exact", head: true }).eq("slug", slug);

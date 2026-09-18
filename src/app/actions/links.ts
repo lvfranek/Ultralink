@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getActiveOwnerId } from "@/lib/team";
 import { normalizeUrl, isValidUrl } from "@/lib/url";
 import type { PageLink } from "@/lib/supabase/types";
+import { genericDbError } from "@/lib/db-error";
 
 export type LinkActionResult = { error: string } | { ok: true; link?: PageLink };
 
@@ -80,7 +81,7 @@ export async function addLink(
     .select()
     .single();
 
-  if (error) return { error: error.message };
+  if (error) return genericDbError("links.addLink", error);
 
   revalidatePath(`/dashboard/links/${pageId}`);
   return { ok: true, link: link as PageLink };
@@ -139,7 +140,7 @@ export async function updateLink(
     })
     .eq("id", id);
 
-  if (error) return { error: error.message };
+  if (error) return genericDbError("links.updateLink", error);
 
   revalidatePath(`/dashboard/links/${existing.page_id}`);
   return { ok: true };
@@ -161,7 +162,7 @@ export async function deleteLink(id: string): Promise<LinkActionResult> {
   if (!owns) return { error: "Not authorized." };
 
   const { error } = await supabase.from("page_links").delete().eq("id", id);
-  if (error) return { error: error.message };
+  if (error) return genericDbError("links.deleteLink", error);
 
   revalidatePath(`/dashboard/links/${existing.page_id}`);
   return { ok: true };
@@ -184,7 +185,7 @@ export async function reorderLinks(pageId: string, orderedIds: string[]): Promis
 
   const results = await Promise.all(updates);
   const failed = results.find((r) => r.error);
-  if (failed?.error) return { error: failed.error.message };
+  if (failed?.error) return genericDbError("links.reorderLinks", failed.error);
 
   revalidatePath(`/dashboard/links/${pageId}`);
   return { ok: true };
@@ -216,7 +217,7 @@ export async function applyPresetToLinks(
     })
     .eq("page_id", pageId);
 
-  if (error) return { error: error.message };
+  if (error) return genericDbError("links.applyPresetToLinks", error);
 
   revalidatePath(`/dashboard/links/${pageId}`);
   return { ok: true };

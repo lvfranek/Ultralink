@@ -3,10 +3,19 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { getSiteUrl } from "@/lib/site-url";
+import { genericDbError } from "@/lib/db-error";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
 
 export async function resendConfirmationEmail(email: string): Promise<{ error?: string }> {
+  // Supabase Auth already rate-limits the emails it sends; this is a second
+  // layer against someone hammering the action itself.
+  const ip = await getClientIp();
+  if (!rateLimit(`resend-confirm:${ip}`, 5, 600).allowed) {
+    return { error: "Too many attempts. Please wait a few minutes and try again." };
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.auth.resend({
     type: "signup",
@@ -41,11 +50,11 @@ export async function updateUsername(username: string): Promise<{ error?: string
 
   const { data, error } = await supabase.from("profiles").update({ username }).eq("id", user.id).select("id");
 
-  if (error) return { error: error.message };
+  if (error) return genericDbError("account.updateUsername", error);
   if (!data || data.length === 0) {
     // Row missing — insert it as a fallback
     const { error: upsertError } = await supabase.from("profiles").insert({ id: user.id, username });
-    if (upsertError) return { error: upsertError.message };
+    if (upsertError) return genericDbError("account.updateUsername.fallbackInsert", upsertError);
   }
 
   revalidatePath("/dashboard/account", "layout");

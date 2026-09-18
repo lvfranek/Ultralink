@@ -50,5 +50,5 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 
-# claude
-.claude
+# Claude Code
+/.claude/

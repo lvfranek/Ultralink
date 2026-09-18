@@ -62,7 +62,8 @@ export async function POST(request: Request) {
     if (profile.stripe_customer_id) {
       await admin.from("profiles").update({ stripe_customer_id: null, stripe_subscription_id: null }).eq("id", user.id);
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("[account/delete] deleteUser failed", error);
+    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 
   await supabase.auth.signOut();

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getActiveOwnerId } from "@/lib/team";
 import { normalizeUrl, isValidUrl } from "@/lib/url";
 import type { PageSocial } from "@/lib/supabase/types";
+import { genericDbError } from "@/lib/db-error";
 
 const MAX_SOCIALS = 20;
 
@@ -61,7 +62,7 @@ export async function addSocial(pageId: string, data: { platform: string; url: s
     .select()
     .single();
 
-  if (error) return { error: error.message };
+  if (error) return genericDbError("socials.addSocial", error);
 
   revalidatePath(`/dashboard/links/${pageId}`);
   return { ok: true, social: social as PageSocial };
@@ -97,7 +98,7 @@ export async function updateSocial(id: string, data: { platform?: string; url?: 
     })
     .eq("id", id);
 
-  if (error) return { error: error.message };
+  if (error) return genericDbError("socials.updateSocial", error);
 
   revalidatePath(`/dashboard/links/${existing.page_id}`);
   return { ok: true };
@@ -119,7 +120,7 @@ export async function deleteSocial(id: string): Promise<SocialActionResult> {
   if (!owns) return { error: "Not authorized." };
 
   const { error } = await supabase.from("page_socials").delete().eq("id", id);
-  if (error) return { error: error.message };
+  if (error) return genericDbError("socials.deleteSocial", error);
 
   revalidatePath(`/dashboard/links/${existing.page_id}`);
   return { ok: true };
@@ -142,7 +143,7 @@ export async function reorderSocials(pageId: string, orderedIds: string[]): Prom
 
   const results = await Promise.all(updates);
   const failed = results.find((r) => r.error);
-  if (failed?.error) return { error: failed.error.message };
+  if (failed?.error) return genericDbError("socials.reorderSocials", failed.error);
 
   revalidatePath(`/dashboard/links/${pageId}`);
   return { ok: true };
