@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { emailInUse, resendConfirmationEmail } from "@/app/actions/account";
+import { resendConfirmationEmail } from "@/app/actions/account";
 import { notifySignup } from "@/app/actions/notify";
 import { siteConfig } from "@/lib/config/site";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -14,7 +14,7 @@ import { AuthShell, inputStyle, inputErrorStyle } from "../auth-shell";
 type Mode = "signin" | "signup" | "reset";
 type View = "form" | "confirm-sent";
 type UsernameState = "idle" | "checking" | "available" | "taken" | "invalid";
-type EmailCheckState = "idle" | "checking" | "in-use";
+type EmailCheckState = "idle" | "in-use";
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
@@ -122,7 +122,6 @@ export function LoginForm() {
 
   const [emailCheckState, setEmailCheckState] = useState<EmailCheckState>("idle");
   const [autoSwitching, setAutoSwitching] = useState(false);
-  const emailDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoSwitchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isSubmittingRef = useRef(false);
 
@@ -157,7 +156,6 @@ export function LoginForm() {
   useEffect(() => {
     return () => {
       if (usernameDebounceRef.current) clearTimeout(usernameDebounceRef.current);
-      if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
       if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
     };
   }, []);
@@ -286,20 +284,6 @@ export function LoginForm() {
     }, 1200);
   }, [handleModeSwitch]);
 
-  const checkEmailInUse = useCallback(async (value: string) => {
-    if (!isValidEmail(value)) {
-      setEmailCheckState("idle");
-      return;
-    }
-    setEmailCheckState("checking");
-    const inUse = await emailInUse(value);
-    if (inUse) {
-      triggerAutoSwitch(value);
-    } else {
-      setEmailCheckState((s) => (s === "checking" ? "idle" : s));
-    }
-  }, [triggerAutoSwitch]);
-
   const handleEmailChange = (value: string) => {
     setEmail(value);
     clearMessages();
@@ -307,11 +291,8 @@ export function LoginForm() {
       setBannerHidden(true);
       clearErrorFromUrl();
     }
-    if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
     if (mode !== "signup" || autoSwitching) return;
     setEmailCheckState("idle");
-    if (!isValidEmail(value)) return;
-    emailDebounceRef.current = setTimeout(() => checkEmailInUse(value), 500);
   };
 
   const handleBannerResend = async () => {
@@ -396,13 +377,7 @@ export function LoginForm() {
 
     try {
       if (mode === "signup") {
-        const inUse = await emailInUse(email);
-        if (inUse) {
-          triggerAutoSwitch(email);
-          return;
-        }
-
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -425,6 +400,12 @@ export function LoginForm() {
             return;
           }
           throw error;
+        }
+        // Supabase answers a sign-up for an existing, confirmed email with a
+        // user that has no identities (instead of an error) — switch to sign-in.
+        if (data.user && (data.user.identities?.length ?? 0) === 0) {
+          triggerAutoSwitch(email);
+          return;
         }
         void notifySignup(username, email);
         setConfirmedEmail(email);
@@ -506,6 +487,10 @@ export function LoginForm() {
         Privacy Policy
       </Link>
       .
+      <br />
+      <Link href="/imprint" style={{ display: 'inline-block', marginTop: 8, color: '#9a9a9a', textDecoration: 'underline', textUnderlineOffset: 2 }}>
+        Imprint
+      </Link>
     </p>
   );
 

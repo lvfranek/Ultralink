@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import type { Metadata } from "next";
+import { getLegalContact } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -8,6 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
+  const contact = getLegalContact();
+
   return (
     <div className="min-h-dvh bg-bg dark-theme">
       {/* Minimal header */}
@@ -21,18 +24,6 @@ export default function PrivacyPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        {/* Lawyer review banner */}
-        <div className="mb-10 p-4 rounded-[var(--radius)] border border-amber-700/40 bg-amber-950/20">
-          <p className="text-sm text-amber-400 font-medium">
-            ⚠ Legal review required
-          </p>
-          <p className="text-xs text-amber-400/80 mt-1">
-            This is a template generated for the operator and must be reviewed by a qualified
-            lawyer before launch. It is provided as a starting point only and does not constitute
-            legal advice.
-          </p>
-        </div>
-
         <h1
           className="text-4xl sm:text-5xl font-bold text-text mb-3"
           style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
@@ -52,9 +43,18 @@ export default function PrivacyPage() {
               The data controller responsible for processing your personal data is:
             </p>
             <address className="not-italic mt-3 p-4 bg-surface rounded-[var(--radius)] border border-border text-sm">
-              Franciszek Kaminski<br />
-              Sole proprietor (Einzelunternehmer)<br />
-              Germany<br />
+              {contact ? (
+                <>
+                  {contact.name}<br />
+                  {contact.street}<br />
+                  {contact.city}<br />
+                  {contact.country}<br />
+                </>
+              ) : (
+                <>
+                  The operator of this site — see the <Link href="/imprint" className="text-gold underline underline-offset-2 hover:text-gold-bright transition-colors">Imprint</Link>.<br />
+                </>
+              )}
               Email: <a href="mailto:support@ultralink.bio" className="text-gold underline underline-offset-2 hover:text-gold-bright transition-colors">support@ultralink.bio</a>
             </address>
             <p className="mt-4">
@@ -251,6 +251,7 @@ export default function PrivacyPage() {
           <div className="flex gap-6">
             <Link href="/terms" className="hover:text-text transition-colors">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-text transition-colors text-text-muted">Privacy Policy</Link>
+            <Link href="/imprint" className="hover:text-text transition-colors">Imprint</Link>
           </div>
         </div>
       </footer>

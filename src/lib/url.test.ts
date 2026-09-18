@@ -1,5 +1,32 @@
 import { describe, it, expect } from "vitest";
-import { normalizeUrl, isValidUrl } from "./url";
+import { normalizeUrl, isValidUrl, safeRedirectPath } from "./url";
+
+describe("safeRedirectPath", () => {
+  it("keeps paths on this site, including query and hash", () => {
+    expect(safeRedirectPath("/dashboard")).toBe("/dashboard");
+    expect(safeRedirectPath("/checkout?tier=10&interval=annual")).toBe("/checkout?tier=10&interval=annual");
+    expect(safeRedirectPath("/help#videos")).toBe("/help#videos");
+  });
+
+  it("falls back for missing or non-path values", () => {
+    expect(safeRedirectPath(null)).toBe("/dashboard");
+    expect(safeRedirectPath("")).toBe("/dashboard");
+    expect(safeRedirectPath("dashboard")).toBe("/dashboard");
+    expect(safeRedirectPath("https://evil.com")).toBe("/dashboard");
+    expect(safeRedirectPath("@evil.com")).toBe("/dashboard");
+  });
+
+  it("blocks tricks that browsers treat as another site", () => {
+    expect(safeRedirectPath("//evil.com")).toBe("/dashboard");
+    expect(safeRedirectPath("/\\evil.com")).toBe("/dashboard");
+    expect(safeRedirectPath("/\t/evil.com")).toBe("/dashboard");
+    expect(safeRedirectPath("/\n/evil.com")).toBe("/dashboard");
+  });
+
+  it("uses a custom fallback when given", () => {
+    expect(safeRedirectPath("//evil.com", "/login")).toBe("/login");
+  });
+});
 
 describe("normalizeUrl", () => {
   it("adds https:// to bare domains", () => {

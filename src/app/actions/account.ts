@@ -6,23 +6,6 @@ import { getSiteUrl } from "@/lib/site-url";
 
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
 
-export async function emailInUse(email: string): Promise<boolean> {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/admin/users?filter=${encodeURIComponent(email)}`;
-  const res = await fetch(url, {
-    headers: {
-      apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
-    },
-    cache: "no-store",
-  });
-  if (!res.ok) return false;
-  const data = await res.json();
-  const users: Array<{ email?: string }> = Array.isArray(data?.users) ? data.users : [];
-  const normalized = email.toLowerCase();
-  // Both confirmed and unconfirmed accounts count as "in use" — don't leak confirmation state.
-  return users.some((u) => u.email?.toLowerCase() === normalized);
-}
-
 export async function resendConfirmationEmail(email: string): Promise<{ error?: string }> {
   const supabase = await createClient();
   const { error } = await supabase.auth.resend({

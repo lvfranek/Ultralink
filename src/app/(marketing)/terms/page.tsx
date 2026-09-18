@@ -21,18 +21,6 @@ export default function TermsPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        {/* Lawyer review banner */}
-        <div className="mb-10 p-4 rounded-[var(--radius)] border border-amber-700/40 bg-amber-950/20">
-          <p className="text-sm text-amber-400 font-medium">
-            ⚠ Legal review required
-          </p>
-          <p className="text-xs text-amber-400/80 mt-1">
-            This is a template generated for the operator and must be reviewed by a qualified
-            lawyer before launch. It is provided as a starting point only and does not constitute
-            legal advice.
-          </p>
-        </div>
-
         <h1
           className="text-4xl sm:text-5xl font-bold text-text mb-3"
           style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
@@ -49,8 +37,8 @@ export default function TermsPage() {
           <section>
             <p>
               These Terms of Service (&ldquo;Terms&rdquo;) govern your use of Ultralink, a hosted
-              link-in-bio service operated by Franciszek Kaminski, sole proprietor
-              (Einzelunternehmer), Germany (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;Ultralink&rdquo;). By creating an
+              link-in-bio service operated by Franciszek Kaminski,
+              Germany (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;Ultralink&rdquo;). By creating an
               account or using the service, you agree to these Terms. If you do not agree,
               do not use Ultralink.
             </p>
@@ -229,6 +217,7 @@ export default function TermsPage() {
           <div className="flex gap-6">
             <Link href="/terms" className="hover:text-text transition-colors text-text-muted">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-text transition-colors">Privacy Policy</Link>
+            <Link href="/imprint" className="hover:text-text transition-colors">Imprint</Link>
           </div>
         </div>
       </footer>

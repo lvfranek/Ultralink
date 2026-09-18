@@ -367,6 +367,10 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
                 Terms
               </Link>
               <span className="text-xs" style={{ color: panelText }}>·</span>
+              <Link href="/imprint" className="text-xs hover:opacity-70 transition-opacity" style={{ color: panelText }}>
+                Imprint
+              </Link>
+              <span className="text-xs" style={{ color: panelText }}>·</span>
               <a
                 href={`mailto:report@ultralink.bio?subject=Report: ${encodeURIComponent(page.slug)}`}
                 className="text-xs hover:opacity-70 transition-opacity"

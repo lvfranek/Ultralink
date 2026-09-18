@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
+import { safeRedirectPath } from "@/lib/url";
 
 const ALLOWED_TYPES: EmailOtpType[] = ["signup", "recovery", "email_change", "invite", "magiclink"];
 
@@ -36,6 +37,5 @@ export async function confirmToken(formData: FormData) {
     redirect(`/login?error=${encodeURIComponent((error as { code?: string }).code ?? "auth_callback_failed")}`);
   }
 
-  const destination = typeof next === "string" && next.startsWith("/") ? next : "/dashboard";
-  redirect(destination);
+  redirect(safeRedirectPath(next));
 }

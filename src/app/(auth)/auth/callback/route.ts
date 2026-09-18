@@ -2,6 +2,7 @@ import { NextResponse, after } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { sendSignupNotification } from "@/lib/notifications/signup";
+import { safeRedirectPath } from "@/lib/url";
 
 // Only OAuth (Google) sign-ins land here — email sign-ups go through /auth/confirm.
 // A brand-new account was created moments ago; returning users are older.
@@ -16,7 +17,8 @@ function loginErrorUrl(origin: string, code: string, description?: string | null
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  // Only same-site paths — never let ?next= send users to another site
+  const next = safeRedirectPath(searchParams.get("next"));
 
   if (code) {
     const hadCodeVerifier = (await cookies())

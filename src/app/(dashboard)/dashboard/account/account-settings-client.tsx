@@ -878,7 +878,7 @@ function DangerZoneCard({ username }: { username: string }) {
       {expanded && (
         <div style={cardBody}>
           <p style={{ margin: "0 0 16px", fontSize: 14, color: "#9A9A9A" }}>
-            Deleting your account is permanent and cannot be undone. All your pages, links, and data will be removed.
+            Deleting your account is permanent and cannot be undone. All your pages, links, and data will be removed, and any active subscription is canceled immediately.
           </p>
           <FieldRow>
             <label style={label}>

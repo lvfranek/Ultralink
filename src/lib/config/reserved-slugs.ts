@@ -5,6 +5,7 @@ export const RESERVED_SLUGS = new Set([
   "dashboard",
   "privacy",
   "terms",
+  "imprint",
   "auth",
   "api",
   "_next",
