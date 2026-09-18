@@ -86,18 +86,23 @@ const bebasNeue = Bebas_Neue({
 
 export const metadata: Metadata = {
   title: {
-    default: "Ultralink — One link. Your entire world.",
+    default: "Ultralink",
     template: "%s | Ultralink",
   },
   description: "The premium link-in-bio platform for creators and agencies. Fast pages and real analytics.",
   metadataBase: new URL("https://ultralink.bio"),
   icons: {
     icon: "/favicon/favicon.png",
+    shortcut: "/favicon/favicon.ico",
+    apple: "/favicon/apple-touch-icon.png",
   },
   openGraph: {
     siteName: "Ultralink",
     locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
   },
   robots: {
     index: true,

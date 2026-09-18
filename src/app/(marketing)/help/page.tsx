@@ -4,8 +4,10 @@ import { Footer } from "@/components/marketing/footer";
 import { HelpCenter } from "@/components/marketing/help-center";
 
 export const metadata: Metadata = {
-  title: "Help Center — Ultralink",
+  // The root layout's title template already appends " | Ultralink"
+  title: "Help Center",
   description: "Learn how to get the most out of Ultralink with short video walkthroughs.",
+  alternates: { canonical: "/help" },
 };
 
 export default function HelpPage() {

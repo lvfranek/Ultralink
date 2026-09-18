@@ -7,15 +7,12 @@ import { Footer } from "@/components/marketing/footer";
 import { Header } from "@/components/marketing/header";
 import type { Metadata } from "next";
 
+// Title/description/openGraph are already the root layout's defaults —
+// only add what's specific to this page (its canonical URL), so this page
+// still inherits the root's og:image instead of shadowing it with an
+// openGraph object that omits `images`.
 export const metadata: Metadata = {
-  title: "Ultralink — One link. Your entire world.",
-  description: "The premium link-in-bio for creators and agencies. Fast pages and real analytics.",
-  openGraph: {
-    title: "Ultralink — One link. Your entire world.",
-    description: "The premium link-in-bio for creators and agencies. Fast pages and real analytics.",
-    type: "website",
-    url: "https://ultralink.bio",
-  },
+  alternates: { canonical: "/" },
 };
 
 export default function HomePage() {

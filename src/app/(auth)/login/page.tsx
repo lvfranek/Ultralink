@@ -3,9 +3,11 @@ import type { Metadata } from "next";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
-  title: "Sign in — Ultralink",
+  // The root layout's title template already appends " | Ultralink"
+  title: "Sign in",
   description: "Sign in or create your Ultralink account.",
   robots: { index: false, follow: false },
+  alternates: { canonical: "/login" },
 };
 
 export default function LoginPage() {

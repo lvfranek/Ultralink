@@ -6,6 +6,7 @@ import { getLegalContact } from "@/lib/legal";
 export const metadata: Metadata = {
   title: "Imprint",
   description: "Legal notice (Imprint) for Ultralink as required by German law.",
+  alternates: { canonical: "/imprint" },
 };
 
 export default function ImprintPage() {

@@ -6,6 +6,7 @@ import { getLegalContact } from "@/lib/legal";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "How Ultralink collects, uses, and protects your personal data.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

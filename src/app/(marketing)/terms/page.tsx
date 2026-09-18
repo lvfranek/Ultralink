@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service",
   description: "Ultralink Terms of Service — rules, rights, and responsibilities.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {
