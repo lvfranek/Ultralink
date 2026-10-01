@@ -496,8 +496,13 @@ function smooth(pts: [number, number][]) {
     const p1 = pts[i];
     const p2 = pts[i + 1];
     const p3 = pts[i + 2] ?? p2;
-    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, Math.min(H, p1[1] + (p2[1] - p0[1]) / 6)];
-    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, Math.min(H, p2[1] - (p3[1] - p1[1]) / 6)];
+    // Keeping the handles between the two points' heights stops the curve from
+    // overshooting: it never rises above a peak or dips below zero
+    const lo = Math.min(p1[1], p2[1]);
+    const hi = Math.max(p1[1], p2[1]);
+    const clampY = (v: number) => Math.min(hi, Math.max(lo, v));
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, clampY(p1[1] + (p2[1] - p0[1]) / 6)];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, clampY(p2[1] - (p3[1] - p1[1]) / 6)];
     d += ` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
   }
   return d;
@@ -515,7 +520,8 @@ function ActivityCard({
   const [hover, setHover] = useState<number | null>(null);
 
   const n = points.length;
-  const max = niceMax(Math.max(...points.map((p) => (show.views ? p.views : p.clicks))));
+  // Scale to whichever visible line is highest; clicks can outnumber views on a day
+  const max = niceMax(Math.max(...points.map((p) => Math.max(show.views ? p.views : 0, show.clicks ? p.clicks : 0))));
   const x = (i: number) => (i / (n - 1)) * W;
   const y = (v: number) => H - (v / max) * H;
   const viewsPath = smooth(points.map((p, i) => [x(i), y(p.views)]));
