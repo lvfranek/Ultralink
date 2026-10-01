@@ -2,6 +2,7 @@ import { cache } from "react";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { AuthShell } from "@/app/(auth)/auth-shell";
 import { AcceptInviteClient } from "./accept-client";
 
 type Props = { searchParams: Promise<{ token?: string }> };
@@ -80,42 +81,12 @@ export default async function AcceptInvitePage({ searchParams }: Props) {
 
 // ─── Server-rendered card shells ──────────────────────────────────────────────
 
+// Same frame as sign-in, so accepting an invite feels like part of the auth flow
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "32px 16px",
-        background: "#0A0A0A",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 420,
-          background: "#141417",
-          border: "1px solid rgba(255,255,255,.08)",
-          borderRadius: 20,
-          padding: "40px 32px",
-          textAlign: "center",
-        }}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Logo() {
-  return (
-    <p
-      style={{ fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A86A", margin: "0 0 28px" }}
-    >
-      ultralink
-    </p>
+    <AuthShell>
+      <div style={{ textAlign: "center" }}>{children}</div>
+    </AuthShell>
   );
 }
 
@@ -135,7 +106,6 @@ function InviteCard({
   if (state === "invalid" || state === "wrong-email") {
     return (
       <Card>
-        <Logo />
         <div
           style={{
             width: 52,
@@ -151,7 +121,7 @@ function InviteCard({
         >
           <svg
             viewBox="0 0 24 24"
-            style={{ width: 24, height: 24, color: "#ef4444" }}
+            style={{ width: 24, height: 24, color: "#f87171" }}
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
@@ -164,10 +134,10 @@ function InviteCard({
             />
           </svg>
         </div>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: "#ffffff", margin: "0 0 12px" }}>
+        <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", color: "#ffffff", margin: "0 0 12px" }}>
           {state === "wrong-email" ? "Wrong account" : "Invite invalid"}
         </h1>
-        <p style={{ fontSize: 14, color: "#9A9A9A", lineHeight: 1.6, margin: 0 }}>{message}</p>
+        <p style={{ fontSize: 14, color: "#A1A1AA", lineHeight: 1.6, margin: 0 }}>{message}</p>
       </Card>
     );
   }
@@ -175,15 +145,14 @@ function InviteCard({
   if (state === "unauthenticated") {
     return (
       <Card>
-        <Logo />
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: "#ffffff", margin: "0 0 12px" }}>
+        <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", color: "#ffffff", margin: "0 0 12px" }}>
           You&apos;ve been invited.
         </h1>
-        <p style={{ fontSize: 15, color: "#9A9A9A", lineHeight: 1.6, margin: "0 0 32px" }}>
+        <p style={{ fontSize: 15, color: "#A1A1AA", lineHeight: 1.6, margin: "0 0 32px" }}>
           <strong style={{ color: "#ffffff" }}>{ownerUsername}</strong> invited you to collaborate on their Ultralink
           pages as an Editor.
         </p>
-        <p style={{ fontSize: 13, color: "#6B6B6B", margin: "0 0 20px" }}>Sign in or create an account to accept.</p>
+        <p style={{ fontSize: 13, color: "#71717A", margin: "0 0 20px" }}>Sign in or create an account to accept.</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <a
             href={loginUrl}
@@ -194,7 +163,7 @@ function InviteCard({
               fontWeight: 600,
               borderRadius: 10,
               background: "#ffffff",
-              color: "#000000",
+              color: "#0A0A0B",
               textDecoration: "none",
               textAlign: "center",
             }}
@@ -209,9 +178,10 @@ function InviteCard({
   // state === "ready"
   return (
     <Card>
-      <Logo />
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: "#ffffff", margin: "0 0 12px" }}>You&apos;ve been invited.</h1>
-      <p style={{ fontSize: 15, color: "#9A9A9A", lineHeight: 1.6, margin: "0 0 32px" }}>
+      <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", color: "#ffffff", margin: "0 0 12px" }}>
+        You&apos;ve been invited.
+      </h1>
+      <p style={{ fontSize: 15, color: "#A1A1AA", lineHeight: 1.6, margin: "0 0 32px" }}>
         <strong style={{ color: "#ffffff" }}>{ownerUsername}</strong> invited you to collaborate on their Ultralink
         pages as an Editor.
       </p>

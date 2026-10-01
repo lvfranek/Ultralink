@@ -32,7 +32,7 @@ export function AcceptInviteClient({ token }: { token: string }) {
             background: "rgba(220,38,38,0.08)",
             border: "1px solid rgba(220,38,38,0.25)",
             fontSize: 13,
-            color: "#ef4444",
+            color: "#f87171",
             textAlign: "left",
           }}
         >
@@ -55,7 +55,7 @@ export function AcceptInviteClient({ token }: { token: string }) {
           borderRadius: 10,
           border: "none",
           background: pending ? "rgba(255,255,255,.12)" : "#ffffff",
-          color: pending ? "#9A9A9A" : "#000000",
+          color: pending ? "#A1A1AA" : "#0A0A0B",
           cursor: pending ? "not-allowed" : "pointer",
           fontFamily: "inherit",
         }}
