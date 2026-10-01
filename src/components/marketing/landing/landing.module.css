@@ -194,7 +194,6 @@
 .navScrolled .navInner {
   background: rgba(16, 16, 19, 0.72);
   backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
   border-color: var(--line);
   box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
 }
@@ -565,7 +564,6 @@
 .fcInner {
   background: rgba(22, 22, 26, 0.72);
   backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
   padding: 14px 16px;
@@ -1856,6 +1854,71 @@
   border-radius: 20px;
 }
 
+/* ─── Legal pages + 404 ─────────────────────────────────────────────────── */
+
+.legalHead {
+  position: relative;
+  padding: 150px 24px 56px;
+}
+.legalHeadInner {
+  position: relative;
+  max-width: 768px;
+  margin: 0 auto;
+}
+.legalIntro {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+/* Readable text column; the copy keeps its own token-based styling */
+.legalBody {
+  position: relative;
+  /* 768px text column + its 24px side padding, so it lines up with the heading */
+  max-width: 816px;
+  margin: 0 auto;
+  padding: 24px 24px 120px;
+  font-size: 15.5px;
+}
+.legalBody a {
+  color: #fff;
+}
+
+.notFound {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 140px 24px 80px;
+}
+.notFoundInner {
+  position: relative;
+  max-width: 520px;
+}
+.notFoundCode {
+  font-family: var(--font-serif-display), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(120px, 22vw, 200px);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+  background: var(--rainbow);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.notFoundInner .lead {
+  margin: 16px auto 0;
+}
+.notFoundActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 32px;
+}
+
 /* ─── Responsive ────────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
@@ -1884,7 +1947,6 @@
     border: 1px solid var(--line);
     background: rgba(16, 16, 19, 0.99);
     backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
     opacity: 0;
     transform: translateY(-6px);
@@ -1968,7 +2030,8 @@
 
 @media (max-width: 600px) {
   .hero,
-  .helpHero {
+  .helpHero,
+  .legalHead {
     padding-top: 120px;
   }
   .lead {
