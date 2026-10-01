@@ -115,7 +115,9 @@ export async function updatePage(id: string, _prev: ActionResult | null, formDat
   const avatar_url = (formData.get("avatar_url") as string | null) ?? undefined;
   const avatar_style = (formData.get("avatar_style") as string | null) ?? undefined;
   const active_badge = formData.get("active_badge") === "true";
-  const age_gate_enabled = formData.get("age_gate_enabled") === "true";
+  // Only changed when the form sends it. The editor has no age-gate switch, and
+  // reading a missing field as "off" silently disabled the gate on every save.
+  const age_gate_enabled = formData.has("age_gate_enabled") ? formData.get("age_gate_enabled") === "true" : undefined;
 
   const blockedCountriesStr = formData.get("blocked_countries") as string | null;
   let blocked_countries: string[] = [];
@@ -198,11 +200,11 @@ export async function updatePage(id: string, _prev: ActionResult | null, formDat
       title,
       bio,
       is_active,
-      age_gate_enabled,
       active_badge,
       blocked_countries,
       win_back,
       updated_at: new Date().toISOString(),
+      ...(age_gate_enabled !== undefined ? { age_gate_enabled } : {}),
       ...(avatar_url !== undefined ? { avatar_url } : {}),
       ...(avatar_style !== undefined ? { avatar_style } : {}),
       ...(theme !== undefined ? { theme } : {}),
