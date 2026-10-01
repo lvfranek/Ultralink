@@ -279,9 +279,12 @@ export function AppShell({
   );
 }
 
-// ─── Account menu ────────────────────────────────────────────────────────────
+// ─── Account row ─────────────────────────────────────────────────────────────
 
-/** The user row at the bottom: switch between your own account and teams you edit for, settings, log out */
+/**
+ * The user row at the bottom with a direct log-out button. Team editors can also
+ * click their name to switch between their own account and the teams they edit for.
+ */
 function AccountMenu({
   user,
   displayName,
@@ -296,9 +299,9 @@ function AccountMenu({
   teamMemberships: TeamEntry[];
 }) {
   const router = useRouter();
-  const { startLoading } = useNavigationLoading();
   const { open, setOpen, ref } = usePopover();
   const [switching, setSwitching] = useState<string | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
 
   const selfName = displayName || username || user.email?.split("@")[0] || "Account";
   const activeTeam = teamMemberships.find((m) => m.ownerId === activeOwnerId);
@@ -308,6 +311,7 @@ function AccountMenu({
     { id: user.id, name: selfName, role: "Owner" },
     ...teamMemberships.map((m) => ({ id: m.ownerId, name: m.ownerDisplayName || m.ownerUsername, role: "Editor" })),
   ];
+  const canSwitch = teamMemberships.length > 0;
 
   const switchTo = async (ownerId: string) => {
     if (ownerId === activeOwnerId) return setOpen(false);
@@ -319,69 +323,78 @@ function AccountMenu({
   };
 
   const signOut = async () => {
+    setSigningOut(true);
     await createClient().auth.signOut();
     router.push("/login");
     router.refresh();
   };
 
+  const identity = (
+    <>
+      <Avatar name={activeName} size={30} round />
+      <span className={s.userText}>
+        <span className={s.userName}>{activeName}</span>
+        <span className={s.userEmail}>{user.email}</span>
+      </span>
+    </>
+  );
+
   return (
     <div className={cx(s.popWrap, s.userMenu)} ref={ref}>
-      <button
-        type="button"
-        className={s.userRow}
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        aria-haspopup="menu"
-      >
-        <Avatar name={activeName} size={30} round />
-        <span className={s.userText}>
-          <span className={s.userName}>{activeName}</span>
-          <span className={s.userEmail}>{user.email}</span>
-        </span>
-        <ChevronsUpDown size={15} className={s.wsChevron} aria-hidden="true" />
-      </button>
+      <div className={s.userBar}>
+        {canSwitch ? (
+          <button
+            type="button"
+            className={s.userRow}
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-haspopup="menu"
+            aria-label={`${activeName}, switch account`}
+          >
+            {identity}
+            <ChevronsUpDown size={15} className={s.wsChevron} aria-hidden="true" />
+          </button>
+        ) : (
+          <div className={cx(s.userRow, s.userRowStatic)}>{identity}</div>
+        )}
+        <button
+          type="button"
+          className={cx(s.iconBtn, s.iconBtnBare)}
+          onClick={signOut}
+          disabled={signingOut}
+          aria-label="Log out"
+          title="Log out"
+        >
+          {signingOut ? (
+            <Loader2 size={15} className={s.spin} aria-hidden="true" />
+          ) : (
+            <LogOut size={15} aria-hidden="true" />
+          )}
+        </button>
+      </div>
       {open && (
         <div className={cx(s.menu, s.menuUp)} role="menu">
-          {teamMemberships.length > 0 && (
-            <>
-              <div className={s.menuHead}>Accounts</div>
-              {accounts.map((a) => (
-                <button
-                  key={a.id}
-                  type="button"
-                  role="menuitemradio"
-                  aria-checked={a.id === activeOwnerId}
-                  className={s.menuItem}
-                  disabled={!!switching}
-                  onClick={() => switchTo(a.id)}
-                >
-                  <Avatar name={a.name} size={22} round />
-                  <span className={s.menuGrow}>{a.name}</span>
-                  <span className={s.roleChip}>{a.role}</span>
-                  {switching === a.id ? (
-                    <Loader2 size={14} className={s.spin} aria-hidden="true" />
-                  ) : (
-                    a.id === activeOwnerId && <Check size={15} className={s.check} aria-hidden="true" />
-                  )}
-                </button>
-              ))}
-              <div className={s.menuSep} role="separator" />
-            </>
-          )}
-          <Link
-            href="/dashboard/account"
-            role="menuitem"
-            className={s.menuItem}
-            onClick={() => {
-              setOpen(false);
-              startLoading();
-            }}
-          >
-            <Settings size={15} aria-hidden="true" /> Account settings
-          </Link>
-          <button type="button" role="menuitem" className={cx(s.menuItem, s.menuDanger)} onClick={signOut}>
-            <LogOut size={15} aria-hidden="true" /> Log out
-          </button>
+          <div className={s.menuHead}>Switch account</div>
+          {accounts.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              role="menuitemradio"
+              aria-checked={a.id === activeOwnerId}
+              className={s.menuItem}
+              disabled={!!switching}
+              onClick={() => switchTo(a.id)}
+            >
+              <Avatar name={a.name} size={22} round />
+              <span className={s.menuGrow}>{a.name}</span>
+              <span className={s.roleChip}>{a.role}</span>
+              {switching === a.id ? (
+                <Loader2 size={14} className={s.spin} aria-hidden="true" />
+              ) : (
+                a.id === activeOwnerId && <Check size={15} className={s.check} aria-hidden="true" />
+              )}
+            </button>
+          ))}
         </div>
       )}
     </div>

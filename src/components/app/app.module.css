@@ -427,6 +427,21 @@
 .userRow:hover {
   background: rgba(255, 255, 255, 0.05);
 }
+.userBar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.userBar .userRow {
+  flex: 1;
+  min-width: 0;
+}
+.userRowStatic {
+  cursor: default;
+}
+.userRowStatic:hover {
+  background: transparent;
+}
 .userText {
   flex: 1;
   min-width: 0;
