@@ -6,7 +6,8 @@
   --line: rgba(255, 255, 255, 0.08);
   --text: #f4f4f5;
   --muted: #a1a1aa;
-  --subtle: #71717a;
+  /* Lightest grey that still clears WCAG AA (4.5:1) on every dark surface here */
+  --subtle: #85858e;
   --pink: #f7a8c4;
   --rainbow: linear-gradient(100deg, #fbc2a4 0%, #f7a8c4 35%, #c9a7f2 70%, #a7c7f7 100%);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -794,38 +795,51 @@
 .storySteps {
   padding: 18vh 0;
 }
+/* Inactive steps recede through colour, not opacity, so every step keeps
+   readable (WCAG AA) contrast; the active one lights up white and pink. */
 .step {
   min-height: 62vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  opacity: 0.25;
-  transition: opacity 0.5s var(--ease);
-}
-.stepActive {
-  opacity: 1;
 }
 .stepNum {
   width: fit-content;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--pink);
-  border: 1px solid rgba(247, 168, 196, 0.3);
+  color: var(--subtle);
+  border: 1px solid var(--line);
   border-radius: 99px;
   padding: 4px 11px;
+  transition:
+    color 0.5s var(--ease),
+    border-color 0.5s var(--ease);
 }
 .stepTitle {
   font-size: clamp(26px, 3vw, 36px);
   font-weight: 500;
   letter-spacing: -0.03em;
   margin: 18px 0 12px;
+  color: var(--muted);
+  transition: color 0.5s var(--ease);
 }
 .stepBody {
   font-size: 17px;
   line-height: 1.65;
-  color: var(--muted);
+  color: var(--subtle);
   max-width: 440px;
   margin: 0;
+  transition: color 0.5s var(--ease);
+}
+.stepActive .stepNum {
+  color: var(--pink);
+  border-color: rgba(247, 168, 196, 0.3);
+}
+.stepActive .stepTitle {
+  color: #fff;
+}
+.stepActive .stepBody {
+  color: var(--muted);
 }
 
 /* Story scenes */
@@ -1879,8 +1893,12 @@
   padding: 24px 24px 120px;
   font-size: 15.5px;
 }
+/* Links in running text need more than colour to stand out (WCAG link-in-text-block),
+   so restore the underline that the global .root a reset removes */
 .legalBody a {
   color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .notFound {
