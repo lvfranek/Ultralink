@@ -3,7 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/site-url";
-import { PageBuilder } from "@/components/dashboard/page-builder/page-builder";
+import { EditorRoot } from "@/components/dashboard/editor/editor-root";
+import { getLinkClicks } from "@/lib/dashboard-stats";
 import { getEffectivePlan } from "@/lib/supabase/types";
 import { getActiveOwnerId } from "@/lib/team";
 import type { Page, PageLink, PageSocial, SubscriptionStatus } from "@/lib/supabase/types";
@@ -62,16 +63,25 @@ export default async function EditLinkPage({ params }: { params: Promise<{ id: s
   };
   const effectivePlan = getEffectivePlan(subProfile);
 
+  const pro = effectivePlan === "pro";
+
+  // Clicks per button over the last 30 days, shown next to each link (Pro)
+  const clicks = pro
+    ? await getLinkClicks(
+        await createClient(),
+        links.filter((l) => l.item_type === "button").map((l) => l.id),
+      )
+    : null;
+
   return (
-    <div className="flex flex-col h-[calc(100dvh-3.5rem)] lg:h-dvh">
-      <PageBuilder
-        page={page}
-        initialLinks={links}
-        initialSocials={socials}
-        effectivePlan={effectivePlan}
-        userId={user.id}
-        siteUrl={getSiteUrl()}
-      />
-    </div>
+    <EditorRoot
+      page={page}
+      links={links}
+      socials={socials}
+      siteUrl={getSiteUrl()}
+      userId={user.id}
+      pro={pro}
+      clicks={clicks}
+    />
   );
 }

@@ -5,7 +5,6 @@ const RESERVED_SLUGS = new Set([
   // Routes in src/app
   "admin",
   "api",
-  "app-lab",
   "auth",
   "checkout",
   "dashboard",

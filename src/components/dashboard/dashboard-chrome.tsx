@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sidebar } from "@/components/dashboard/sidebar";
+import { AppShell } from "@/components/app/app-shell";
 import { WelcomeModal } from "@/components/dashboard/welcome-modal";
 import { WelcomeModalContext } from "@/components/dashboard/welcome-modal-context";
 import { FeedbackModal } from "@/components/dashboard/feedback-modal";
@@ -17,10 +17,11 @@ interface DashboardChromeProps {
   displayName?: string | null;
   username?: string | null;
   activeOwnerId: string;
-  selfUsername: string;
   teamMemberships: TeamEntry[];
   hasSeenWelcome: boolean;
   activeOwnerSubscriptionStatus: SubscriptionStatus;
+  pagesUsed: number;
+  linkCap: number;
   children: React.ReactNode;
 }
 
@@ -29,10 +30,11 @@ export function DashboardChrome({
   displayName,
   username,
   activeOwnerId,
-  selfUsername,
   teamMemberships,
   hasSeenWelcome,
   activeOwnerSubscriptionStatus,
+  pagesUsed,
+  linkCap,
   children,
 }: DashboardChromeProps) {
   // Auto-open on first mount based on the server-loaded welcome state.
@@ -59,16 +61,18 @@ export function DashboardChrome({
     <NavigationLoadingProvider>
       <WelcomeModalContext.Provider value={{ openWelcomeModal }}>
         <FeedbackModalContext.Provider value={{ openFeedbackModal }}>
-          <Sidebar
+          <AppShell
             user={user}
             displayName={displayName}
             username={username}
             activeOwnerId={activeOwnerId}
-            selfUsername={selfUsername}
             teamMemberships={teamMemberships}
             activeOwnerSubscriptionStatus={activeOwnerSubscriptionStatus}
-          />
-          <main className="flex-1 overflow-y-auto pt-14 lg:pt-0">{children}</main>
+            pagesUsed={pagesUsed}
+            linkCap={linkCap}
+          >
+            {children}
+          </AppShell>
           <WelcomeModal open={open} onClose={handleClose} displayName={displayName} />
           <FeedbackModal
             open={feedbackOpen}

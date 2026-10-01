@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { planHasAnalytics } from "@/lib/config/pricing";
 import { getActiveOwnerId } from "@/lib/team";
 import { getUserPages } from "@/app/actions/analytics";
-import { AnalyticsDashboard } from "./analytics-client";
+import { AnalyticsView } from "@/components/dashboard/analytics-view";
 import { EXAMPLE_ANALYTICS_DATA } from "@/lib/analytics/example-data";
 import type { SubscriptionStatus } from "@/lib/supabase/types";
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function AnalyticsPage() {
+export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -33,11 +33,14 @@ export default async function AnalyticsPage() {
     grace_period_ends_at: null,
   };
 
-  const pages = await getUserPages();
+  const [pages, sp] = await Promise.all([getUserPages(), searchParams]);
 
-  if (!planHasAnalytics(subProfile)) {
-    return <AnalyticsDashboard pages={pages} exampleData={EXAMPLE_ANALYTICS_DATA} />;
-  }
-
-  return <AnalyticsDashboard pages={pages} />;
+  return (
+    <AnalyticsView
+      pages={pages}
+      // "View analytics" on a page card opens that page
+      initialPage={sp.page ?? "all"}
+      exampleData={planHasAnalytics(subProfile) ? undefined : EXAMPLE_ANALYTICS_DATA}
+    />
+  );
 }

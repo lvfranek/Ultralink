@@ -13,6 +13,7 @@ import {
   gradientEndColor,
 } from "@/lib/config/theme";
 import { SocialIcon } from "./social-icon";
+import { getPlatform } from "@/lib/config/socials";
 import { isAdultConfirmed, showAdultGate } from "./adult-gate";
 import Link from "next/link";
 
@@ -24,6 +25,8 @@ interface ProfilePageViewProps {
   isPreview?: boolean;
   /** Free plans show the "Build your own" CTA card above the footer; Pro pages show no promotion. */
   isPro?: boolean;
+  /** Editor preview only: outlines the button being hovered in the editor */
+  highlightLinkId?: string | null;
 }
 
 // Approximates whether a hex color reads as "light" (used to detect dark vs. light themes,
@@ -72,7 +75,15 @@ function BgLayer({ pageBgIsImage, value, overlay, blur = 0, className = "absolut
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
-export function ProfilePageView({ page, links, socials, theme: rawTheme, isPreview, isPro }: ProfilePageViewProps) {
+export function ProfilePageView({
+  page,
+  links,
+  socials,
+  theme: rawTheme,
+  isPreview,
+  isPro,
+  highlightLinkId,
+}: ProfilePageViewProps) {
   const theme: Theme = rawTheme && typeof rawTheme === "object" && "preset" in rawTheme
     ? (rawTheme as Theme)
     : resolveTheme(rawTheme as Record<string, unknown>);
@@ -125,6 +136,8 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
   const nameColor   = t.colors.name;
   const handleColor = t.colors.handle;
   const iconsColor  = t.colors.icons;
+  // Platforms we no longer support (e.g. removed ones still saved on old pages) are skipped
+  const shownSocials = socials.filter((s) => getPlatform(s.platform));
 
   // ── Content shared between mobile and desktop ──────────────────────────────
 
@@ -208,9 +221,9 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
       )}
 
       {/* Socials icon row */}
-      {socials.length > 0 && (
+      {shownSocials.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
-          {socials.map((social) => (
+          {shownSocials.map((social) => (
             <a
               key={social.id}
               href={social.url}
@@ -218,7 +231,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
               rel="noopener noreferrer"
               style={{ color: iconsColor }}
               className="hover:opacity-80 transition-opacity"
-              aria-label={social.platform}
+              aria-label={getPlatform(social.platform)?.label ?? social.platform}
             >
               <SocialIcon platform={social.platform} size={20} />
             </a>
@@ -242,6 +255,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
                   link={link}
                   index={index}
                   isPreview={isPreview ?? false}
+                  highlighted={link.id === highlightLinkId}
                 />
               )
             )}
@@ -400,7 +414,17 @@ function HeadingItem({ label, color, bodyFont }: { label: string; color: string;
   );
 }
 
-function LinkButton({ link, index, isPreview }: { link: PageLink; index: number; isPreview: boolean }) {
+function LinkButton({
+  link,
+  index,
+  isPreview,
+  highlighted = false,
+}: {
+  link: PageLink;
+  index: number;
+  isPreview: boolean;
+  highlighted?: boolean;
+}) {
   const ls = resolveLinkStyle(link);
   const btnRadius = cornerRadius(ls.corner);
   const animCls = animClass(ls.animation);
@@ -431,6 +455,8 @@ function LinkButton({ link, index, isPreview }: { link: PageLink; index: number;
         color: ls.textColor,
         borderRadius: btnRadius,
         animationDelay: ls.animation !== "none" ? `${index * 120}ms` : undefined,
+        boxShadow: highlighted ? "0 0 0 2px #fff, 0 0 0 4px #f7a8c4" : undefined,
+        transition: "box-shadow 0.2s ease",
       }}
     >
       {/* Icon floats on the left without occupying flex space, so the

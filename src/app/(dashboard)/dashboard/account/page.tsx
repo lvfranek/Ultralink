@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getLinkCap } from "@/lib/config/pricing";
 import { getActiveOwnerId } from "@/lib/team";
 import type { SubscriptionStatus, PlanInterval, TeamMember, TeamInvite } from "@/lib/supabase/types";
-import { AccountSettingsClient } from "./account-settings-client";
+import { AccountView } from "@/components/dashboard/account-view";
 
 export const metadata: Metadata = {
   title: "Account",
@@ -90,8 +90,10 @@ export default async function AccountSettingsPage() {
   }
 
   return (
-    <AccountSettingsClient
+    <AccountView
+      userId={user.id}
       email={user.email ?? ""}
+      emailConfirmed={!!user.email_confirmed_at}
       username={username}
       linkCap={linkCap}
       linksUsed={linksUsed}
@@ -103,8 +105,13 @@ export default async function AccountSettingsPage() {
       gracePeriodEndsAt={profile.grace_period_ends_at}
       stripeCustomerId={profile.stripe_customer_id}
       isEditor={isEditor}
-      teamMembers={teamMembers}
-      pendingInvites={pendingInvites}
+      members={teamMembers.map((m) => ({
+        editorId: m.editor_id,
+        name: m.editor_display_name || m.editor_username,
+        username: m.editor_username,
+      }))}
+      // Only what the list shows; invite tokens never leave the server
+      invites={pendingInvites.map((v) => ({ id: v.id, email: v.email, expiresAt: v.expires_at }))}
     />
   );
 }

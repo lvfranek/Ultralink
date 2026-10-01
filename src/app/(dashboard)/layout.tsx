@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardChrome } from "@/components/dashboard/dashboard-chrome";
 import { getActiveOwnerId, getTeamMemberships } from "@/lib/team";
+import { getLinkCap } from "@/lib/config/pricing";
 import type { SubscriptionStatus } from "@/lib/supabase/types";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -19,25 +20,38 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
 
-  const { data: activeOwnerProfile } = await supabase
-    .from("profiles")
-    .select("subscription_status")
-    .eq("id", activeOwnerId)
-    .single();
+  const [{ data: activeOwnerProfile }, { count: pagesUsed }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("subscription_status, plan_tier, grace_period_ends_at")
+      .eq("id", activeOwnerId)
+      .single(),
+    supabase.from("pages").select("*", { count: "exact", head: true }).eq("owner_id", activeOwnerId),
+  ]);
 
   return (
     <>
-      <style>{`html, body { background: #131313 !important; }`}</style>
-      <div className="flex h-dvh overflow-hidden dark-theme" style={{ background: "#131313" }}>
+      <style>{`html, body { background: #08080a !important; }`}</style>
+      {/* dark-theme keeps the not-yet-redesigned screens inside readable */}
+      <div className="dark-theme">
         <DashboardChrome
           user={user}
           displayName={profileResult.data?.display_name}
           username={profileResult.data?.username}
           activeOwnerId={activeOwnerId}
-          selfUsername={profileResult.data?.username ?? ""}
           teamMemberships={memberships}
           hasSeenWelcome={profileResult.data?.has_seen_welcome ?? false}
           activeOwnerSubscriptionStatus={(activeOwnerProfile?.subscription_status as SubscriptionStatus) ?? "none"}
+          pagesUsed={pagesUsed ?? 0}
+          linkCap={
+            activeOwnerProfile
+              ? getLinkCap({
+                  subscription_status: activeOwnerProfile.subscription_status as SubscriptionStatus,
+                  plan_tier: activeOwnerProfile.plan_tier,
+                  grace_period_ends_at: activeOwnerProfile.grace_period_ends_at,
+                })
+              : 1
+          }
         >
           {children}
         </DashboardChrome>

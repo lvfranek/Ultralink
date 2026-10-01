@@ -194,7 +194,8 @@ export async function reorderLinks(pageId: string, orderedIds: string[]): Promis
 /** Apply a preset's default link style to all links on a page at once. */
 export async function applyPresetToLinks(
   pageId: string,
-  style: { fill_type: string; fill_value: string; text_color: string; corner: string; animation: string },
+  /** Leave out animation to keep each button's own */
+  style: { fill_type: string; fill_value: string; text_color: string; corner: string; animation?: string },
 ): Promise<LinkActionResult> {
   const supabase = await createClient();
   const {
@@ -213,9 +214,11 @@ export async function applyPresetToLinks(
       fill_value: style.fill_value,
       text_color: style.text_color,
       corner: style.corner,
-      animation: style.animation,
+      ...(style.animation !== undefined ? { animation: style.animation } : {}),
     })
-    .eq("page_id", pageId);
+    .eq("page_id", pageId)
+    // Headings take their colour from the theme, not from the button style
+    .eq("item_type", "button");
 
   if (error) return genericDbError("links.applyPresetToLinks", error);
 
