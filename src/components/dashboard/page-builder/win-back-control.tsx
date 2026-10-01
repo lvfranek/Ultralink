@@ -26,7 +26,7 @@ function Toggle({ checked, onToggle }: { checked: boolean; onToggle: () => void 
       aria-checked={checked}
       onClick={onToggle}
       className={[
-        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 cursor-pointer flex-shrink-0",
+        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 cursor-pointer shrink-0",
         checked ? "bg-emerald-500" : "bg-surface-2 border border-border-strong",
       ].join(" ")}
     >
@@ -67,7 +67,7 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
             <p className="text-sm font-medium text-text">Win-Back</p>
             <p className="text-xs text-text-muted mt-0.5">Recover visitors who try to leave.</p>
           </div>
-          <span className="ml-3 flex-shrink-0 text-[10px] px-1.5 py-0.5 bg-gold-dim text-gold border border-gold/20 rounded font-semibold uppercase tracking-wider">
+          <span className="ml-3 shrink-0 text-[10px] px-1.5 py-0.5 bg-gold-dim text-gold border border-gold/20 rounded font-semibold uppercase tracking-wider">
             PRO
           </span>
         </div>
@@ -93,7 +93,7 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
           <p className="text-sm font-medium text-text">Win-Back</p>
           <p className="text-xs text-text-muted mt-0.5">Recover visitors who try to leave.</p>
         </div>
-        <div className="flex items-center gap-1.5 ml-3 flex-shrink-0 mt-0.5">
+        <div className="flex items-center gap-1.5 ml-3 shrink-0 mt-0.5">
           <span className="text-xs" style={{ color: "#9A9A9A" }}>
             {rowSummary(value)}
           </span>
@@ -102,7 +102,7 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
-            className={`w-3 h-3 flex-shrink-0 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+            className={`w-3 h-3 shrink-0 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
             style={{ color: "#9A9A9A" }}
           >
             <path d="M2 4l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
@@ -128,7 +128,7 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
                 placeholder="Wait! Check out my newest video first."
                 disabled={!value.enabled}
                 maxLength={80}
-                className="w-full bg-surface-2 border border-border-strong text-text rounded-[var(--radius)] px-3 py-2 text-xs placeholder:text-text-subtle focus:outline-none focus:ring-1 focus:ring-white/20 disabled:opacity-40"
+                className="w-full bg-surface-2 border border-border-strong text-text rounded-(--radius) px-3 py-2 text-xs placeholder:text-text-subtle focus:outline-none focus:ring-1 focus:ring-white/20 disabled:opacity-40"
               />
               {charCount >= 70 && (
                 <span
@@ -149,7 +149,7 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
               onChange={(e) => onChange({ ...value, url: e.target.value })}
               placeholder="https://…"
               disabled={!value.enabled}
-              className="w-full bg-surface-2 border border-border-strong text-text rounded-[var(--radius)] px-3 py-2 text-xs placeholder:text-text-subtle focus:outline-none focus:ring-1 focus:ring-white/20 disabled:opacity-40"
+              className="w-full bg-surface-2 border border-border-strong text-text rounded-(--radius) px-3 py-2 text-xs placeholder:text-text-subtle focus:outline-none focus:ring-1 focus:ring-white/20 disabled:opacity-40"
             />
           </div>
 
@@ -168,7 +168,7 @@ export function WinBackControl({ value, onChange, isPro, theme, avatarUrl, title
               type="button"
               onClick={() => setPreviewOpen(true)}
               disabled={!canPreview}
-              className="w-full flex items-center justify-center gap-1.5 bg-surface-2 border border-border-strong text-text rounded-[var(--radius)] px-3 py-2 text-xs font-medium cursor-pointer transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-2"
+              className="w-full flex items-center justify-center gap-1.5 bg-surface-2 border border-border-strong text-text rounded-(--radius) px-3 py-2 text-xs font-medium cursor-pointer transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-2"
             >
               <svg
                 viewBox="0 0 16 16"

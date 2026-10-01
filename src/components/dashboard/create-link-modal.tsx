@@ -78,7 +78,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
         <div
-          className="w-full max-w-md bg-surface-2 border border-border rounded-[var(--radius-lg)] shadow-[0_8px_40px_rgba(0,0,0,0.5)] overflow-hidden"
+          className="w-full max-w-md bg-surface-2 border border-border rounded-lg shadow-[0_8px_40px_rgba(0,0,0,0.5)] overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -89,7 +89,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-[var(--radius-sm)] text-text-subtle hover:text-text hover:bg-surface-2 transition-colors cursor-pointer"
+              className="p-1.5 rounded-sm text-text-subtle hover:text-text hover:bg-surface-2 transition-colors cursor-pointer"
               aria-label="Close"
             >
               <svg
@@ -129,7 +129,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                   spellCheck={false}
                   disabled={isPending}
                   className={[
-                    "w-full bg-surface-2 border text-text placeholder-text-subtle rounded-[var(--radius)] pl-[7.5rem] pr-10 py-3 text-sm transition-colors duration-150 focus:outline-none focus:ring-2 disabled:opacity-50",
+                    "w-full bg-surface-2 border text-text placeholder-text-subtle rounded-(--radius) pl-30 pr-10 py-3 text-sm transition-colors duration-150 focus:outline-none focus:ring-2 disabled:opacity-50",
                     slugError
                       ? "border-red-400 focus:ring-red-400/30 focus:border-red-400"
                       : slugOk
@@ -192,7 +192,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
             {showValidation && missingMessage() && (
               <div
                 role="alert"
-                className="p-3 rounded-[var(--radius-sm)] bg-surface-2 border border-border-strong text-sm text-text-muted"
+                className="p-3 rounded-sm bg-surface-2 border border-border-strong text-sm text-text-muted"
               >
                 {missingMessage()}
               </div>
@@ -200,10 +200,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
 
             {/* Server error */}
             {state && "error" in state && (
-              <div
-                role="alert"
-                className="p-3 rounded-[var(--radius-sm)] bg-red-950/30 border border-red-800/40 text-sm text-red-400"
-              >
+              <div role="alert" className="p-3 rounded-sm bg-red-950/30 border border-red-800/40 text-sm text-red-400">
                 {state.error}
               </div>
             )}
@@ -214,7 +211,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                 type="button"
                 onClick={onClose}
                 disabled={isPending}
-                className="flex-1 py-3 text-sm font-medium text-text-muted border border-border-strong rounded-[var(--radius)] hover:bg-surface-2 hover:text-text transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-3 text-sm font-medium text-text-muted border border-border-strong rounded-(--radius) hover:bg-surface-2 hover:text-text transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
@@ -226,7 +223,7 @@ export function CreateLinkModal({ onClose, initialSlug = "" }: CreateLinkModalPr
                 <button
                   type="button"
                   onClick={handleSubmitAttempt}
-                  className="flex-1 py-3 text-sm font-medium text-text-subtle bg-surface border border-border rounded-[var(--radius)] cursor-pointer hover:bg-surface-2 transition-colors"
+                  className="flex-1 py-3 text-sm font-medium text-text-subtle bg-surface border border-border rounded-(--radius) cursor-pointer hover:bg-surface-2 transition-colors"
                 >
                   Create link
                 </button>

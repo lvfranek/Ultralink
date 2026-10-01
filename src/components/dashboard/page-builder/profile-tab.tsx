@@ -77,11 +77,11 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
             <img
               src={page.avatar_url}
               alt="Avatar"
-              className="w-7 h-7 rounded-full object-cover border border-white/10 flex-shrink-0"
+              className="w-7 h-7 rounded-full object-cover border border-white/10 shrink-0"
             />
           ) : (
             <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+              className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
               style={{ background: "#ffffff", color: "#0A0A0B" }}
             >
               {(page.title || "U").charAt(0).toUpperCase()}
@@ -92,7 +92,7 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="px-2.5 py-1 text-xs font-medium border border-border-strong text-text rounded-[var(--radius-sm)] hover:bg-surface-2 transition-colors disabled:opacity-50 cursor-pointer"
+            className="px-2.5 py-1 text-xs font-medium border border-border-strong text-text rounded-sm hover:bg-surface-2 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {uploading ? "…" : page.avatar_url ? "Change" : "Upload"}
           </button>
@@ -100,7 +100,7 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
             <button
               type="button"
               onClick={removeAvatar}
-              className="px-2.5 py-1 text-xs font-medium border border-border-strong text-text-subtle hover:text-red-400 hover:border-red-800/40 rounded-[var(--radius-sm)] transition-colors cursor-pointer"
+              className="px-2.5 py-1 text-xs font-medium border border-border-strong text-text-subtle hover:text-red-400 hover:border-red-800/40 rounded-sm transition-colors cursor-pointer"
             >
               Remove
             </button>
@@ -133,7 +133,7 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
           value={page.title ?? ""}
           onChange={(e) => onChange({ title: e.target.value })}
           placeholder="Your name or brand"
-          className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+          className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-sm px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
         />
       </FieldRow>
 
@@ -142,14 +142,14 @@ export function ProfileTab({ page, userId, onChange }: ProfileTabProps) {
         className="flex gap-3 py-2.5"
         style={{ borderTop: "1px solid rgba(255,255,255,.06)", alignItems: "flex-start" }}
       >
-        <span className="text-sm text-text-muted flex-shrink-0 min-w-[72px] pt-1.5">Bio</span>
+        <span className="text-sm text-text-muted shrink-0 min-w-18 pt-1.5">Bio</span>
         <div className="flex-1">
           <textarea
             value={page.bio ?? ""}
             onChange={(e) => onChange({ bio: e.target.value })}
             placeholder="Tell visitors what you're about"
             rows={3}
-            className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius)] px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-gold/40 transition-colors"
+            className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-(--radius) px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-gold/40 transition-colors"
           />
         </div>
       </div>

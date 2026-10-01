@@ -178,9 +178,9 @@ export function ColorPickerField({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-strong rounded-[var(--radius-sm)] cursor-pointer hover:border-gold/40 transition-colors"
+        className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-strong rounded-sm cursor-pointer hover:border-gold/40 transition-colors"
       >
-        <span className="w-4 h-4 rounded-sm flex-shrink-0 border border-black/10" style={{ background: value }} />
+        <span className="w-4 h-4 rounded-sm shrink-0 border border-black/10" style={{ background: value }} />
         <span className="text-xs text-text font-mono uppercase">{value}</span>
       </button>
       {open && mounted && createPortal(pickerContent, document.body)}
@@ -224,7 +224,7 @@ export function GradientBuilder({ value, onChange }: { value: string; onChange: 
   return (
     <div className="space-y-3">
       <div
-        className="w-full h-7 rounded-[var(--radius-sm)] border border-border-strong"
+        className="w-full h-7 rounded-sm border border-border-strong"
         style={{ background: buildGradient(stop1, stop2, angle) }}
       />
       <div className="grid grid-cols-2 gap-3">
@@ -480,14 +480,14 @@ export function PresetsContent({ theme, userId, links, onChange, onPresetApply }
                   <img
                     src={theme.pageBg.value}
                     alt="Background"
-                    className="w-12 h-12 rounded-[var(--radius-sm)] object-cover border border-border-strong flex-shrink-0"
+                    className="w-12 h-12 rounded-sm object-cover border border-border-strong shrink-0"
                   />
                 )}
                 <button
                   type="button"
                   disabled={bgUploading}
                   onClick={() => bgFileRef.current?.click()}
-                  className="px-3 py-1.5 text-xs font-medium border border-border-strong text-text rounded-[var(--radius-sm)] hover:bg-surface-2 transition-colors disabled:opacity-50 cursor-pointer"
+                  className="px-3 py-1.5 text-xs font-medium border border-border-strong text-text rounded-sm hover:bg-surface-2 transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   {bgUploading ? "Uploading…" : theme.pageBg.value ? "Change image" : "Upload image"}
                 </button>
@@ -595,7 +595,7 @@ export function TypographyContent({ theme, onChange }: TypographyProps) {
           <select
             value={theme.fonts.title}
             onChange={(e) => onChange(patchTheme(theme, { fonts: { ...theme.fonts, title: e.target.value } }))}
-            className="w-full appearance-none bg-surface-2 border border-border-strong text-text rounded-[var(--radius-sm)] pl-2.5 pr-7 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
+            className="w-full appearance-none bg-surface-2 border border-border-strong text-text rounded-sm pl-2.5 pr-7 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
             style={{ fontFamily: titleFont ? `var(${titleFont.variable}), system-ui, sans-serif` : undefined }}
           >
             {FONT_OPTIONS.map((f) => (
@@ -621,7 +621,7 @@ export function TypographyContent({ theme, onChange }: TypographyProps) {
           <select
             value={theme.fonts.body}
             onChange={(e) => onChange(patchTheme(theme, { fonts: { ...theme.fonts, body: e.target.value } }))}
-            className="w-full appearance-none bg-surface-2 border border-border-strong text-text rounded-[var(--radius-sm)] pl-2.5 pr-7 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
+            className="w-full appearance-none bg-surface-2 border border-border-strong text-text rounded-sm pl-2.5 pr-7 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
             style={{ fontFamily: bodyFont ? `var(${bodyFont.variable}), system-ui, sans-serif` : undefined }}
           >
             {FONT_OPTIONS.map((f) => (

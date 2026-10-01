@@ -190,7 +190,7 @@ function SegmentedPill<T extends string>({
 }) {
   return (
     <div
-      className="flex items-center p-[3px] rounded-full gap-0.5 overflow-x-auto no-scrollbar max-w-[calc(100vw-32px)] sm:max-w-none"
+      className="flex items-center p-0.75 rounded-full gap-0.5 overflow-x-auto no-scrollbar max-w-[calc(100vw-32px)] sm:max-w-none"
       style={{
         background: "#2A2A2A",
         border: "1px solid rgba(255,255,255,.08)",
@@ -268,7 +268,7 @@ function ActivityTooltip({
 function ActivityChart({ data, loading }: { data: AnalyticsData | null; loading: boolean }) {
   if (loading || !data) {
     return (
-      <div className="h-[200px] flex items-center justify-center">
+      <div className="h-50 flex items-center justify-center">
         <span className="text-xs" style={{ color: "#6B6B6B" }}>
           Loading…
         </span>
@@ -318,7 +318,7 @@ function ActivityChart({ data, loading }: { data: AnalyticsData | null; loading:
 function SourcesDonut({ sources }: { sources: AnalyticsData["sources"] }) {
   if (!sources.length) {
     return (
-      <div className="flex items-center justify-center h-[140px]">
+      <div className="flex items-center justify-center h-35">
         <span className="text-xs" style={{ color: "#6B6B6B" }}>
           No data
         </span>
@@ -771,7 +771,7 @@ function AnalyticsDashboardInner({ pages, exampleData }: Props) {
           <Card>
             <CardTitle>Traffic Sources</CardTitle>
             {loading || !data ? (
-              <div className="h-[200px] flex items-center justify-center">
+              <div className="h-50 flex items-center justify-center">
                 <span className="text-xs" style={{ color: "#6B6B6B" }}>
                   Loading…
                 </span>

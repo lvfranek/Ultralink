@@ -94,7 +94,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   ];
 
   return (
-    <div className="p-6 lg:p-8 flex flex-col gap-6 max-w-[1200px] mx-auto w-full overflow-y-auto">
+    <div className="p-6 lg:p-8 flex flex-col gap-6 max-w-300 mx-auto w-full overflow-y-auto">
       <h1 className="text-xl font-semibold text-white">Admin</h1>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">

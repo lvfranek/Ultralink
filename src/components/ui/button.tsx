@@ -19,9 +19,9 @@ const variantClasses: Record<Variant, string> = {
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: "px-3.5 py-1.5 text-sm rounded-[var(--radius-sm)]",
-  md: "px-5 py-2.5 text-sm rounded-[var(--radius)]",
-  lg: "px-7 py-3.5 text-base rounded-[var(--radius)]",
+  sm: "px-3.5 py-1.5 text-sm rounded-sm",
+  md: "px-5 py-2.5 text-sm rounded-(--radius)",
+  lg: "px-7 py-3.5 text-base rounded-(--radius)",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

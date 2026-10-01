@@ -11,7 +11,7 @@ export function YouTubeThumbnail({ youtubeId, title, onPlay, comingSoon }: YouTu
   if (comingSoon) {
     return (
       <div
-        className="relative w-full aspect-video rounded-[12px] flex items-center justify-center overflow-hidden"
+        className="relative w-full aspect-video rounded-xl flex items-center justify-center overflow-hidden"
         style={{ background: "#1E1E1E", border: "1px solid rgba(255,255,255,.06)" }}
       >
         <span className="text-xs font-medium" style={{ color: "#9A9A9A" }}>
@@ -26,7 +26,7 @@ export function YouTubeThumbnail({ youtubeId, title, onPlay, comingSoon }: YouTu
       type="button"
       onClick={onPlay}
       aria-label={`Play: ${title}`}
-      className="relative w-full aspect-video rounded-[12px] overflow-hidden cursor-pointer group"
+      className="relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer group"
       style={{ background: "#000", border: "1px solid rgba(255,255,255,.06)" }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- external YouTube thumbnail; img.youtube.com isn't configured for next/image */}

@@ -232,7 +232,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
               value={newLabel}
               onChange={(e) => setNewLabel(e.target.value)}
               placeholder="Label"
-              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
             />
             <input
               type="url"
@@ -242,7 +242,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleAddSubmit();
               }}
-              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
             />
             {addError && <p className="text-xs text-red-400">{addError}</p>}
             <div className="flex gap-2">
@@ -250,7 +250,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
                 type="button"
                 onClick={handleAddSubmit}
                 disabled={isAdding || !newLabel.trim() || !newUrl.trim()}
-                className="flex-1 py-2 text-xs font-semibold bg-gold text-bg rounded-[var(--radius-sm)] hover:bg-gold-bright transition-colors disabled:opacity-40 cursor-pointer"
+                className="flex-1 py-2 text-xs font-semibold bg-gold text-bg rounded-sm hover:bg-gold-bright transition-colors disabled:opacity-40 cursor-pointer"
               >
                 {isAdding ? "Adding…" : "Add button"}
               </button>
@@ -260,7 +260,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
                   setAdding(false);
                   setAddError(null);
                 }}
-                className="px-3 py-2 text-xs text-text-muted border border-border-strong rounded-[var(--radius-sm)] hover:bg-surface-2 cursor-pointer"
+                className="px-3 py-2 text-xs text-text-muted border border-border-strong rounded-sm hover:bg-surface-2 cursor-pointer"
               >
                 Cancel
               </button>
@@ -280,7 +280,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleAddHeadingSubmit();
               }}
-              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
             />
             {addError && <p className="text-xs text-red-400">{addError}</p>}
             <div className="flex gap-2">
@@ -288,7 +288,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
                 type="button"
                 onClick={handleAddHeadingSubmit}
                 disabled={isAdding || !newHeadingLabel.trim()}
-                className="flex-1 py-2 text-xs font-semibold bg-gold text-bg rounded-[var(--radius-sm)] hover:bg-gold-bright transition-colors disabled:opacity-40 cursor-pointer"
+                className="flex-1 py-2 text-xs font-semibold bg-gold text-bg rounded-sm hover:bg-gold-bright transition-colors disabled:opacity-40 cursor-pointer"
               >
                 {isAdding ? "Adding…" : "Add heading"}
               </button>
@@ -298,7 +298,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
                   setAddingHeading(false);
                   setAddError(null);
                 }}
-                className="px-3 py-2 text-xs text-text-muted border border-border-strong rounded-[var(--radius-sm)] hover:bg-surface-2 cursor-pointer"
+                className="px-3 py-2 text-xs text-text-muted border border-border-strong rounded-sm hover:bg-surface-2 cursor-pointer"
               >
                 Cancel
               </button>
@@ -314,7 +314,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
                   setAdding(true);
                   setAddError(null);
                 }}
-                className="flex-1 py-2.5 border border-dashed border-gold/30 text-gold text-sm font-medium rounded-[var(--radius)] hover:border-gold/60 hover:bg-gold-dim transition-all cursor-pointer"
+                className="flex-1 py-2.5 border border-dashed border-gold/30 text-gold text-sm font-medium rounded-(--radius) hover:border-gold/60 hover:bg-gold-dim transition-all cursor-pointer"
               >
                 + Add button
               </button>
@@ -324,7 +324,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
                   setAddingHeading(true);
                   setAddError(null);
                 }}
-                className="flex-1 py-2.5 border border-dashed border-gold/30 text-gold text-sm font-medium rounded-[var(--radius)] hover:border-gold/60 hover:bg-gold-dim transition-all cursor-pointer"
+                className="flex-1 py-2.5 border border-dashed border-gold/30 text-gold text-sm font-medium rounded-(--radius) hover:border-gold/60 hover:bg-gold-dim transition-all cursor-pointer"
               >
                 + Add heading
               </button>
@@ -383,7 +383,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
                 setNewPlatform(e.target.value);
                 setNewSocialUrl("");
               }}
-              className="w-full bg-surface-2 border border-border-strong text-text rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
+              className="w-full bg-surface-2 border border-border-strong text-text rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
             >
               {SOCIAL_PLATFORMS.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -399,7 +399,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleAddSocialSubmit();
               }}
-              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
             />
             {addSocialError && <p className="text-xs text-red-400">{addSocialError}</p>}
             <div className="flex gap-2">
@@ -407,7 +407,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
                 type="button"
                 onClick={handleAddSocialSubmit}
                 disabled={isAddingSocial || !newSocialUrl.trim()}
-                className="flex-1 py-2 text-xs font-semibold bg-gold text-bg rounded-[var(--radius-sm)] hover:bg-gold-bright disabled:opacity-40 cursor-pointer"
+                className="flex-1 py-2 text-xs font-semibold bg-gold text-bg rounded-sm hover:bg-gold-bright disabled:opacity-40 cursor-pointer"
               >
                 {isAddingSocial ? "Adding…" : "Add"}
               </button>
@@ -417,7 +417,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
                   setAddingSocial(false);
                   setAddSocialError(null);
                 }}
-                className="px-3 py-2 text-xs text-text-muted border border-border-strong rounded-[var(--radius-sm)] hover:bg-surface-2 cursor-pointer"
+                className="px-3 py-2 text-xs text-text-muted border border-border-strong rounded-sm hover:bg-surface-2 cursor-pointer"
               >
                 Cancel
               </button>
@@ -428,7 +428,7 @@ export const LinksTab = forwardRef<LinksTabHandle, LinksTabProps>(function Links
             <button
               type="button"
               onClick={() => setAddingSocial(true)}
-              className="w-full py-2.5 border border-dashed border-border-strong/60 text-text-muted text-sm font-medium rounded-[var(--radius)] hover:border-border-strong hover:bg-surface transition-all cursor-pointer"
+              className="w-full py-2.5 border border-dashed border-border-strong/60 text-text-muted text-sm font-medium rounded-(--radius) hover:border-border-strong hover:bg-surface transition-all cursor-pointer"
             >
               + Add social icon
             </button>

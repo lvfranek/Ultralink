@@ -134,7 +134,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
     <>
       {/* Hero — full-bleed: no side padding, flush to the very top */}
       {heroActive && (
-        <div className="relative z-[1] w-full flex-shrink-0 overflow-hidden" style={{ height: 220 }}>
+        <div className="relative z-1 w-full shrink-0 overflow-hidden" style={{ height: 220 }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer */}
           <img
             src={page.avatar_url!}
@@ -150,7 +150,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
         </div>
       )}
 
-    <div className={`relative z-[1] w-full flex flex-col items-center px-4 pb-8 ${heroActive ? "pt-4" : "pt-10"}`}>
+    <div className={`relative z-1 w-full flex flex-col items-center px-4 pb-8 ${heroActive ? "pt-4" : "pt-10"}`}>
 
       {/* Circle avatar — when not hero OR when hero but no photo yet (fallback) */}
       {(!isHero || !page.avatar_url) && (
@@ -330,7 +330,7 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
           className={[
             "w-full relative overflow-hidden",
             // Desktop card shape (public page only)
-            !isPreview && "md:max-w-[480px] md:rounded-[32px] md:shadow-[0_10px_40px_rgba(0,0,0,.35),0_4px_12px_rgba(0,0,0,.25)]",
+            !isPreview && "md:max-w-120 md:rounded-4xl md:shadow-[0_10px_40px_rgba(0,0,0,.35),0_4px_12px_rgba(0,0,0,.25)]",
           ].filter(Boolean).join(" ")}
         >
           {/* Desktop card background — suppressed in preview (mobile bg covers everything) */}
@@ -346,9 +346,9 @@ export function ProfilePageView({ page, links, socials, theme: rawTheme, isPrevi
 
       {/* ── Bottom panel: Free-plan CTA + legal row, bundled in one readable container ── */}
       {!isPreview && (
-        <div className="relative z-[1] w-full flex justify-center px-4 pb-8 mt-4">
+        <div className="relative z-1 w-full flex justify-center px-4 pb-8 mt-4">
           <div
-            className="w-full max-w-[480px] flex flex-col items-center gap-3 rounded-2xl px-4 py-4"
+            className="w-full max-w-120 flex flex-col items-center gap-3 rounded-2xl px-4 py-4"
             style={{
               background: panelBg,
               backdropFilter: "blur(16px)",
@@ -438,7 +438,7 @@ function LinkButton({ link, index, isPreview }: { link: PageLink; index: number;
       {iconUrl && (
         <span className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-2" aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer */}
-          <img src={iconUrl} alt="" className="flex-shrink-0 w-5 h-5 object-contain rounded-sm" />
+          <img src={iconUrl} alt="" className="shrink-0 w-5 h-5 object-contain rounded-sm" />
         </span>
       )}
 

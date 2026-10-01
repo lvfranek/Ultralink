@@ -70,7 +70,7 @@ export function WelcomeModal({ open, onClose, displayName }: WelcomeModalProps) 
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      className="fixed inset-0 z-100 flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,.7)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose();
@@ -81,7 +81,7 @@ export function WelcomeModal({ open, onClose, displayName }: WelcomeModalProps) 
         role="dialog"
         aria-modal="true"
         aria-label="Welcome to Ultralink"
-        className="w-full max-w-[560px] rounded-[20px] p-6 sm:p-8 relative"
+        className="w-full max-w-140 rounded-[20px] p-6 sm:p-8 relative"
         style={{
           background: "#141414",
           border: "1px solid rgba(255,255,255,.08)",

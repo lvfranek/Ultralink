@@ -50,7 +50,7 @@ export function Logo({ className = "", iconSize = 20, showWordmark = true, href 
       <LogoMark size={iconSize} />
       {showWordmark && (
         <span
-          className="text-[1.2rem] font-bold leading-none tracking-[-0.05em] whitespace-nowrap"
+          className="text-[1.2rem] font-bold leading-none tracking-tighter whitespace-nowrap"
           style={{ color: onDark ? "#ffffff" : "var(--text)" }}
         >
           ultralink

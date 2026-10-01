@@ -76,7 +76,7 @@ export function AvatarCropModal({ imageSrc, onCancel, onApply }: AvatarCropModal
       aria-modal="true"
       aria-label="Crop avatar"
     >
-      <div className="w-full max-w-md bg-surface border border-border-strong rounded-[var(--radius-lg)] overflow-hidden shadow-2xl">
+      <div className="w-full max-w-md bg-surface border border-border-strong rounded-lg overflow-hidden shadow-2xl">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <h2 className="text-sm font-semibold text-text">Crop photo</h2>
           <button
@@ -126,7 +126,7 @@ export function AvatarCropModal({ imageSrc, onCancel, onApply }: AvatarCropModal
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 py-2.5 text-sm text-text-muted border border-border-strong rounded-[var(--radius)] hover:bg-surface-2 transition-colors"
+            className="flex-1 py-2.5 text-sm text-text-muted border border-border-strong rounded-(--radius) hover:bg-surface-2 transition-colors"
           >
             Cancel
           </button>
@@ -134,7 +134,7 @@ export function AvatarCropModal({ imageSrc, onCancel, onApply }: AvatarCropModal
             type="button"
             onClick={handleApply}
             disabled={applying || !croppedAreaPixels}
-            className="flex-1 py-2.5 text-sm font-semibold text-bg bg-gold rounded-[var(--radius)] hover:bg-gold-bright transition-colors disabled:opacity-50"
+            className="flex-1 py-2.5 text-sm font-semibold text-bg bg-gold rounded-(--radius) hover:bg-gold-bright transition-colors disabled:opacity-50"
           >
             {applying ? "Applying…" : "Apply crop"}
           </button>

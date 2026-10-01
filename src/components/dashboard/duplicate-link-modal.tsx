@@ -93,7 +93,7 @@ export function DuplicateLinkModal({ sourcePageId, sourceSlug, onClose, onDuplic
               autoComplete="off"
               autoCapitalize="none"
               spellCheck={false}
-              className="w-full bg-surface-2 border text-text rounded-[var(--radius)] px-3 pr-9 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2"
+              className="w-full bg-surface-2 border text-text rounded-(--radius) px-3 pr-9 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2"
               style={{
                 borderColor: slugError ? "#f87171" : slugOk ? "#34d399" : "rgba(255,255,255,.18)",
               }}

@@ -185,7 +185,7 @@ export const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkI
     <div
       ref={setNodeRef}
       style={{ ...style, background: "#141414", border: "1px solid rgba(255,255,255,.08)" }}
-      className="rounded-[12px] overflow-hidden"
+      className="rounded-xl overflow-hidden"
     >
       {/* Row header */}
       <div className={`flex items-center gap-2 px-3 ${isHeading ? "py-2" : "py-3"}`}>
@@ -193,7 +193,7 @@ export const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkI
           type="button"
           {...attributes}
           {...listeners}
-          className="flex-shrink-0 cursor-grab text-text-subtle hover:text-text-muted p-1 touch-none"
+          className="shrink-0 cursor-grab text-text-subtle hover:text-text-muted p-1 touch-none"
           aria-label="Drag to reorder"
         >
           <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
@@ -202,20 +202,20 @@ export const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkI
         </button>
 
         {isHeading ? (
-          <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-[11px] font-bold text-text-subtle border border-border-strong rounded">
+          <span className="shrink-0 w-5 h-5 flex items-center justify-center text-[11px] font-bold text-text-subtle border border-border-strong rounded">
             H
           </span>
         ) : (
           <>
             {/* Colour swatch preview */}
             <span
-              className="w-5 h-5 rounded-sm flex-shrink-0 border border-black/10"
+              className="w-5 h-5 rounded-sm shrink-0 border border-black/10"
               style={{ background: btnBg, borderRadius: btnRadius === "9999px" ? "9999px" : "4px" }}
             />
 
             {selectedIcon && selectedIcon.startsWith("http") && (
               // eslint-disable-next-line @next/next/no-img-element -- user-uploaded image (Supabase Storage URL), shown as-is rather than through Next's image optimizer
-              <img src={selectedIcon} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
+              <img src={selectedIcon} alt="" className="w-5 h-5 object-contain shrink-0" />
             )}
           </>
         )}
@@ -228,20 +228,20 @@ export const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkI
         </div>
 
         {!isHeading && link.is_adult && (
-          <span className="text-[10px] font-bold text-text-subtle border border-border-strong rounded px-1 flex-shrink-0">
+          <span className="text-[10px] font-bold text-text-subtle border border-border-strong rounded px-1 shrink-0">
             18+
           </span>
         )}
 
         {saving && (
-          <span className="inline-block w-3.5 h-3.5 border border-current border-t-transparent rounded-full animate-spin text-text-subtle flex-shrink-0" />
+          <span className="inline-block w-3.5 h-3.5 border border-current border-t-transparent rounded-full animate-spin text-text-subtle shrink-0" />
         )}
 
         <button
           type="button"
           onClick={handleToggleExpanded}
           disabled={saving}
-          className="flex-shrink-0 text-text-subtle hover:text-text p-1 transition-colors cursor-pointer disabled:opacity-40"
+          className="shrink-0 text-text-subtle hover:text-text p-1 transition-colors cursor-pointer disabled:opacity-40"
           aria-label={expanded ? "Collapse" : "Edit"}
         >
           <svg
@@ -269,7 +269,7 @@ export const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkI
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               placeholder="Section heading"
-              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
             />
           </div>
 
@@ -286,7 +286,7 @@ export const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkI
               type="button"
               onClick={handleDelete}
               disabled={isPending}
-              className="px-3 py-2 text-xs text-red-400 border border-red-800/40 rounded-[var(--radius-sm)] hover:bg-red-950/30 transition-colors disabled:opacity-40 cursor-pointer"
+              className="px-3 py-2 text-xs text-red-400 border border-red-800/40 rounded-sm hover:bg-red-950/30 transition-colors disabled:opacity-40 cursor-pointer"
             >
               Delete
             </button>
@@ -304,7 +304,7 @@ export const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkI
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="Button label"
-                className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+                className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
               />
             </div>
             <div>
@@ -314,7 +314,7 @@ export const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkI
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://..."
-                className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+                className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
               />
             </div>
           </div>
@@ -400,7 +400,7 @@ export const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkI
                 <img
                   src={selectedIcon}
                   alt="Icon"
-                  className="w-8 h-8 object-contain rounded-[var(--radius-sm)] border border-border flex-shrink-0"
+                  className="w-8 h-8 object-contain rounded-sm border border-border shrink-0"
                 />
               )}
               <input
@@ -450,7 +450,7 @@ export const LinkItem = forwardRef<LinkItemHandle, LinkItemProps>(function LinkI
               type="button"
               onClick={handleDelete}
               disabled={isPending}
-              className="px-3 py-2 text-xs text-red-400 border border-red-800/40 rounded-[var(--radius-sm)] hover:bg-red-950/30 transition-colors disabled:opacity-40 cursor-pointer"
+              className="px-3 py-2 text-xs text-red-400 border border-red-800/40 rounded-sm hover:bg-red-950/30 transition-colors disabled:opacity-40 cursor-pointer"
             >
               Delete
             </button>

@@ -52,14 +52,14 @@ export function SocialItem({ social, onUpdate, onDelete }: SocialItemProps) {
     <div
       ref={setNodeRef}
       style={{ ...style, background: "#141414", border: "1px solid rgba(255,255,255,.08)" }}
-      className="rounded-[12px] overflow-hidden"
+      className="rounded-xl overflow-hidden"
     >
       <div className="flex items-center gap-3 px-3 py-2.5">
         <button
           type="button"
           {...attributes}
           {...listeners}
-          className="flex-shrink-0 cursor-grab text-text-subtle hover:text-text-muted p-1 touch-none"
+          className="shrink-0 cursor-grab text-text-subtle hover:text-text-muted p-1 touch-none"
           aria-label="Drag to reorder"
         >
           <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
@@ -67,7 +67,7 @@ export function SocialItem({ social, onUpdate, onDelete }: SocialItemProps) {
           </svg>
         </button>
 
-        <span className="flex-shrink-0 text-text-muted">
+        <span className="shrink-0 text-text-muted">
           <SocialIcon platform={social.platform} size={18} />
         </span>
 
@@ -79,7 +79,7 @@ export function SocialItem({ social, onUpdate, onDelete }: SocialItemProps) {
         <button
           type="button"
           onClick={() => setEditing((v) => !v)}
-          className="flex-shrink-0 text-text-subtle hover:text-text p-1 cursor-pointer"
+          className="shrink-0 text-text-subtle hover:text-text p-1 cursor-pointer"
           aria-label={editing ? "Close" : "Edit"}
         >
           <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
@@ -99,7 +99,7 @@ export function SocialItem({ social, onUpdate, onDelete }: SocialItemProps) {
             <select
               value={platform}
               onChange={(e) => setPlatform(e.target.value)}
-              className="w-full bg-surface-2 border border-border-strong text-text rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
+              className="w-full bg-surface-2 border border-border-strong text-text rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 cursor-pointer"
             >
               {SOCIAL_PLATFORMS.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -115,7 +115,7 @@ export function SocialItem({ social, onUpdate, onDelete }: SocialItemProps) {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder={SOCIAL_PLATFORMS.find((p) => p.id === platform)?.placeholder}
-              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-[var(--radius-sm)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+              className="w-full bg-surface-2 border border-border-strong text-text placeholder-text-subtle rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
             />
           </div>
           {error && <p className="text-xs text-red-400">{error}</p>}
@@ -124,7 +124,7 @@ export function SocialItem({ social, onUpdate, onDelete }: SocialItemProps) {
               type="button"
               onClick={save}
               disabled={saving}
-              className="flex-1 py-1.5 text-xs font-semibold bg-gold text-bg rounded-[var(--radius-sm)] hover:bg-gold-bright disabled:opacity-40 cursor-pointer"
+              className="flex-1 py-1.5 text-xs font-semibold bg-gold text-bg rounded-sm hover:bg-gold-bright disabled:opacity-40 cursor-pointer"
             >
               {saving ? "Saving…" : "Save"}
             </button>
@@ -132,7 +132,7 @@ export function SocialItem({ social, onUpdate, onDelete }: SocialItemProps) {
               type="button"
               onClick={handleDelete}
               disabled={isPending}
-              className="px-3 py-1.5 text-xs text-red-400 border border-red-800/40 rounded-[var(--radius-sm)] hover:bg-red-950/30 disabled:opacity-40 cursor-pointer"
+              className="px-3 py-1.5 text-xs text-red-400 border border-red-800/40 rounded-sm hover:bg-red-950/30 disabled:opacity-40 cursor-pointer"
             >
               Delete
             </button>

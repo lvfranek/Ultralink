@@ -190,7 +190,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
         >
           {/* Error banner */}
           {((state && "error" in state) || slugError || linkFlushError) && (
-            <div className="flex-shrink-0 px-4 py-2 border-b border-red-800/30 bg-red-950/10">
+            <div className="shrink-0 px-4 py-2 border-b border-red-800/30 bg-red-950/10">
               <p className="text-xs text-red-400">
                 {(state && "error" in state && state.error) || slugError || linkFlushError}
               </p>
@@ -199,7 +199,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
 
           {/* Sticky sub-header: spans full canvas width */}
           <div
-            className="flex-shrink-0 px-4 py-2.5 flex items-center gap-3"
+            className="shrink-0 px-4 py-2.5 flex items-center gap-3"
             style={{ borderBottom: "1px solid rgba(255,255,255,.08)" }}
           >
             <div className="flex-1 min-w-0 flex items-center gap-1.5">
@@ -225,7 +225,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                   setCopied(true);
                   setTimeout(() => setCopied(false), 1200);
                 }}
-                className="flex-shrink-0 p-0.5 rounded transition-colors cursor-pointer"
+                className="shrink-0 p-0.5 rounded transition-colors cursor-pointer"
                 style={{ color: copied ? "#34d399" : "#9A9A9A" }}
                 onMouseEnter={(e) => {
                   if (!copied) e.currentTarget.style.color = "#ffffff";
@@ -263,7 +263,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
             </div>
 
             {(isDirty || hasLinksDirty) && (
-              <span className="text-xs flex-shrink-0 font-medium" style={{ color: "#FF6B6B" }}>
+              <span className="text-xs shrink-0 font-medium" style={{ color: "#FF6B6B" }}>
                 Unsaved
               </span>
             )}
@@ -272,7 +272,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
             <button
               type="button"
               onClick={() => setMobileView((v) => (v === "edit" ? "preview" : "edit"))}
-              className="md:hidden flex-shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer"
+              className="md:hidden shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer"
               style={{
                 background: mobileView === "preview" ? "rgba(255,255,255,.12)" : "rgba(255,255,255,.08)",
                 color: "#ffffff",
@@ -281,7 +281,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
               {mobileView === "preview" ? "← Edit" : "Preview"}
             </button>
 
-            <form onSubmit={handleSave} className="flex-shrink-0">
+            <form onSubmit={handleSave} className="shrink-0">
               <input type="hidden" name="slug" value={local.slug} />
               <input type="hidden" name="title" value={local.title ?? ""} />
               <input type="hidden" name="bio" value={local.bio ?? ""} />
@@ -330,11 +330,11 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
 
             {/* Right: settings panel — always visible on md+, mobile only in edit mode */}
             <div
-              className={`${mobileView === "preview" ? "hidden md:flex" : "flex"} flex-col w-full md:w-80 xl:w-96 overflow-hidden flex-shrink-0`}
+              className={`${mobileView === "preview" ? "hidden md:flex" : "flex"} flex-col w-full md:w-80 xl:w-96 overflow-hidden shrink-0`}
               style={{ borderLeft: "1px solid rgba(255,255,255,.05)" }}
             >
               {/* Tab switcher — centered pill segmented control */}
-              <div className="flex-shrink-0 py-3 flex justify-center">
+              <div className="shrink-0 py-3 flex justify-center">
                 <div
                   className="inline-flex p-1"
                   style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,.08)", borderRadius: 999 }}
@@ -389,7 +389,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                           autoCapitalize="none"
                           spellCheck={false}
                           className={[
-                            "w-full bg-surface-2 border text-text rounded-[var(--radius)] pl-[8rem] pr-9 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2",
+                            "w-full bg-surface-2 border text-text rounded-(--radius) pl-32 pr-9 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2",
                             slugError
                               ? "border-red-400 focus:ring-red-400/30"
                               : slugOk
@@ -479,7 +479,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                           aria-checked={local.active_badge ?? false}
                           onClick={() => handleLocalChange({ active_badge: !local.active_badge })}
                           className={[
-                            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold cursor-pointer flex-shrink-0 ml-3",
+                            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold cursor-pointer shrink-0 ml-3",
                             local.active_badge ? "bg-emerald-500" : "bg-surface-2 border border-border-strong",
                           ].join(" ")}
                         >
@@ -490,7 +490,7 @@ export function PageBuilder({ page, initialLinks, initialSocials, effectivePlan,
                       ) : (
                         <Link
                           href="/#pricing"
-                          className="text-xs text-gold hover:text-gold-bright transition-colors flex-shrink-0 ml-3"
+                          className="text-xs text-gold hover:text-gold-bright transition-colors shrink-0 ml-3"
                         >
                           Upgrade →
                         </Link>

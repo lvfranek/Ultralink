@@ -24,7 +24,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-xl font-semibold text-text mb-4">1. Data Controller</h2>
           <p>The data controller responsible for processing your personal data is:</p>
-          <address className="not-italic mt-3 p-4 bg-surface rounded-[var(--radius)] border border-border text-sm">
+          <address className="not-italic mt-3 p-4 bg-surface rounded-(--radius) border border-border text-sm">
             {contact ? (
               <>
                 {contact.name}

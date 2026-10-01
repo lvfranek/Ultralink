@@ -10,7 +10,7 @@ export default function RevenuePage() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
       <h1 className="text-2xl font-bold text-text mb-2">Revenue</h1>
       <div className="mt-12 flex flex-col items-center text-center">
-        <div className="w-16 h-16 rounded-[var(--radius-lg)] flex items-center justify-center mb-5 bg-surface-2 border border-border">
+        <div className="w-16 h-16 rounded-lg flex items-center justify-center mb-5 bg-surface-2 border border-border">
           <svg
             viewBox="0 0 24 24"
             className="w-7 h-7 text-text-muted"

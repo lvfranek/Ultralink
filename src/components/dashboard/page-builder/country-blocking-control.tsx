@@ -52,7 +52,7 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
             <p className="text-sm font-medium text-text">Country blocking</p>
             <p className="text-xs text-text-muted mt-0.5">Block visitors from selected countries.</p>
           </div>
-          <span className="ml-3 flex-shrink-0 text-[10px] px-1.5 py-0.5 bg-gold-dim text-gold border border-gold/20 rounded font-semibold uppercase tracking-wider">
+          <span className="ml-3 shrink-0 text-[10px] px-1.5 py-0.5 bg-gold-dim text-gold border border-gold/20 rounded font-semibold uppercase tracking-wider">
             PRO
           </span>
         </div>
@@ -72,7 +72,7 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
           <p className="text-sm font-medium text-text">Country blocking</p>
           <p className="text-xs text-text-muted mt-0.5">Block visitors from selected countries.</p>
         </div>
-        <div className="flex items-center gap-1.5 ml-3 flex-shrink-0 mt-0.5">
+        <div className="flex items-center gap-1.5 ml-3 shrink-0 mt-0.5">
           <span className="text-xs" style={{ color: "#9A9A9A" }}>
             {countrySummary(value)}
           </span>
@@ -81,7 +81,7 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
-            className={`w-3 h-3 flex-shrink-0 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+            className={`w-3 h-3 shrink-0 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
             style={{ color: "#9A9A9A" }}
           >
             <path d="M2 4l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
@@ -97,7 +97,7 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
             placeholder="Search countries…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full mb-2 bg-surface-2 border border-border-strong rounded-[var(--radius)] px-3 py-2 text-xs text-text placeholder:text-text-subtle focus:outline-none focus:ring-1 focus:ring-white/20"
+            className="w-full mb-2 bg-surface-2 border border-border-strong rounded-(--radius) px-3 py-2 text-xs text-text placeholder:text-text-subtle focus:outline-none focus:ring-1 focus:ring-white/20"
           />
 
           {/* Selected chips */}
@@ -125,7 +125,7 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
 
           {/* Country list */}
           <div
-            className="overflow-y-auto rounded-[var(--radius)]"
+            className="overflow-y-auto rounded-(--radius)"
             style={{ maxHeight: 200, background: "#1E1E1E", border: "1px solid rgba(255,255,255,.06)" }}
           >
             {filtered.length === 0 ? (
@@ -142,11 +142,11 @@ export function CountryBlockingControl({ value, onChange, isPro }: CountryBlocki
                     type="checkbox"
                     checked={value.includes(code)}
                     onChange={() => toggle(code)}
-                    className="rounded accent-white flex-shrink-0"
+                    className="rounded accent-white shrink-0"
                   />
-                  <span className="text-xs flex-shrink-0">{flagEmoji(code)}</span>
+                  <span className="text-xs shrink-0">{flagEmoji(code)}</span>
                   <span className="text-xs text-text flex-1 min-w-0 truncate">{name}</span>
-                  <span className="text-xs flex-shrink-0" style={{ color: "#6B6B6B" }}>
+                  <span className="text-xs shrink-0" style={{ color: "#6B6B6B" }}>
                     {code}
                   </span>
                 </label>

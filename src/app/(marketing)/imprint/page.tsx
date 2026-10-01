@@ -65,7 +65,7 @@ export default function ImprintPage() {
           </section>
         </div>
       ) : (
-        <div className="p-4 rounded-[var(--radius)] border border-amber-700/40 bg-amber-950/20">
+        <div className="p-4 rounded-(--radius) border border-amber-700/40 bg-amber-950/20">
           <p className="text-sm text-amber-400 font-medium">Imprint not configured</p>
           <p className="text-xs text-amber-400/80 mt-1">
             Set <code>IMPRINT_NAME</code>, <code>IMPRINT_STREET</code> and <code>IMPRINT_CITY</code> in your environment

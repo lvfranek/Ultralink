@@ -43,7 +43,7 @@ function NavItem({
   const { startLoading } = useNavigationLoading();
 
   const cls = [
-    "flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm font-medium transition-all duration-150",
+    "flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-sm font-medium transition-all duration-150",
     active
       ? "text-white"
       : disabled
@@ -173,7 +173,7 @@ function AccountMenu({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-3 p-2.5 rounded-[var(--radius)] hover:bg-surface-2 transition-colors cursor-pointer"
+        className="w-full flex items-center gap-3 p-2.5 rounded-(--radius) hover:bg-surface-2 transition-colors cursor-pointer"
         aria-expanded={open}
       >
         <Avatar name={activeName} />
@@ -196,7 +196,7 @@ function AccountMenu({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} aria-hidden="true" />
-          <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-surface-2 border border-border-strong rounded-[var(--radius)] py-1 px-1 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+          <div className="absolute bottom-full left-0 right-0 mb-1 z-20 bg-surface-2 border border-border-strong rounded-(--radius) py-1 px-1 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
             {hasMemberships && (
               <>
                 {/* Switching as header */}
@@ -222,7 +222,7 @@ function AccountMenu({
                       type="button"
                       onClick={() => handleSwitchOwner(acct.id)}
                       disabled={!!switching}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius-sm)] transition-colors cursor-pointer hover:bg-surface disabled:cursor-wait"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-sm transition-colors cursor-pointer hover:bg-surface disabled:cursor-wait"
                       style={{ textAlign: "left" }}
                     >
                       <Avatar name={acct.name} size={24} />
@@ -256,7 +256,7 @@ function AccountMenu({
                 startLoading();
                 router.push("/dashboard/account");
               }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface rounded-[var(--radius-sm)] transition-colors cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-text-muted hover:text-text hover:bg-surface rounded-sm transition-colors cursor-pointer"
             >
               <svg
                 viewBox="0 0 16 16"
@@ -278,7 +278,7 @@ function AccountMenu({
                 setOpen(false);
                 handleSignOut();
               }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-surface rounded-[var(--radius-sm)] transition-colors cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-surface rounded-sm transition-colors cursor-pointer"
             >
               <svg
                 viewBox="0 0 16 16"
@@ -362,7 +362,7 @@ export function Sidebar({
       icon: (
         <svg
           viewBox="0 0 16 16"
-          className="w-[18px] h-[18px]"
+          className="w-4.5 h-4.5"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.75"
@@ -411,7 +411,7 @@ export function Sidebar({
             openWelcomeModal();
             onClose?.();
           }}
-          className="w-full flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm transition-colors cursor-pointer"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-sm transition-colors cursor-pointer"
           style={{ color: "#9A9A9A" }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = "#ffffff";
@@ -431,7 +431,7 @@ export function Sidebar({
             openFeedbackModal();
             onClose?.();
           }}
-          className="w-full flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm transition-colors cursor-pointer"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-sm transition-colors cursor-pointer"
           style={{ color: "#9A9A9A" }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = "#ffffff";
@@ -451,7 +451,7 @@ export function Sidebar({
             href={item.href}
             target={item.href.startsWith("http") ? "_blank" : undefined}
             rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-            className="flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-sm transition-colors"
             style={{ color: "#9A9A9A" }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = "#ffffff";
@@ -476,7 +476,7 @@ export function Sidebar({
                 router.push("/dashboard/account");
                 onClose?.();
               }}
-              className="w-full flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-sm font-medium transition-colors cursor-pointer"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-sm font-medium transition-colors cursor-pointer"
               style={{ color: "#F87171", background: "rgba(248,113,113,0.08)" }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "rgba(248,113,113,0.14)";
@@ -533,11 +533,11 @@ export function Sidebar({
         <button
           type="button"
           onClick={() => setMobileOpen((v) => !v)}
-          className="p-2 rounded-[var(--radius-sm)] text-text-muted hover:text-text hover:bg-surface-2 transition-colors cursor-pointer"
+          className="p-2 rounded-sm text-text-muted hover:text-text hover:bg-surface-2 transition-colors cursor-pointer"
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileOpen}
         >
-          <span className="flex flex-col gap-[5px] w-5" aria-hidden="true">
+          <span className="flex flex-col gap-1.25 w-5" aria-hidden="true">
             <span
               className={`block h-0.5 bg-current rounded-full transition-all duration-200 ${mobileOpen ? "rotate-45 translate-y-[7px]" : ""}`}
             />

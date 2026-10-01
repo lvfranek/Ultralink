@@ -310,7 +310,7 @@ export function LinksList({ pages, siteUrl, linkCap: _linkCap = 1, survivingPage
         </div>
 
         {/* Sort dropdown */}
-        <div className="relative flex-shrink-0">
+        <div className="relative shrink-0">
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}

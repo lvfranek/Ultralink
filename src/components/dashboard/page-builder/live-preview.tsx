@@ -48,7 +48,7 @@ export function LivePreview({ page, links, socials, theme, isPro }: LivePreviewP
 
       {/* Content frame — full-bleed on mobile, phone-frame mockup on desktop */}
       <div
-        className="relative flex flex-col w-full h-full md:w-[390px] md:h-[88%] md:max-h-[844px] md:rounded-[44px] md:shadow-[0_24px_80px_rgba(0,0,0,0.5)]"
+        className="relative flex flex-col w-full h-full md:w-97.5 md:h-[88%] md:max-h-211 md:rounded-[44px] md:shadow-[0_24px_80px_rgba(0,0,0,0.5)]"
         style={{
           overflow: "hidden",
         }}
