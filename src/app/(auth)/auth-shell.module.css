@@ -1,0 +1,138 @@
+/* Auth pages — split layout: form on the left, brand panel with the phone on the right */
+
+.layout {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.formCol {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 40px 32px;
+}
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #a1a1aa !important;
+  transition: color 0.15s;
+}
+.back:hover {
+  color: #fff !important;
+}
+.formMain {
+  flex: 1;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 48px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Card with the same 1px spinning rainbow border as the Pro pricing card */
+.card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 1px;
+  border-radius: 24px;
+  box-shadow: 0 40px 100px -40px rgba(201, 167, 242, 0.3);
+}
+.cardInner {
+  position: relative;
+  z-index: 1;
+  border-radius: 23px;
+  padding: 32px 28px;
+  background: linear-gradient(180deg, #131317, #0d0d10);
+}
+
+/* Dark-mode autofill: keep Chrome/Safari from painting inputs white/yellow */
+.card input:-webkit-autofill {
+  -webkit-text-fill-color: #fff;
+  box-shadow: 0 0 0 1000px #17171b inset;
+  caret-color: #fff;
+}
+.card input::placeholder {
+  color: #52525b;
+}
+
+/* Brand panel */
+.panel {
+  /* Stays in view while a long sign-up form scrolls */
+  position: sticky;
+  top: 16px;
+  height: calc(100dvh - 32px);
+  align-self: start;
+  margin: 16px 16px 16px 0;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0e0e11;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 56px 32px 0;
+}
+.panelCopy {
+  position: relative;
+  text-align: center;
+}
+.panelTitle {
+  font-size: clamp(34px, 3.4vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-weight: 500;
+  margin: 0 0 14px;
+  background: linear-gradient(180deg, #ffffff 35%, #a1a1aa 110%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.panelSub {
+  margin: 0;
+  color: #a1a1aa;
+  font-size: 16px;
+}
+/* Phone rises from the bottom edge, cropped by the panel */
+.panelPhone {
+  position: relative;
+  margin-bottom: -180px;
+}
+
+@media (max-width: 1023px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    display: none;
+  }
+  .formCol {
+    padding: 22px 20px 28px;
+  }
+  .formMain {
+    padding: 36px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardInner {
+    padding: 28px 20px;
+  }
+}
+
+/* The shared spinner is sized for wide elements; the tall card needs a bigger square to stay covered */
+.card > span:first-child {
+  width: 260%;
+}

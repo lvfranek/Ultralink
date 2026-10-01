@@ -46,14 +46,16 @@ export function ResetPasswordForm() {
 
   return (
     <>
-      <h1 style={{ fontSize: 20, fontWeight: 600, color: "#0A0A0A", margin: "0 0 4px" }}>Set a new password</h1>
-      <p style={{ fontSize: 14, color: "#6B6B6B", margin: "0 0 24px" }}>Choose a new password for your account.</p>
+      <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", color: "#F4F4F5", margin: "0 0 4px" }}>
+        Set a new password
+      </h1>
+      <p style={{ fontSize: 14, color: "#A1A1AA", margin: "0 0 24px" }}>Choose a new password for your account.</p>
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }} noValidate>
         <div>
           <label
             htmlFor="new-password"
-            style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#6B6B6B", marginBottom: 6 }}
+            style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#A1A1AA", marginBottom: 6 }}
           >
             New password <span style={{ fontWeight: 400, color: "#9a9a9a" }}>(min. 8 characters)</span>
           </label>
@@ -71,13 +73,13 @@ export function ResetPasswordForm() {
             disabled={loading}
             style={passwordError ? inputErrorStyle : inputStyle}
           />
-          {passwordError && <p style={{ marginTop: 6, fontSize: 12, color: "#dc2626" }}>{passwordError}</p>}
+          {passwordError && <p style={{ marginTop: 6, fontSize: 12, color: "#f87171" }}>{passwordError}</p>}
         </div>
 
         <div>
           <label
             htmlFor="confirm-new-password"
-            style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#6B6B6B", marginBottom: 6 }}
+            style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#A1A1AA", marginBottom: 6 }}
           >
             Confirm new password
           </label>
@@ -95,7 +97,7 @@ export function ResetPasswordForm() {
             disabled={loading}
             style={confirmError ? inputErrorStyle : inputStyle}
           />
-          {confirmError && <p style={{ marginTop: 6, fontSize: 12, color: "#dc2626" }}>{confirmError}</p>}
+          {confirmError && <p style={{ marginTop: 6, fontSize: 12, color: "#f87171" }}>{confirmError}</p>}
         </div>
 
         {error && (
@@ -104,10 +106,10 @@ export function ResetPasswordForm() {
             style={{
               padding: "10px 14px",
               borderRadius: 8,
-              background: "rgba(220,38,38,0.08)",
-              border: "1px solid rgba(220,38,38,0.25)",
+              background: "rgba(248,113,113,0.1)",
+              border: "1px solid rgba(248,113,113,0.3)",
               fontSize: 14,
-              color: "#b91c1c",
+              color: "#fca5a5",
             }}
           >
             {error}
@@ -120,10 +122,10 @@ export function ResetPasswordForm() {
             style={{
               padding: "10px 14px",
               borderRadius: 8,
-              background: "rgba(5,150,105,0.08)",
-              border: "1px solid rgba(5,150,105,0.25)",
+              background: "rgba(52,211,153,0.1)",
+              border: "1px solid rgba(52,211,153,0.3)",
               fontSize: 14,
-              color: "#047857",
+              color: "#6ee7b7",
             }}
           >
             Password updated. Redirecting to your dashboard…
@@ -144,8 +146,8 @@ export function ResetPasswordForm() {
             fontWeight: 600,
             borderRadius: 10,
             border: "none",
-            background: "#0A0A0A",
-            color: "#ffffff",
+            background: "#ffffff",
+            color: "#0A0A0B",
             cursor: loading || success ? "not-allowed" : "pointer",
             opacity: loading || success ? 0.6 : 1,
             fontFamily: "inherit",

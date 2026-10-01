@@ -461,7 +461,8 @@ export function LoginForm() {
   }
 
   return (
-    <AuthShell footer={footer}>
+    // The phone preview on the brand panel shows the name being claimed
+    <AuthShell footer={footer} previewUsername={mode === "signup" ? username : undefined}>
       {/* Auth-callback error banner (expired/used confirmation links) */}
       {banner && mode !== "reset" && (
         <AuthErrorBanner
@@ -483,12 +484,12 @@ export function LoginForm() {
             marginBottom: 20,
             padding: "10px 14px",
             borderRadius: 8,
-            background: "rgba(0,0,0,0.04)",
-            border: "1px solid rgba(0,0,0,.08)",
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,.08)",
           }}
         >
-          <p style={{ fontSize: 12, color: "#6B6B6B", margin: 0, fontWeight: 500 }}>
-            Claiming <span style={{ fontWeight: 700, color: "#0A0A0A" }}>ultralink.bio/{prefilledUsername}</span>
+          <p style={{ fontSize: 12, color: "#A1A1AA", margin: 0, fontWeight: 500 }}>
+            Claiming <span style={{ fontWeight: 700, color: "#F4F4F5" }}>ultralink.bio/{prefilledUsername}</span>
           </p>
         </div>
       )}
@@ -500,7 +501,7 @@ export function LoginForm() {
           aria-label="Authentication mode"
           style={{
             display: "flex",
-            background: "rgba(0,0,0,0.06)",
+            background: "rgba(255,255,255,0.06)",
             borderRadius: 10,
             padding: 4,
             marginBottom: 24,
@@ -520,21 +521,21 @@ export function LoginForm() {
                 fontWeight: 600,
                 borderRadius: 7,
                 border: "none",
-                background: mode === m ? "#0A0A0A" : "transparent",
-                color: mode === m ? "#ffffff" : "#6B6B6B",
+                background: mode === m ? "#ffffff" : "transparent",
+                color: mode === m ? "#0A0A0B" : "#A1A1AA",
                 cursor: "pointer",
                 fontFamily: "inherit",
                 transition: "all 0.15s",
               }}
               onMouseEnter={(e) => {
                 if (mode !== m) {
-                  e.currentTarget.style.color = "#0A0A0A";
-                  e.currentTarget.style.background = "rgba(0,0,0,.06)";
+                  e.currentTarget.style.color = "#ffffff";
+                  e.currentTarget.style.background = "rgba(255,255,255,.06)";
                 }
               }}
               onMouseLeave={(e) => {
                 if (mode !== m) {
-                  e.currentTarget.style.color = "#6B6B6B";
+                  e.currentTarget.style.color = "#A1A1AA";
                   e.currentTarget.style.background = "transparent";
                 }
               }}
@@ -546,10 +547,10 @@ export function LoginForm() {
       )}
 
       {/* Heading */}
-      <h1 style={{ fontSize: 20, fontWeight: 600, color: "#0A0A0A", margin: "0 0 4px" }}>
+      <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", color: "#F4F4F5", margin: "0 0 4px" }}>
         {mode === "signup" ? "Create your account" : mode === "reset" ? "Reset your password" : "Welcome back"}
       </h1>
-      <p style={{ fontSize: 14, color: "#6B6B6B", margin: "0 0 24px" }}>
+      <p style={{ fontSize: 14, color: "#A1A1AA", margin: "0 0 24px" }}>
         {mode === "signup"
           ? "Start for free. No credit card required."
           : mode === "reset"
@@ -589,11 +590,11 @@ export function LoginForm() {
               gap: 10,
               padding: "12px 16px",
               borderRadius: 8,
-              border: "1px solid rgba(0,0,0,.12)",
+              border: "1px solid rgba(255,255,255,.12)",
               fontSize: 14,
               fontWeight: 500,
-              color: "#0A0A0A",
-              background: "rgba(0,0,0,0.03)",
+              color: "#F4F4F5",
+              background: "rgba(255,255,255,0.03)",
               cursor: googleLoading || loading ? "not-allowed" : "pointer",
               opacity: googleLoading || loading ? 0.5 : 1,
               marginBottom: 20,
@@ -602,13 +603,11 @@ export function LoginForm() {
             }}
             onMouseEnter={(e) => {
               if (!googleLoading && !loading) {
-                e.currentTarget.style.background = "rgba(0,0,0,.07)";
-                e.currentTarget.style.transform = "scale(0.98)";
+                e.currentTarget.style.background = "rgba(255,255,255,.07)";
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(0,0,0,0.03)";
-              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.03)";
             }}
           >
             {googleLoading ? <Spinner /> : <GoogleIcon />}
@@ -616,15 +615,10 @@ export function LoginForm() {
           </button>
 
           {/* Divider */}
-          <div style={{ position: "relative", margin: "20px 0" }}>
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center" }} aria-hidden="true">
-              <div style={{ width: "100%", borderTop: "1px solid rgba(0,0,0,.08)" }} />
-            </div>
-            <div style={{ position: "relative", display: "flex", justifyContent: "center" }}>
-              <span style={{ padding: "0 12px", background: "#fff", fontSize: 12, color: "#6B6B6B" }}>
-                or continue with email
-              </span>
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
+            <div style={{ flex: 1, borderTop: "1px solid rgba(255,255,255,.08)" }} aria-hidden="true" />
+            <span style={{ fontSize: 12, color: "#A1A1AA" }}>or continue with email</span>
+            <div style={{ flex: 1, borderTop: "1px solid rgba(255,255,255,.08)" }} aria-hidden="true" />
           </div>
 
           {/* Email/password form */}
@@ -632,7 +626,7 @@ export function LoginForm() {
             <div>
               <label
                 htmlFor="email"
-                style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#6B6B6B", marginBottom: 6 }}
+                style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#A1A1AA", marginBottom: 6 }}
               >
                 Email address
               </label>
@@ -649,13 +643,13 @@ export function LoginForm() {
                 disabled={loading || autoSwitching}
                 style={emailError || emailInUseError ? inputErrorStyle : inputStyle}
               />
-              {emailError && <p style={{ marginTop: 6, fontSize: 12, color: "#dc2626" }}>{emailError}</p>}
+              {emailError && <p style={{ marginTop: 6, fontSize: 12, color: "#f87171" }}>{emailError}</p>}
               {mode === "signup" && emailCheckState === "in-use" && (
                 <p
                   style={{
                     marginTop: 6,
                     fontSize: 12,
-                    color: "#6B6B6B",
+                    color: "#A1A1AA",
                     display: "flex",
                     alignItems: "center",
                     gap: 6,
@@ -677,13 +671,13 @@ export function LoginForm() {
                 </p>
               )}
               {emailInUseError && emailCheckState !== "in-use" && (
-                <p style={{ marginTop: 6, fontSize: 12, color: "#dc2626" }}>
+                <p style={{ marginTop: 6, fontSize: 12, color: "#f87171" }}>
                   An account with this email already exists.{" "}
                   <button
                     type="button"
                     onClick={() => handleModeSwitch("signin", email)}
                     style={{
-                      color: "#dc2626",
+                      color: "#f87171",
                       textDecoration: "underline",
                       textUnderlineOffset: 2,
                       background: "none",
@@ -704,7 +698,7 @@ export function LoginForm() {
               <div>
                 <label
                   htmlFor="username"
-                  style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#6B6B6B", marginBottom: 6 }}
+                  style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#A1A1AA", marginBottom: 6 }}
                 >
                   Username
                 </label>
@@ -753,7 +747,7 @@ export function LoginForm() {
                         transform: "translateY(-50%)",
                         width: 16,
                         height: 16,
-                        color: "#059669",
+                        color: "#34d399",
                       }}
                       viewBox="0 0 16 16"
                       fill="none"
@@ -773,7 +767,7 @@ export function LoginForm() {
                         transform: "translateY(-50%)",
                         width: 16,
                         height: 16,
-                        color: "#dc2626",
+                        color: "#f87171",
                       }}
                       viewBox="0 0 16 16"
                       fill="none"
@@ -786,11 +780,11 @@ export function LoginForm() {
                   )}
                 </div>
                 {usernameError ? (
-                  <p style={{ marginTop: 6, fontSize: 12, color: "#dc2626" }}>{usernameError}</p>
+                  <p style={{ marginTop: 6, fontSize: 12, color: "#f87171" }}>{usernameError}</p>
                 ) : usernameState === "available" ? (
-                  <p style={{ marginTop: 6, fontSize: 12, color: "#059669" }}>Username is available.</p>
+                  <p style={{ marginTop: 6, fontSize: 12, color: "#34d399" }}>Username is available.</p>
                 ) : (
-                  <p style={{ marginTop: 6, fontSize: 12, color: "#6B6B6B" }}>
+                  <p style={{ marginTop: 6, fontSize: 12, color: "#A1A1AA" }}>
                     3–20 characters, lowercase letters, numbers, underscores.
                   </p>
                 )}
@@ -800,11 +794,11 @@ export function LoginForm() {
             <div>
               <label
                 htmlFor="password"
-                style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#6B6B6B", marginBottom: 6 }}
+                style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#A1A1AA", marginBottom: 6 }}
               >
                 Password
                 {mode === "signup" && (
-                  <span style={{ fontWeight: 400, color: "#6B6B6B", marginLeft: 4 }}>(min. 8 characters)</span>
+                  <span style={{ fontWeight: 400, color: "#A1A1AA", marginLeft: 4 }}>(min. 8 characters)</span>
                 )}
               </label>
               <PasswordInput
@@ -822,7 +816,7 @@ export function LoginForm() {
                 disabled={loading || autoSwitching}
                 style={passwordError ? inputErrorStyle : inputStyle}
               />
-              {passwordError && <p style={{ marginTop: 6, fontSize: 12, color: "#dc2626" }}>{passwordError}</p>}
+              {passwordError && <p style={{ marginTop: 6, fontSize: 12, color: "#f87171" }}>{passwordError}</p>}
               {mode === "signin" && (
                 <p style={{ marginTop: 6, textAlign: "right" }}>
                   <button
@@ -830,7 +824,7 @@ export function LoginForm() {
                     onClick={() => handleModeSwitch("reset", email)}
                     style={{
                       fontSize: 12,
-                      color: "#6B6B6B",
+                      color: "#A1A1AA",
                       background: "none",
                       border: "none",
                       cursor: "pointer",
@@ -851,7 +845,7 @@ export function LoginForm() {
               <div>
                 <label
                   htmlFor="confirm-password"
-                  style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#6B6B6B", marginBottom: 6 }}
+                  style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#A1A1AA", marginBottom: 6 }}
                 >
                   Confirm password
                 </label>
@@ -871,7 +865,7 @@ export function LoginForm() {
                   style={confirmPasswordError ? inputErrorStyle : inputStyle}
                 />
                 {confirmPasswordError && (
-                  <p style={{ marginTop: 6, fontSize: 12, color: "#dc2626" }}>{confirmPasswordError}</p>
+                  <p style={{ marginTop: 6, fontSize: 12, color: "#f87171" }}>{confirmPasswordError}</p>
                 )}
               </div>
             )}
@@ -882,10 +876,10 @@ export function LoginForm() {
                 style={{
                   padding: "10px 14px",
                   borderRadius: 8,
-                  background: "rgba(220,38,38,0.08)",
-                  border: "1px solid rgba(220,38,38,0.25)",
+                  background: "rgba(248,113,113,0.1)",
+                  border: "1px solid rgba(248,113,113,0.3)",
                   fontSize: 14,
-                  color: "#b91c1c",
+                  color: "#fca5a5",
                 }}
               >
                 {error}
@@ -900,7 +894,7 @@ export function LoginForm() {
                         setResendCooldown(RESEND_COOLDOWN_SECONDS);
                       }}
                       style={{
-                        color: "#b91c1c",
+                        color: "#fca5a5",
                         textDecoration: "underline",
                         textUnderlineOffset: 2,
                         background: "none",
@@ -932,22 +926,21 @@ export function LoginForm() {
                 fontWeight: 600,
                 borderRadius: 10,
                 border: "none",
-                background: "#0A0A0A",
-                color: "#ffffff",
+                background: "#ffffff",
+                color: "#0A0A0B",
                 cursor: loading || googleLoading || autoSwitching ? "not-allowed" : "pointer",
                 opacity: loading || googleLoading || autoSwitching ? 0.6 : 1,
                 fontFamily: "inherit",
-                transition: "opacity 0.15s, transform 0.15s",
+                transition: "opacity 0.15s, box-shadow 0.2s",
               }}
               onMouseEnter={(e) => {
                 if (!loading && !googleLoading && !autoSwitching) {
-                  e.currentTarget.style.opacity = "0.82";
-                  e.currentTarget.style.transform = "scale(0.98)";
+                  // Soft ring instead of fading — a faded white button just looks grey
+                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(255,255,255,.1)";
                 }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = loading || googleLoading || autoSwitching ? "0.6" : "1";
-                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "none";
               }}
             >
               {loading && <Spinner />}

@@ -32,17 +32,17 @@ export function AuthErrorBanner({
         marginBottom: 20,
         padding: "14px 16px",
         borderRadius: 12,
-        background: "rgba(220,38,38,0.05)",
-        border: "1px solid rgba(220,38,38,0.18)",
+        background: "rgba(248,113,113,0.08)",
+        border: "1px solid rgba(248,113,113,0.25)",
       }}
     >
-      <p style={{ fontSize: 13, fontWeight: 600, color: "#b91c1c", margin: 0 }}>{banner.title}</p>
-      <p style={{ fontSize: 13, color: "#6B6B6B", margin: "4px 0 0", lineHeight: 1.5 }}>{banner.body}</p>
-      <p style={{ fontSize: 12, color: "#6B6B6B", margin: "6px 0 0", lineHeight: 1.5, wordBreak: "break-word" }}>
+      <p style={{ fontSize: 13, fontWeight: 600, color: "#fca5a5", margin: 0 }}>{banner.title}</p>
+      <p style={{ fontSize: 13, color: "#A1A1AA", margin: "4px 0 0", lineHeight: 1.5 }}>{banner.body}</p>
+      <p style={{ fontSize: 12, color: "#A1A1AA", margin: "6px 0 0", lineHeight: 1.5, wordBreak: "break-word" }}>
         Details: {detail ? `${detail} (${code})` : code}
       </p>
       {needsEmail && (
-        <p style={{ fontSize: 12, color: "#b91c1c", margin: "8px 0 0" }}>
+        <p style={{ fontSize: 12, color: "#fca5a5", margin: "8px 0 0" }}>
           Enter your email to resend the confirmation.
         </p>
       )}
@@ -58,7 +58,7 @@ export function AuthErrorBanner({
             gap: 8,
             fontSize: 13,
             fontWeight: 600,
-            color: "#0A0A0A",
+            color: "#F4F4F5",
             background: "none",
             border: "none",
             padding: 0,
@@ -80,8 +80,8 @@ export function AuthErrorBanner({
             marginTop: 10,
             padding: "4px 10px",
             borderRadius: 999,
-            background: "rgba(5,150,105,0.1)",
-            color: "#047857",
+            background: "rgba(52,211,153,0.12)",
+            color: "#6ee7b7",
             fontSize: 12,
             fontWeight: 600,
           }}

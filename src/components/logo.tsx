@@ -10,7 +10,14 @@ interface LogoProps {
   capitalized?: boolean;
 }
 
-export function Logo({ className = "", iconSize = 28, showWordmark = true, href = "/", onDark = false, capitalized = false }: LogoProps) {
+export function Logo({
+  className = "",
+  iconSize = 28,
+  showWordmark = true,
+  href = "/",
+  onDark = false,
+  capitalized = false,
+}: LogoProps) {
   const content = (
     <span className={`inline-flex items-center gap-2.5 select-none ${className}`} aria-label="Ultralink">
       <Image

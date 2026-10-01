@@ -31,7 +31,7 @@ export function ResetPasswordForm({
       <div>
         <label
           htmlFor="reset-email"
-          style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#6B6B6B", marginBottom: 6 }}
+          style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#A1A1AA", marginBottom: 6 }}
         >
           Email address
         </label>
@@ -48,7 +48,7 @@ export function ResetPasswordForm({
           disabled={resetLoading}
           style={emailError ? inputErrorStyle : inputStyle}
         />
-        {emailError && <p style={{ marginTop: 6, fontSize: 12, color: "#dc2626" }}>{emailError}</p>}
+        {emailError && <p style={{ marginTop: 6, fontSize: 12, color: "#f87171" }}>{emailError}</p>}
       </div>
 
       {resetSent && (
@@ -59,10 +59,10 @@ export function ResetPasswordForm({
           style={{
             padding: "10px 14px",
             borderRadius: 8,
-            background: "rgba(5,150,105,0.08)",
-            border: "1px solid rgba(5,150,105,0.25)",
+            background: "rgba(52,211,153,0.1)",
+            border: "1px solid rgba(52,211,153,0.3)",
             fontSize: 14,
-            color: "#047857",
+            color: "#6ee7b7",
           }}
         >
           If an account exists for that email, a reset link is on the way.
@@ -83,8 +83,8 @@ export function ResetPasswordForm({
           fontWeight: 600,
           borderRadius: 10,
           border: "none",
-          background: "#0A0A0A",
-          color: "#ffffff",
+          background: "#ffffff",
+          color: "#0A0A0B",
           cursor: resetLoading ? "not-allowed" : "pointer",
           opacity: resetLoading ? 0.6 : 1,
           fontFamily: "inherit",
@@ -101,7 +101,7 @@ export function ResetPasswordForm({
         style={{
           textAlign: "center",
           fontSize: 13,
-          color: "#6B6B6B",
+          color: "#A1A1AA",
           background: "none",
           border: "none",
           cursor: "pointer",

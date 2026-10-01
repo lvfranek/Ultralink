@@ -6,10 +6,10 @@ const SCREEN_BG = "linear-gradient(180deg,#FDEDE4 0%,#FBE3EE 38%,#EEE5FB 72%,#E4
 const EXAMPLE_SOCIALS = ["instagram", "tiktok", "youtube", "x"];
 const EXAMPLE_LINKS = ["Watch my newest vlog", "Shop my travel essentials", "Join my newsletter", "Book a collab"];
 
-// "franek-k" → "Franek K"
+// "franek-k" / "mia_studio" → "Franek K" / "Mia Studio"
 function nameFromSlug(slug: string): string {
   return slug
-    .split("-")
+    .split(/[-_]/)
     .filter(Boolean)
     .map((w) => w[0].toUpperCase() + w.slice(1))
     .join(" ");

@@ -4,35 +4,21 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { HELP_SECTIONS, type HelpVideo } from "@/lib/config/help-content";
 import { YouTubeThumbnail } from "@/components/youtube-thumbnail";
 import { VideoLightbox } from "@/components/video-lightbox";
+import { cx, spotlight } from "@/components/marketing/landing/shared";
+import s from "@/components/marketing/landing/landing.module.css";
 
 function VideoCard({ video, onPlay }: { video: HelpVideo; onPlay: () => void }) {
   const comingSoon = video.youtubeId === "PLACEHOLDER";
   return (
-    <div
-      className="rounded-[18px] p-3 transition-colors"
-      style={{ background: "#141414", border: "1px solid rgba(255,255,255,.06)" }}
-      onMouseEnter={(e) => {
-        if (!comingSoon) e.currentTarget.style.background = "#2A2A2A";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = "#141414";
-      }}
-    >
+    <div className={cx(s.card, s.videoCard)} onPointerMove={spotlight}>
       <YouTubeThumbnail youtubeId={video.youtubeId} title={video.title} onPlay={onPlay} comingSoon={comingSoon} />
-      <div className="mt-3 px-1 pb-1">
+      <div className="relative mt-3 px-1 pb-1">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-medium" style={{ color: "#fff" }}>
-            {video.title}
-          </p>
-          <span className="text-xs shrink-0" style={{ color: "#9A9A9A" }}>
-            {comingSoon ? "Coming soon" : video.duration}
-          </span>
+          <p className="text-[15px] font-medium text-white">{video.title}</p>
+          {/* Unpublished videos already say "Coming soon" on the thumbnail */}
+          {!comingSoon && <span className="text-xs shrink-0 text-[#a1a1aa]">{video.duration}</span>}
         </div>
-        {video.description && (
-          <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "#9A9A9A" }}>
-            {video.description}
-          </p>
-        )}
+        {video.description && <p className="text-[13px] mt-1.5 leading-relaxed text-[#a1a1aa]">{video.description}</p>}
       </div>
     </div>
   );
@@ -104,54 +90,44 @@ export function HelpCenter() {
   return (
     <>
       {/* Hero */}
-      <section style={{ background: "#0A0A0A" }} aria-label="Help Center hero">
-        <div style={{ maxWidth: 1140, margin: "0 auto", padding: "88px 24px 32px" }}>
-          <h1 className="text-4xl sm:text-5xl font-bold" style={{ color: "#fff", letterSpacing: "-0.02em" }}>
-            Help Center
+      <section className={s.helpHero} aria-label="Help Center hero">
+        <div className={s.aurora} aria-hidden="true">
+          <span className={s.blobA} />
+          <span className={s.blobB} />
+        </div>
+        <div className={s.grid} aria-hidden="true" />
+        <div className={s.helpHeroInner}>
+          <p className={s.eyebrow}>Help Center</p>
+          <h1 className={s.h2}>
+            Learn Ultralink
+            <br />
+            <em className={s.serifAccent}>in a few minutes.</em>
           </h1>
-          <p className="mt-3 text-base sm:text-lg" style={{ color: "#9A9A9A" }}>
-            Learn how to get the most out of Ultralink.
-          </p>
-          <div className="mt-6 max-w-sm">
-            <div className="relative">
-              <svg
-                viewBox="0 0 16 16"
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-                fill="none"
-                stroke="#6B6B6B"
-                strokeWidth="1.5"
-                aria-hidden="true"
-              >
-                <circle cx="7" cy="7" r="5" />
-                <path d="M11 11l3.5 3.5" strokeLinecap="round" />
-              </svg>
-              <input
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search videos…"
-                aria-label="Search help videos"
-                className="w-full pl-9 pr-4 py-2.5 rounded-full focus:outline-none"
-                style={{
-                  background: "#141414",
-                  border: "1px solid rgba(255,255,255,.10)",
-                  color: "#fff",
-                  // 16px, not the 14px `text-sm` gives: smaller makes iOS Safari zoom in on focus
-                  fontSize: 16,
-                }}
-              />
-            </div>
+          <p className={s.helpLead}>Short video walkthroughs for everything from your first link to Win-Back.</p>
+          <div className={s.helpSearch}>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <circle cx="7" cy="7" r="5" />
+              <path d="M11 11l3.5 3.5" strokeLinecap="round" />
+            </svg>
+            {/* 16px font: anything smaller makes iOS Safari zoom in on focus */}
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search videos…"
+              aria-label="Search help videos"
+            />
           </div>
         </div>
       </section>
 
       {/* Content */}
-      <section style={{ background: "#0A0A0A" }} aria-label="Help sections">
-        <div style={{ maxWidth: 1140, margin: "0 auto", padding: "0 24px 96px" }}>
+      <section aria-label="Help sections">
+        <div style={{ maxWidth: 1140, margin: "0 auto", padding: "0 24px 120px" }}>
           <div className="flex flex-col lg:flex-row gap-10">
             {/* Section nav */}
             <nav
-              className="lg:w-48 shrink-0 lg:sticky lg:top-24 lg:self-start -mx-1 lg:mx-0 overflow-x-auto lg:overflow-visible"
+              className="lg:w-48 shrink-0 lg:sticky lg:top-28 lg:self-start -mx-1 lg:mx-0 overflow-x-auto lg:overflow-visible"
               aria-label="Help sections navigation"
             >
               <ul className="flex lg:flex-col gap-1.5 lg:gap-1 px-1 lg:px-0 pb-2 lg:pb-0">
@@ -159,12 +135,11 @@ export function HelpCenter() {
                   <li key={section.id} className="shrink-0">
                     <a
                       href={`#${section.id}`}
-                      className="block whitespace-nowrap lg:whitespace-normal px-3.5 py-2 text-sm rounded-full lg:rounded-[10px] transition-colors"
-                      style={
-                        activeSection === section.id && !query
-                          ? { background: "rgba(255,255,255,.10)", color: "#fff" }
-                          : { color: "#9A9A9A" }
-                      }
+                      className={cx(
+                        "block whitespace-nowrap lg:whitespace-normal px-3.5 py-2 text-sm rounded-full lg:rounded-[10px] transition-colors",
+                        s.helpNavLink,
+                        activeSection === section.id && !query && s.helpNavActive,
+                      )}
                     >
                       {section.title}
                     </a>
@@ -176,18 +151,12 @@ export function HelpCenter() {
             {/* Sections */}
             <div className="flex-1 min-w-0 space-y-16">
               {!hasResults && (
-                <div
-                  className="rounded-[18px] p-8 text-center"
-                  style={{ background: "#141414", border: "1px solid rgba(255,255,255,.06)" }}
-                >
-                  <p className="text-sm" style={{ color: "#9A9A9A" }}>
-                    No videos match that search.
-                  </p>
+                <div className={cx(s.card, "text-center")}>
+                  <p className="relative text-sm text-[#a1a1aa]">No videos match that search.</p>
                   <button
                     type="button"
                     onClick={() => setSearch("")}
-                    className="mt-2 text-sm font-medium cursor-pointer"
-                    style={{ color: "#fff", textDecoration: "underline" }}
+                    className="relative mt-2 text-sm font-medium cursor-pointer text-white underline underline-offset-2"
                   >
                     Clear search
                   </button>
@@ -201,14 +170,10 @@ export function HelpCenter() {
                   ref={(el) => {
                     sectionRefs.current[section.id] = el;
                   }}
-                  className="scroll-mt-24"
+                  className="scroll-mt-28"
                 >
-                  <h2 className="text-xl font-bold" style={{ color: "#fff" }}>
-                    {section.title}
-                  </h2>
-                  <p className="mt-1.5 text-sm" style={{ color: "#9A9A9A" }}>
-                    {section.description}
-                  </p>
+                  <h2 className="text-2xl font-medium tracking-[-0.02em] text-white">{section.title}</h2>
+                  <p className="mt-1.5 text-[15px] text-[#a1a1aa]">{section.description}</p>
                   <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {section.videos.map((video) => (
                       <VideoCard key={video.id} video={video} onPlay={() => setPlaying(video)} />

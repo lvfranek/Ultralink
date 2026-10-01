@@ -51,8 +51,10 @@ export default async function ConfirmPage({
 
   return (
     <AuthShell>
-      <h1 style={{ fontSize: 20, fontWeight: 600, color: "#0A0A0A", margin: "0 0 8px" }}>{copy.title}</h1>
-      <p style={{ fontSize: 14, color: "#6B6B6B", margin: "0 0 24px", lineHeight: 1.5 }}>{copy.body}</p>
+      <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", color: "#F4F4F5", margin: "0 0 8px" }}>
+        {copy.title}
+      </h1>
+      <p style={{ fontSize: 14, color: "#A1A1AA", margin: "0 0 24px", lineHeight: 1.5 }}>{copy.body}</p>
 
       <form action={confirmToken}>
         <input type="hidden" name="token_hash" value={tokenHash} />
@@ -67,8 +69,8 @@ export default async function ConfirmPage({
             fontWeight: 600,
             borderRadius: 10,
             border: "none",
-            background: "#0A0A0A",
-            color: "#ffffff",
+            background: "#ffffff",
+            color: "#0A0A0B",
             cursor: "pointer",
             fontFamily: "inherit",
           }}

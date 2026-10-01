@@ -14,13 +14,13 @@ test.describe("Homepage", () => {
 
   test("FAQ answers open and close", async ({ page }) => {
     await page.goto("/");
-    const question = page.getByRole("button", { name: "What is Win-Back?" });
+    const question = page.getByText("What is Win-Back?");
+    const answer = page.getByText(/Win-Back shows a clean prompt/);
     await question.click();
-    await expect(question).toHaveAttribute("aria-expanded", "true");
-    await expect(page.getByRole("region", { name: "What is Win-Back?" })).toBeVisible();
+    await expect(answer).toBeVisible();
 
     await question.click();
-    await expect(question).toHaveAttribute("aria-expanded", "false");
+    await expect(answer).toBeHidden();
   });
 
   test("the imprint is reachable from the footer", async ({ page }) => {

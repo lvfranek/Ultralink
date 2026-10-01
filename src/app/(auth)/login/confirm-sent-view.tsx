@@ -25,12 +25,14 @@ export function ConfirmSentView({
     <AuthShell footer={footer}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
         <Mail size={24} color="#9a9a9a" aria-hidden="true" style={{ marginBottom: 16 }} />
-        <h1 style={{ fontSize: 20, fontWeight: 600, color: "#0A0A0A", margin: "0 0 8px" }}>Check your inbox.</h1>
-        <p style={{ fontSize: 14, color: "#6B6B6B", margin: "0 0 8px", lineHeight: 1.5 }}>
-          We just sent a confirmation link to <strong style={{ color: "#0A0A0A" }}>{email}</strong>. Click it to
+        <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", color: "#F4F4F5", margin: "0 0 8px" }}>
+          Check your inbox.
+        </h1>
+        <p style={{ fontSize: 14, color: "#A1A1AA", margin: "0 0 8px", lineHeight: 1.5 }}>
+          We just sent a confirmation link to <strong style={{ color: "#F4F4F5" }}>{email}</strong>. Click it to
           activate your account.
         </p>
-        <p style={{ fontSize: 12, color: "#6B6B6B", margin: "0 0 24px" }}>
+        <p style={{ fontSize: 12, color: "#A1A1AA", margin: "0 0 24px" }}>
           Didn&apos;t get it? Check your spam folder, or check that the address is right.
         </p>
 
@@ -50,9 +52,9 @@ export function ConfirmSentView({
               fontSize: 13,
               fontWeight: 600,
               borderRadius: 8,
-              border: "1px solid rgba(0,0,0,.12)",
+              border: "1px solid rgba(255,255,255,.12)",
               background: "transparent",
-              color: "#0A0A0A",
+              color: "#F4F4F5",
               cursor: resendLoading || resendCooldown > 0 ? "not-allowed" : "pointer",
               opacity: resendLoading || resendCooldown > 0 ? 0.5 : 1,
               fontFamily: "inherit",
@@ -70,9 +72,9 @@ export function ConfirmSentView({
               fontSize: 13,
               fontWeight: 600,
               borderRadius: 8,
-              border: "1px solid rgba(0,0,0,.12)",
+              border: "1px solid rgba(255,255,255,.12)",
               background: "transparent",
-              color: "#0A0A0A",
+              color: "#F4F4F5",
               cursor: "pointer",
               fontFamily: "inherit",
             }}

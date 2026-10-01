@@ -18,8 +18,10 @@ export default async function ResetPasswordPage() {
   if (!user) {
     return (
       <AuthShell>
-        <h1 style={{ fontSize: 20, fontWeight: 600, color: "#0A0A0A", margin: "0 0 4px" }}>Link expired</h1>
-        <p style={{ fontSize: 14, color: "#6B6B6B", margin: "0 0 20px" }}>
+        <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", color: "#F4F4F5", margin: "0 0 4px" }}>
+          Link expired
+        </h1>
+        <p style={{ fontSize: 14, color: "#A1A1AA", margin: "0 0 20px" }}>
           This reset link has expired or is invalid. Request a new one.
         </p>
         <Link
@@ -33,8 +35,8 @@ export default async function ResetPasswordPage() {
             fontSize: 15,
             fontWeight: 600,
             borderRadius: 10,
-            background: "#0A0A0A",
-            color: "#ffffff",
+            background: "#ffffff",
+            color: "#0A0A0B",
             textDecoration: "none",
             boxSizing: "border-box",
           }}

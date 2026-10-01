@@ -1,11 +1,6 @@
-import { Hero } from "@/components/marketing/hero";
-import { Features } from "@/components/marketing/features";
-import { TrafficRecovery } from "@/components/marketing/traffic-recovery";
-import { Pricing } from "@/components/marketing/pricing";
-import { FAQ } from "@/components/marketing/faq";
-import { Footer } from "@/components/marketing/footer";
-import { Header } from "@/components/marketing/header";
 import type { Metadata } from "next";
+import { serifDisplay } from "@/components/marketing/landing/fonts";
+import { Landing } from "@/components/marketing/landing/landing";
 
 // Title/description/openGraph are already the root layout's defaults —
 // only add what's specific to this page (its canonical URL), so this page
@@ -19,7 +14,8 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div style={{ background: "#0A0A0A", minHeight: "100dvh", overflowX: "hidden", overflowY: "visible" }}>
+    // No overflow clipping here — it would break the sticky "How it works" story
+    <div className={serifDisplay.variable}>
       {/* Invisible until focused with Tab — lets keyboard users jump past the menu */}
       <a
         href="#main"
@@ -27,15 +23,7 @@ export default function HomePage() {
       >
         Skip to main content
       </a>
-      <Header capitalizedLogo />
-      <main id="main">
-        <Hero />
-        <Features />
-        <TrafficRecovery />
-        <Pricing />
-        <FAQ />
-      </main>
-      <Footer capitalizedLogo />
+      <Landing />
     </div>
   );
 }
