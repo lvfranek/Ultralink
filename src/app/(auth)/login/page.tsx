@@ -2,13 +2,23 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { LoginForm } from "./login-form";
 
-export const metadata: Metadata = {
-  // The root layout's title template already appends " | Ultralink"
-  title: "Sign in",
-  description: "Sign in or create your Ultralink account.",
-  robots: { index: false, follow: false },
-  alternates: { canonical: "/login" },
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const sp = await searchParams;
+  // Same rule LoginForm uses to open in sign-up mode (e.g. arriving from "Claim my link")
+  const isSignup = sp.mode === "signup" || !!sp.username || !!sp.plan;
+
+  return {
+    // The root layout's title template already appends " | ULTRALINK"
+    title: isSignup ? "Sign up" : "Sign in",
+    description: "Sign in or create your Ultralink account.",
+    robots: { index: false, follow: false },
+    alternates: { canonical: "/login" },
+  };
+}
 
 export default function LoginPage() {
   return (

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { headers } from "next/headers";
@@ -18,23 +19,43 @@ interface Props {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+// Shared by generateMetadata and the page, so the lookups run once per request
+const loadPage = cache(async (slug: string) => {
   const supabase = await createClient();
-
-  const { data: page } = await supabase
+  const { data } = await supabase
     .from("pages")
-    .select("title, bio, avatar_url")
+    .select("*, page_links(*), page_socials(*)")
     .eq("slug", slug)
     .eq("is_active", true)
     .single();
+  return data;
+});
+
+const loadOwnerProfile = cache(async (ownerId: string) => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, subscription_status, grace_period_ends_at")
+    .eq("id", ownerId)
+    .single();
+  return data;
+});
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const page = await loadPage(slug);
 
   if (!page) {
-    return { title: "Not found" };
+    return { title: "Page not found" };
   }
 
+  const ownerProfile = await loadOwnerProfile(page.owner_id);
+  const ownerIsPro = ownerProfile ? isProActive(ownerProfile) : false;
+  const name = page.title || slug;
+
   return {
-    title: page.title || slug,
+    // Pro pages carry no Ultralink branding, so the tab drops the " | ULTRALINK" suffix too
+    title: ownerIsPro ? { absolute: name } : name,
     description: page.bio || undefined,
     alternates: { canonical: `/${slug}` },
     openGraph: {
@@ -64,21 +85,12 @@ export default async function BioPage({ params, searchParams }: Props) {
 
   const supabase = await createClient();
 
-  const { data: page } = await supabase
-    .from("pages")
-    .select("*, page_links(*), page_socials(*)")
-    .eq("slug", slug)
-    .eq("is_active", true)
-    .single();
+  const page = await loadPage(slug);
 
   if (!page) notFound();
 
   // Subscription enforcement: check owner's subscription status
-  const { data: ownerProfile } = await supabase
-    .from("profiles")
-    .select("id, subscription_status, grace_period_ends_at")
-    .eq("id", page.owner_id)
-    .single();
+  const ownerProfile = await loadOwnerProfile(page.owner_id);
 
   const ownerIsPro = ownerProfile ? isProActive(ownerProfile) : false;
 

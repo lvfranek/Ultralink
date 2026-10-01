@@ -10,7 +10,7 @@ const NAV_LINKS = [
   { label: "FAQ", href: "#faq" },
 ];
 
-export function Header() {
+export function Header({ capitalizedLogo = false }: { capitalizedLogo?: boolean } = {}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -65,7 +65,7 @@ export function Header() {
               padding: "8px 14px",
             }}
           >
-            <Logo onDark />
+            <Logo onDark capitalized={capitalizedLogo} />
           </div>
 
           {/* Glass pill — right (desktop) */}
@@ -88,7 +88,7 @@ export function Header() {
                   color: "#cfcfcf",
                   textDecoration: "none",
                   fontSize: 14,
-                  fontWeight: 500,
+                  fontWeight: 400,
                   padding: "8px 14px",
                   borderRadius: 999,
                   transition: "color 0.15s",
@@ -105,7 +105,7 @@ export function Header() {
                 color: "#cfcfcf",
                 textDecoration: "none",
                 fontSize: 14,
-                fontWeight: 500,
+                fontWeight: 400,
                 padding: "8px 14px",
                 borderRadius: 999,
                 transition: "color 0.15s",
@@ -137,7 +137,7 @@ export function Header() {
                 e.currentTarget.style.transform = "scale(1)";
               }}
             >
-              Sign up for free
+              Sign up
             </Link>
           </nav>
 
@@ -254,7 +254,7 @@ export function Header() {
                 borderRadius: 999,
               }}
             >
-              Sign up for free
+              Sign up
             </Link>
           </div>
         </nav>

@@ -1,9 +1,15 @@
 import { notFound } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminStats } from "@/lib/admin/stats";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Admin",
+  robots: { index: false, follow: false },
+};
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (

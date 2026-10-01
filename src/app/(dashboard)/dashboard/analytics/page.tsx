@@ -9,7 +9,7 @@ import { EXAMPLE_ANALYTICS_DATA } from "@/lib/analytics/example-data";
 import type { SubscriptionStatus } from "@/lib/supabase/types";
 
 export const metadata: Metadata = {
-  title: "Ultralink Analytics",
+  title: "Analytics",
   robots: { index: false, follow: false },
 };
 

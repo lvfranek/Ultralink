@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
@@ -9,20 +10,14 @@ import type { Page, PageLink, PageSocial, SubscriptionStatus } from "@/lib/supab
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Ultralink Links",
-  robots: { index: false, follow: false },
-};
-
-export default async function EditLinkPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-
+// Shared by generateMetadata and the page, so the queries run once per request
+const loadEditor = cache(async (id: string) => {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  if (!user) return null;
 
   const activeOwnerId = await getActiveOwnerId(user.id, supabase);
 
@@ -32,6 +27,29 @@ export default async function EditLinkPage({ params }: { params: Promise<{ id: s
     supabase.from("page_socials").select("*").eq("page_id", id).order("position", { ascending: true }),
     supabase.from("profiles").select("subscription_status, grace_period_ends_at").eq("id", activeOwnerId).single(),
   ]);
+
+  return { user, pageResult, linksResult, socialsResult, profileResult };
+});
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const data = await loadEditor(id);
+  const slug = (data?.pageResult.data as Page | null)?.slug;
+
+  return {
+    // Names the page so several open editor tabs can be told apart
+    title: slug ? `Edit @${slug}` : "Edit page",
+    robots: { index: false, follow: false },
+  };
+}
+
+export default async function EditLinkPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
+  const data = await loadEditor(id);
+  if (!data) redirect("/login");
+
+  const { user, pageResult, linksResult, socialsResult, profileResult } = data;
 
   if (!pageResult.data) notFound();
 

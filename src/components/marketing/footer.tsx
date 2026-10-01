@@ -42,7 +42,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
   );
 }
 
-export function Footer() {
+export function Footer({ capitalizedLogo = false }: { capitalizedLogo?: boolean } = {}) {
   const year = new Date().getFullYear();
 
   return (
@@ -67,7 +67,7 @@ export function Footer() {
           >
             {/* Brand column */}
             <div style={{ gridColumn: "span 1" }}>
-              <Logo className="mb-4" />
+              <Logo className="mb-4" capitalized={capitalizedLogo} />
               <p
                 style={{
                   fontSize: 14,
@@ -134,7 +134,6 @@ export function Footer() {
             <p style={{ fontSize: 12, color: "rgba(10,10,10,0.6)", margin: 0 }}>
               &copy; {year} Ultralink. All rights reserved.
             </p>
-            <p style={{ fontSize: 12, color: "rgba(10,10,10,0.6)", margin: 0 }}>Built for influencer agencies.</p>
           </div>
         </div>
       </div>

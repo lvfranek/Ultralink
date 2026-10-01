@@ -12,6 +12,8 @@ import type { Metadata } from "next";
 // still inherits the root's og:image instead of shadowing it with an
 // openGraph object that omits `images`.
 export const metadata: Metadata = {
+  // absolute: the slogan replaces the " | ULTRALINK" template — it's the headline Google shows
+  title: { absolute: "ULTRALINK – The link in bio that converts" },
   alternates: { canonical: "/" },
 };
 
@@ -25,7 +27,7 @@ export default function HomePage() {
       >
         Skip to main content
       </a>
-      <Header />
+      <Header capitalizedLogo />
       <main id="main">
         <Hero />
         <Features />
@@ -33,7 +35,7 @@ export default function HomePage() {
         <Pricing />
         <FAQ />
       </main>
-      <Footer />
+      <Footer capitalizedLogo />
     </div>
   );
 }

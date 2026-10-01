@@ -86,8 +86,8 @@ const bebasNeue = Bebas_Neue({
 
 export const metadata: Metadata = {
   title: {
-    default: "Ultralink",
-    template: "%s | Ultralink",
+    default: "ULTRALINK",
+    template: "%s | ULTRALINK",
   },
   description: "The premium link-in-bio platform for creators and agencies. Fast pages and real analytics.",
   metadataBase: new URL("https://ultralink.bio"),

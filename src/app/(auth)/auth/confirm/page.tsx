@@ -4,7 +4,7 @@ import { AuthShell } from "../../auth-shell";
 import { confirmToken } from "@/app/actions/confirm";
 
 export const metadata: Metadata = {
-  title: "Confirm — Ultralink",
+  title: "Confirm email",
   robots: { index: false, follow: false },
 };
 

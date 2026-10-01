@@ -7,7 +7,7 @@ import type { SubscriptionStatus, PlanInterval, TeamMember, TeamInvite } from "@
 import { AccountSettingsClient } from "./account-settings-client";
 
 export const metadata: Metadata = {
-  title: "Ultralink Account",
+  title: "Account",
   robots: { index: false, follow: false },
 };
 

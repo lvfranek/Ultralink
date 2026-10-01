@@ -1,26 +1,47 @@
+import { cache } from "react";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { AcceptInviteClient } from "./accept-client";
 
-export const metadata: Metadata = {
-  title: "Ultralink Invite",
-  robots: { index: false, follow: false },
-};
+type Props = { searchParams: Promise<{ token?: string }> };
 
-export default async function AcceptInvitePage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
-  const { token } = await searchParams;
-
-  if (!token) {
-    return <InviteCard state="invalid" message="No invite token provided." />;
-  }
-
+// Shared by generateMetadata and the page, so the lookups run once per request
+const loadInvite = cache(async (token: string) => {
   const service = createServiceClient();
   const { data: invite } = await service
     .from("team_invites")
     .select("id, owner_id, email, expires_at, accepted_at")
     .eq("token", token)
     .maybeSingle();
+
+  // Owner is only shown for invites that can still be accepted
+  if (!invite || invite.accepted_at || new Date(invite.expires_at) < new Date()) {
+    return { invite, ownerUsername: null };
+  }
+
+  const { data: ownerProfile } = await service.from("profiles").select("username").eq("id", invite.owner_id).single();
+  return { invite, ownerUsername: ownerProfile?.username ?? null };
+});
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const { token } = await searchParams;
+  const ownerUsername = token ? (await loadInvite(token)).ownerUsername : null;
+
+  return {
+    title: ownerUsername ? `Join @${ownerUsername}'s team` : "Team invite",
+    robots: { index: false, follow: false },
+  };
+}
+
+export default async function AcceptInvitePage({ searchParams }: Props) {
+  const { token } = await searchParams;
+
+  if (!token) {
+    return <InviteCard state="invalid" message="No invite token provided." />;
+  }
+
+  const { invite, ownerUsername: loadedOwner } = await loadInvite(token);
 
   if (!invite) {
     return <InviteCard state="invalid" message="This invite link is invalid or has already been used." />;
@@ -32,10 +53,7 @@ export default async function AcceptInvitePage({ searchParams }: { searchParams:
     return <InviteCard state="invalid" message="This invite has expired. Ask the owner to send a new one." />;
   }
 
-  // Fetch owner username for display
-  const { data: ownerProfile } = await service.from("profiles").select("username").eq("id", invite.owner_id).single();
-
-  const ownerUsername = ownerProfile?.username ?? "Someone";
+  const ownerUsername = loadedOwner ?? "Someone";
 
   // Check current auth state
   const supabase = await createClient();

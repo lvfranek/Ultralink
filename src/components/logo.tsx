@@ -7,9 +7,10 @@ interface LogoProps {
   showWordmark?: boolean;
   href?: string;
   onDark?: boolean;
+  capitalized?: boolean;
 }
 
-export function Logo({ className = "", iconSize = 28, showWordmark = true, href = "/", onDark = false }: LogoProps) {
+export function Logo({ className = "", iconSize = 28, showWordmark = true, href = "/", onDark = false, capitalized = false }: LogoProps) {
   const content = (
     <span className={`inline-flex items-center gap-2.5 select-none ${className}`} aria-label="Ultralink">
       <Image
@@ -25,7 +26,7 @@ export function Logo({ className = "", iconSize = 28, showWordmark = true, href 
           className="text-[1.05rem] font-semibold tracking-[-0.02em]"
           style={{ color: onDark ? "#ffffff" : "var(--text)" }}
         >
-          ultralink
+          {capitalized ? "Ultralink" : "ultralink"}
         </span>
       )}
     </span>

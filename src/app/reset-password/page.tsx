@@ -5,7 +5,7 @@ import { AuthShell } from "@/app/(auth)/auth-shell";
 import { ResetPasswordForm } from "./reset-password-form";
 
 export const metadata: Metadata = {
-  title: "Reset password — Ultralink",
+  title: "Reset password",
   robots: { index: false, follow: false },
 };
 
