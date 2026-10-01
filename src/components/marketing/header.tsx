@@ -23,19 +23,10 @@ export function Header({ capitalizedLogo = false }: { capitalizedLogo?: boolean 
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Same glass look at rest; scrolling over busy hero content darkens the pill
-  // so nav text stays readable against arbitrary light/dark background art.
-  const pillStyle = {
-    background: scrolled ? "rgba(10,10,10,.55)" : "rgba(255,255,255,.05)",
-    backdropFilter: "blur(14px)",
-    WebkitBackdropFilter: "blur(14px)",
-    border: scrolled ? "1px solid rgba(255,255,255,.14)" : "1px solid rgba(255,255,255,.10)",
-    transition: "background 0.2s ease, border-color 0.2s ease",
-  };
-
   return (
     <>
       <header
+        className={scrolled ? "site-header is-scrolled" : "site-header"}
         style={{
           position: "fixed",
           top: 0,
@@ -45,112 +36,42 @@ export function Header({ capitalizedLogo = false }: { capitalizedLogo?: boolean 
         }}
       >
         <div
+          className="site-header-inner"
           style={{
             maxWidth: 1140,
             margin: "0 auto",
-            padding: "22px 24px",
+            padding: "0 24px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             gap: 14,
           }}
         >
-          {/* Logo — left, wrapped in matching glass pill */}
-          <div
-            style={{
-              ...pillStyle,
-              display: "flex",
-              alignItems: "center",
-              borderRadius: 999,
-              padding: "8px 14px",
-            }}
-          >
+          {/* Left — logo + page sections */}
+          <div style={{ display: "flex", alignItems: "center", gap: 48 }}>
             <Logo onDark capitalized={capitalizedLogo} />
+            <nav aria-label="Primary" className="hidden md:flex" style={{ alignItems: "center", gap: 36 }}>
+              {NAV_LINKS.map((link) => (
+                <Link key={link.href} href={link.href} className="site-nav-link">
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
           </div>
 
-          {/* Glass pill — right (desktop) */}
-          <nav
-            aria-label="Primary"
-            style={{
-              ...pillStyle,
-              alignItems: "center",
-              gap: 2,
-              borderRadius: 999,
-              padding: 5,
-            }}
-            className="hidden md:flex"
-          >
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                style={{
-                  color: "#cfcfcf",
-                  textDecoration: "none",
-                  fontSize: 14,
-                  fontWeight: 400,
-                  padding: "8px 14px",
-                  borderRadius: 999,
-                  transition: "color 0.15s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#cfcfcf")}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <Link
-              href="/login"
-              style={{
-                color: "#cfcfcf",
-                textDecoration: "none",
-                fontSize: 14,
-                fontWeight: 400,
-                padding: "8px 14px",
-                borderRadius: 999,
-                transition: "color 0.15s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#cfcfcf")}
-            >
-              Login
-            </Link>
-            <Link
-              href="/login?mode=signup"
-              style={{
-                background: "#fff",
-                color: "#0A0A0A",
-                fontWeight: 600,
-                borderRadius: 999,
-                padding: "8px 15px",
-                fontSize: 14,
-                textDecoration: "none",
-                whiteSpace: "nowrap",
-                transition: "opacity 0.15s, transform 0.15s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = "0.82";
-                e.currentTarget.style.transform = "scale(0.97)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = "1";
-                e.currentTarget.style.transform = "scale(1)";
-              }}
-            >
+          {/* Right — sign up + login (desktop) */}
+          <div className="hidden md:flex" style={{ alignItems: "center", gap: 28 }}>
+            <Link href="/login?mode=signup" className="site-signup">
               Sign up
             </Link>
-          </nav>
+            <Link href="/login" className="site-nav-link">
+              Login
+            </Link>
+          </div>
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden"
-            style={{
-              ...pillStyle,
-              borderRadius: 999,
-              padding: "10px 14px",
-              cursor: "pointer",
-              color: "#fff",
-            }}
+            className="site-menu-btn inline-flex md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
@@ -167,6 +88,65 @@ export function Header({ capitalizedLogo = false }: { capitalizedLogo?: boolean 
           </button>
         </div>
       </header>
+
+      <style>{`
+        /* Transparent over the dark page top; once scrolled over the white hero card
+           the bar darkens so the light nav text stays readable. */
+        .site-header {
+          border-bottom: 1px solid transparent;
+          transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        /* Same height as the hero card's top offset (.hero-outer padding-top), so the
+           nav items sit exactly centred in the dark gap above the card */
+        .site-header-inner {
+          height: 88px;
+          transition: height 0.2s ease;
+        }
+        .site-header.is-scrolled .site-header-inner { height: 68px; }
+        .site-header.is-scrolled {
+          background: rgba(10,10,10,.88);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border-bottom-color: rgba(255,255,255,.08);
+        }
+        .site-nav-link {
+          color: #b5b5b5;
+          text-decoration: none;
+          font-size: 14px;
+          transition: color 0.15s;
+        }
+        .site-nav-link:hover { color: #fff; }
+        .site-signup {
+          display: inline-flex;
+          align-items: center;
+          background: #fff;
+          color: #0A0A0A;
+          font-size: 14px;
+          font-weight: 600;
+          padding: 10px 20px;
+          border-radius: 10px;
+          text-decoration: none;
+          white-space: nowrap;
+          /* Glow only on hover — same shadow layers at zero alpha so it fades in */
+          box-shadow: 0 0 0 1px rgba(255,255,255,0), 0 0 16px rgba(255,255,255,0), 0 0 40px rgba(255,255,255,0);
+          transition: box-shadow 0.25s ease, transform 0.15s ease;
+        }
+        .site-signup:hover {
+          box-shadow: 0 0 0 1px rgba(255,255,255,.4), 0 0 16px rgba(255,255,255,.26), 0 0 40px rgba(255,255,255,.1);
+        }
+        .site-signup:active { transform: scale(0.97); }
+        .site-menu-btn {
+          align-items: center;
+          justify-content: center;
+          width: 42px;
+          height: 42px;
+          border-radius: 10px;
+          border: 1px solid rgba(255,255,255,.12);
+          background: rgba(255,255,255,.04);
+          color: #fff;
+          cursor: pointer;
+        }
+      `}</style>
 
       {/* Mobile menu */}
       <div
@@ -251,7 +231,7 @@ export function Header({ capitalizedLogo = false }: { capitalizedLogo?: boolean 
                 fontWeight: 600,
                 padding: "14px 16px",
                 textAlign: "center",
-                borderRadius: 999,
+                borderRadius: 10,
               }}
             >
               Sign up

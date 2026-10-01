@@ -293,15 +293,6 @@ export function Hero() {
                         whiteSpace: "nowrap",
                         cursor: "pointer",
                         fontFamily: "inherit",
-                        transition: "opacity 0.15s, transform 0.15s",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.opacity = "0.8";
-                        e.currentTarget.style.transform = "scale(0.97)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.opacity = "1";
-                        e.currentTarget.style.transform = "scale(1)";
                       }}
                     >
                       Claim my link
@@ -342,8 +333,19 @@ export function Hero() {
               align-items: center;
               gap: 56px;
             }
-            .hero-claim-arrow { transition: transform 0.2s ease; }
-            .hero-claim-btn:hover .hero-claim-arrow { transform: translateX(3px); }
+            /* Button stays solid black; hover lifts it with a soft shadow and slides the
+               arrow forward, the press itself gets the scale-down feedback. */
+            .hero-claim-btn {
+              box-shadow: 0 0 0 rgba(10,10,10,0);
+              transition: box-shadow 0.25s ease, transform 0.15s ease;
+            }
+            .hero-claim-arrow { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+            @media (hover: hover) {
+              .hero-claim-btn:hover { box-shadow: 0 8px 20px -8px rgba(10,10,10,.55); }
+              .hero-claim-btn:hover .hero-claim-arrow { transform: translateX(4px); }
+            }
+            .hero-claim-btn:focus-visible .hero-claim-arrow { transform: translateX(4px); }
+            .hero-claim-btn:active { transform: scale(0.97); }
             @media (max-width: 960px) {
               .hero-card { padding: 64px 32px !important; }
               .hero-grid { grid-template-columns: 1fr; gap: 56px; justify-items: center; }
@@ -355,7 +357,7 @@ export function Hero() {
               .phone-mockup { zoom: 0.86; }
               .hero-trust { gap: 8px 14px !important; font-size: 12px !important; }
               .hero-outer {
-                padding: 96px 16px 32px !important;
+                padding: 88px 16px 32px !important;
               }
               .hero-card {
                 padding: 40px 18px 36px !important;

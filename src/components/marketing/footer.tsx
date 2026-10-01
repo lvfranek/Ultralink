@@ -77,9 +77,7 @@ export function Footer({ capitalizedLogo = false }: { capitalizedLogo?: boolean 
                   marginTop: 16,
                 }}
               >
-                One link for everything you do.
-                <br />
-                Fast, beautiful, and built to keep your accounts safe.
+                Send your audience anywhere, track every click, and keep full control of your traffic.
               </p>
             </div>
 

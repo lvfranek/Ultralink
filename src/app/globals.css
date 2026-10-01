@@ -101,29 +101,11 @@ body {
   .benefit-card:hover {
     transform: translateY(-3px);
     box-shadow:
-      -14px -14px 32px -10px rgba(251, 194, 164, 0.55),
-      14px -14px 32px -10px rgba(247, 168, 196, 0.5),
-      -14px 16px 32px -10px rgba(201, 167, 242, 0.5),
-      14px 16px 32px -10px rgba(167, 199, 247, 0.55);
+      -12px -12px 28px -10px rgba(251, 194, 164, 0.4),
+      12px -12px 28px -10px rgba(247, 168, 196, 0.36),
+      -12px 14px 28px -10px rgba(201, 167, 242, 0.36),
+      12px 14px 28px -10px rgba(167, 199, 247, 0.4);
   }
-}
-
-/* Gradient frame — visible gradient border + soft outer glow for claim container */
-.claim-gradient-frame {
-  position: relative;
-  border-radius: 16px;
-  padding: 1.5px;
-  background: linear-gradient(110deg, #fbc2a4 0%, #f7a8c4 33%, #c9a7f2 66%, #a7c7f7 100%);
-}
-
-.claim-gradient-glow {
-  position: absolute;
-  inset: -12px;
-  border-radius: 26px;
-  background: linear-gradient(110deg, #fbc2a4 0%, #f7a8c4 33%, #c9a7f2 66%, #a7c7f7 100%);
-  filter: blur(22px);
-  opacity: 0.55;
-  pointer-events: none;
 }
 
 /* Theme animations — permanent loops on link buttons; respects reduced-motion */

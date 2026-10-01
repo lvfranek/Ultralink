@@ -256,22 +256,23 @@ export function Pricing() {
             aria-hidden="true"
             style={{
               position: "absolute",
-              inset: -16,
-              borderRadius: 36,
+              inset: -6,
+              borderRadius: 27,
               background: GRADIENT,
-              filter: "blur(28px)",
-              opacity: 0.45,
+              filter: "blur(18px)",
+              opacity: 0.35,
               zIndex: 0,
               pointerEvents: "none",
             }}
           />
-          {/* Gradient border frame */}
+          {/* Gradient border frame — whole-pixel padding: a 1.5px border gets rounded
+              differently per side (2px left, 1px right) */}
           <div
             style={{
               position: "relative",
               zIndex: 1,
               borderRadius: 21,
-              padding: 1.5,
+              padding: 2,
               background: GRADIENT,
               flex: 1,
               display: "flex",
@@ -294,13 +295,16 @@ export function Pricing() {
                   display: "inline-block",
                   padding: "4px 16px",
                   borderRadius: 999,
-                  background: "#ffffff",
-                  color: "#0A0A0A",
+                  // Same treatment as the hero's "Beta" badge — dark so it stands off the white card;
+                  // the faint ring keeps its upper half visible against the dark page
+                  background: "#0A0A0A",
+                  color: "#ffffff",
+                  border: "1px solid rgba(255,255,255,.22)",
                   fontSize: 11,
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
-                  boxShadow: "0 1px 6px rgba(0,0,0,.10)",
+                  boxShadow: "0 2px 8px rgba(0,0,0,.18)",
                 }}
               >
                 Recommended
@@ -314,7 +318,7 @@ export function Pricing() {
                 flexDirection: "column",
                 flex: 1,
                 padding: "28px 28px 24px",
-                borderRadius: 20,
+                borderRadius: 19,
                 background: "#ffffff",
               }}
             >
