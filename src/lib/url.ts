@@ -1,6 +1,7 @@
 export function normalizeUrl(url: string): string {
   const trimmed = url.trim();
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  // mailto: links (the Email social icon) are complete as they are
+  if (/^https?:\/\//i.test(trimmed) || /^mailto:/i.test(trimmed)) return trimmed;
   return `https://${trimmed}`;
 }
 

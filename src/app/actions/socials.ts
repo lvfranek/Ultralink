@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveOwnerId } from "@/lib/team";
 import { normalizeUrl, isValidUrl } from "@/lib/url";
+import { getPlatform } from "@/lib/config/socials";
 import type { PageSocial } from "@/lib/supabase/types";
 import { genericDbError } from "@/lib/db-error";
 
@@ -34,6 +35,7 @@ export async function addSocial(pageId: string, data: { platform: string; url: s
 
   if (!data.url.trim()) return { error: "URL is required." };
   if (!data.platform) return { error: "Platform is required." };
+  if (!getPlatform(data.platform)) return { error: "That platform isn't supported." };
 
   const normalizedUrl = normalizeUrl(data.url);
   if (!isValidUrl(normalizedUrl)) return { error: "Please enter a valid URL." };
@@ -74,6 +76,10 @@ export async function updateSocial(id: string, data: { platform?: string; url?: 
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  if (data.platform !== undefined && !getPlatform(data.platform)) {
+    return { error: "That platform isn't supported." };
+  }
 
   const { data: existing } = await supabase.from("page_socials").select("page_id").eq("id", id).single();
 

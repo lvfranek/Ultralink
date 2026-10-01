@@ -34,6 +34,11 @@ describe("normalizeUrl", () => {
     expect(normalizeUrl("youtube.com/@me")).toBe("https://youtube.com/@me");
   });
 
+  it("leaves mailto: links alone, so the Email icon keeps working", () => {
+    expect(normalizeUrl("mailto:you@example.com")).toBe("mailto:you@example.com");
+    expect(normalizeUrl(" MAILTO:you@example.com ")).toBe("MAILTO:you@example.com");
+  });
+
   it("keeps an existing http:// or https:// (any casing)", () => {
     expect(normalizeUrl("https://youtube.com")).toBe("https://youtube.com");
     expect(normalizeUrl("http://example.com")).toBe("http://example.com");
