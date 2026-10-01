@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/lib/config/site";
 
@@ -9,13 +11,38 @@ export const alt = `${siteConfig.name} — ${siteConfig.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// The site's link-chain mark (public/logo.svg), recolored to white for the
-// dark card below. Passed as a data URI — ImageResponse/Satori supports
-// <img src> but not arbitrary inline <svg> shapes.
-const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="#ffffff" d="M31,16v6c0,2.757-2.243,5-5,5H16c-2.757,0-5-2.243-5-5h4c0,0.552,0.449,1,1,1h10 c0.551,0,1-0.448,1-1v-6c0-0.552-0.449-1-1-1H16c-0.551,0-1,0.448-1,1h-4c0-2.757,2.243-5,5-5h10C28.757,11,31,13.243,31,16z M21,16 h-4c0,0.552-0.449,1-1,1H6c-0.551,0-1-0.448-1-1v-6c0-0.552,0.449-1,1-1h10c0.551,0,1,0.448,1,1h4c0-2.757-2.243-5-5-5H6 c-2.757,0-5,2.243-5,5v6c0,2.757,2.243,5,5,5h10C18.757,21,21,18.757,21,16z"/></svg>`;
+// The logo mark (public/favicon/ultralink-icon.svg): black chain on the aurora
+// tile. Passed as a data URI — ImageResponse/Satori supports <img src> but not
+// arbitrary inline <svg> shapes.
+const ICON_SVG = readFileSync(join(process.cwd(), "public/favicon/ultralink-icon.svg"), "utf8");
 const ICON_DATA_URI = `data:image/svg+xml;base64,${Buffer.from(ICON_SVG).toString("base64")}`;
 
-export default function Image() {
+// Satori doesn't ship Geist (the wordmark is Geist Bold, the tagline Geist
+// Regular). Fetched from Google Fonts, subset to the glyphs each line uses; if
+// that fails, fall back to the default font rather than failing the build.
+async function loadGeist(weight: 400 | 700, text: string): Promise<ArrayBuffer | null> {
+  try {
+    const css = await (
+      await fetch(`https://fonts.googleapis.com/css2?family=Geist:wght@${weight}&text=${encodeURIComponent(text)}`)
+    ).text();
+    const url = css.match(/src: url\((.+?)\) format\('(?:opentype|truetype)'\)/)?.[1];
+    if (!url) return null;
+    return await (await fetch(url)).arrayBuffer();
+  } catch {
+    return null;
+  }
+}
+
+export default async function Image() {
+  const [geistBold, geistRegular] = await Promise.all([
+    loadGeist(700, "ultralink"),
+    loadGeist(400, siteConfig.tagline),
+  ]);
+  const fonts = [
+    ...(geistBold ? [{ name: "Geist", data: geistBold, style: "normal" as const, weight: 700 as const }] : []),
+    ...(geistRegular ? [{ name: "Geist", data: geistRegular, style: "normal" as const, weight: 400 as const }] : []),
+  ];
+
   return new ImageResponse(
     <div
       style={{
@@ -30,11 +57,20 @@ export default function Image() {
     >
       <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
         {/* next/og's ImageResponse renders via Satori, not the browser DOM — next/image doesn't apply */}
-        <img src={ICON_DATA_URI} width={72} height={72} alt="" />
-        <span style={{ color: "#ffffff", fontSize: 96, fontWeight: 600, letterSpacing: "-0.03em" }}>ultralink</span>
+        <img src={ICON_DATA_URI} width={84} height={84} alt="" />
+        <span
+          style={{ color: "#ffffff", fontSize: 104, fontFamily: "Geist", fontWeight: 700, letterSpacing: "-0.05em" }}
+        >
+          ultralink
+        </span>
       </div>
-      <div style={{ display: "flex", color: "#9A9A9A", fontSize: 34, marginTop: 28 }}>{siteConfig.tagline}</div>
+      <div style={{ display: "flex", color: "#9A9A9A", fontSize: 34, fontWeight: 400, marginTop: 28 }}>
+        {siteConfig.tagline}
+      </div>
     </div>,
-    { ...size },
+    {
+      ...size,
+      fonts: fonts.length ? fonts : undefined,
+    },
   );
 }

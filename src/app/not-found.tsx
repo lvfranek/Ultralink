@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { SiteShell } from "@/components/marketing/landing/shell";
-import { serifDisplay } from "@/components/marketing/landing/fonts";
 import s from "@/components/marketing/landing/landing.module.css";
 
 export const metadata: Metadata = {
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
 // bio page), in the same frame as the rest of the marketing site.
 export default function NotFound() {
   return (
-    <div className={serifDisplay.variable}>
+    <>
       <SiteShell>
         <main id="main" className={s.notFound}>
           <div className={s.aurora} aria-hidden="true">
@@ -39,6 +38,6 @@ export default function NotFound() {
           </div>
         </main>
       </SiteShell>
-    </div>
+    </>
   );
 }

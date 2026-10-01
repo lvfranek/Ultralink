@@ -9,12 +9,23 @@ import {
   DM_Sans,
   Cormorant,
   Bebas_Neue,
+  Instrument_Serif,
 } from "next/font/google";
 import "./globals.css";
 
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist",
+  display: "swap",
+});
+
+// Italic serif accent: the "link" in the logo wordmark and the accent words in
+// marketing headlines. The logo appears on every page, so it stays preloaded.
+const serifDisplay = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: "italic",
+  variable: "--font-serif-display",
   display: "swap",
 });
 
@@ -91,10 +102,15 @@ export const metadata: Metadata = {
   },
   description: "The premium link-in-bio platform for creators and agencies. Fast pages and real analytics.",
   metadataBase: new URL("https://ultralink.bio"),
+  // New file names on purpose: /favicon/favicon.png doubles as the default avatar
+  // of new link pages (NEW_PAGE_AVATAR_URL), so it must not change with the logo.
   icons: {
-    icon: "/favicon/favicon.png",
-    shortcut: "/favicon/favicon.ico",
-    apple: "/favicon/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon/ultralink-icon.svg", type: "image/svg+xml" },
+      { url: "/favicon/ultralink-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: "/favicon/ultralink.ico",
+    apple: "/favicon/ultralink-apple-touch-icon.png",
   },
   openGraph: {
     siteName: "Ultralink",
@@ -120,6 +136,7 @@ export default function RootLayout({
       lang="en"
       className={[
         geist.variable,
+        serifDisplay.variable,
         inter.variable,
         playfair.variable,
         poppins.variable,

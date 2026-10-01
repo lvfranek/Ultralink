@@ -1,12 +1,11 @@
 import type { ReactNode } from "react";
 import { SiteShell } from "./shell";
-import { serifDisplay } from "./fonts";
 import s from "./landing.module.css";
 
 /** Frame for Privacy, Terms and Imprint: site nav and footer around a readable text column. */
 export function LegalLayout({ title, intro, children }: { title: string; intro: ReactNode; children: ReactNode }) {
   return (
-    <div className={serifDisplay.variable}>
+    <>
       {/* Invisible until focused with Tab — lets keyboard users jump past the menu */}
       <a
         href="#main"
@@ -32,6 +31,6 @@ export function LegalLayout({ title, intro, children }: { title: string; intro: 
           <div className={`dark-theme ${s.legalBody}`}>{children}</div>
         </main>
       </SiteShell>
-    </div>
+    </>
   );
 }

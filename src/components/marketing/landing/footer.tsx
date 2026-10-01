@@ -36,7 +36,7 @@ export function Footer({ home }: { home: boolean }) {
     <footer className={s.footer}>
       <div className={s.footerTop}>
         <div className={s.footerBrand}>
-          <Logo onDark capitalized href={home ? "#top" : "/"} />
+          <Logo onDark href={home ? "#top" : "/"} />
           <p>Send your audience anywhere, track every click, and keep full control of your traffic.</p>
         </div>
         <div className={s.footerCols}>

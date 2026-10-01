@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { serifDisplay } from "@/components/marketing/landing/fonts";
 import { SiteShell } from "@/components/marketing/landing/shell";
 import { HelpCenter } from "@/components/marketing/help-center";
 
@@ -12,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function HelpPage() {
   return (
-    <div className={serifDisplay.variable}>
+    <>
       {/* Invisible until focused with Tab — lets keyboard users jump past the menu */}
       <a
         href="#main"
@@ -25,6 +24,6 @@ export default function HelpPage() {
           <HelpCenter />
         </main>
       </SiteShell>
-    </div>
+    </>
   );
 }

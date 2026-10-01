@@ -32,7 +32,7 @@ export function Nav({ home }: { home: boolean }) {
   return (
     <header className={cx(s.nav, (scrolled || menuOpen) && s.navScrolled)}>
       <div className={s.navInner}>
-        <Logo onDark capitalized href={home ? "#top" : "/"} />
+        <Logo onDark href={home ? "#top" : "/"} />
         <nav className={s.navLinks} aria-label="Primary">
           {SECTIONS.map((l) => (
             <a key={l.href} href={base + l.href}>

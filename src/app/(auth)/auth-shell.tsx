@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { PhoneMockup } from "@/components/marketing/phone-mockup";
-import { serifDisplay } from "@/components/marketing/landing/fonts";
 import site from "@/components/marketing/landing/landing.module.css";
 import s from "./auth-shell.module.css";
 
@@ -39,12 +38,12 @@ export function AuthShell({
   previewUsername?: string;
 }) {
   return (
-    <div className={`${site.root} ${serifDisplay.variable}`}>
+    <div className={site.root}>
       <div className={site.noise} aria-hidden="true" />
       <div className={s.layout}>
         <div className={s.formCol}>
           <div className={s.topBar}>
-            <Logo href="/" onDark capitalized />
+            <Logo href="/" onDark />
             <Link href="/" className={s.back}>
               <ArrowLeft size={15} aria-hidden="true" />
               Back to home

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { serifDisplay } from "@/components/marketing/landing/fonts";
 import { Landing } from "@/components/marketing/landing/landing";
 
 // Title/description/openGraph are already the root layout's defaults —
@@ -14,8 +13,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    // No overflow clipping here — it would break the sticky "How it works" story
-    <div className={serifDisplay.variable}>
+    <>
       {/* Invisible until focused with Tab — lets keyboard users jump past the menu */}
       <a
         href="#main"
@@ -24,6 +22,6 @@ export default function HomePage() {
         Skip to main content
       </a>
       <Landing />
-    </div>
+    </>
   );
 }
